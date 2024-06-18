@@ -34,6 +34,8 @@ class _EmergencyViewState extends State<EmergencyView> {
   BitmapDescriptor? _customIcon;
   List<LatLng> polylineCoordinates = [];
   PolylinePoints polylinePoints = PolylinePoints();
+  bool isMenujuLokasi = true; // Initial state for isMenujuLokasi
+  bool isLoading = false; // Initial state for isLoading
 
   @override
   void initState() {
@@ -41,8 +43,7 @@ class _EmergencyViewState extends State<EmergencyView> {
     _checkPermissions();
     _loadCustomIcon();
   }
-  late double latitude ;
-  late double longitude;
+
   Future<void> _loadCustomIcon() async {
     _customIcon = await BitmapDescriptor.fromAssetImage(
       const ImageConfiguration(size: Size(30, 30)),
@@ -104,24 +105,53 @@ class _EmergencyViewState extends State<EmergencyView> {
       'YOUR_API_KEY', // Ganti dengan API key Google Maps Anda
       PointLatLng(startLatitude, startLongitude),
       PointLatLng(endLatitude, endLongitude),
-      travelMode: TravelMode.driving, // Mode perjalanan bisa diganti dengan walking, bicycling, atau transit
+      travelMode: TravelMode.driving,
     );
 
     if (result.status == 'OK') {
+      polylineCoordinates.clear();
       result.points.forEach((PointLatLng point) {
         polylineCoordinates.add(LatLng(point.latitude, point.longitude));
       });
 
       setState(() {
-        _polylines.add(Polyline(
-          polylineId: PolylineId('polyline_id'),
-          color: Colors.blue,
-          points: polylineCoordinates,
-          width: 3,
-        ));
+        _polylines = [
+          Polyline(
+            polylineId: PolylineId('polyline_id'),
+            color: Colors.blue,
+            points: polylineCoordinates,
+            width: 5,
+          ),
+        ];
       });
+
+      _moveCameraToPolyline();
     } else {
       print('Error: ${result.errorMessage}');
+    }
+  }
+
+  void _moveCameraToPolyline() {
+    if (polylineCoordinates.isNotEmpty) {
+      LatLngBounds bounds;
+      if (polylineCoordinates.length == 1) {
+        bounds = LatLngBounds(
+          southwest: polylineCoordinates.first,
+          northeast: polylineCoordinates.first,
+        );
+      } else {
+        bounds = LatLngBounds(
+          southwest: LatLng(
+            polylineCoordinates.map((p) => p.latitude).reduce((a, b) => a < b ? a : b),
+            polylineCoordinates.map((p) => p.longitude).reduce((a, b) => a < b ? a : b),
+          ),
+          northeast: LatLng(
+            polylineCoordinates.map((p) => p.latitude).reduce((a, b) => a > b ? a : b),
+            polylineCoordinates.map((p) => p.longitude).reduce((a, b) => a > b ? a : b),
+          ),
+        );
+      }
+      _controller.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50));
     }
   }
 
@@ -131,18 +161,10 @@ class _EmergencyViewState extends State<EmergencyView> {
 
   String _calculateTravelTime(double distance) {
     const averageSpeed = 50.0; // Average speed in km/h
-    double timeInHours = distance / averageSpeed; // Time in hours
+    double timeInHours = distance / averageSpeed;
     int hours = timeInHours.floor();
     int minutes = ((timeInHours - hours) * 60).round();
     return '${hours} jam ${minutes} menit';
-  }
-
-  void _moveCamera(double lat, double lng) {
-    _controller.animateCamera(
-      CameraUpdate.newLatLng(
-        LatLng(lat, lng),
-      ),
-    );
   }
 
   Future<void> _updateEstimatedTime(double destinationLat, double destinationLng) async {
@@ -163,9 +185,7 @@ class _EmergencyViewState extends State<EmergencyView> {
       });
     }
   }
-  late final String phoneNumber;
-  bool isLoading = false;
-  bool isMenujuLokasi = true;
+
   void _launchPhoneCall(String phoneNumber) async {
     final Uri phoneLaunchUri = Uri(scheme: 'tel', path: phoneNumber);
 
@@ -184,7 +204,6 @@ class _EmergencyViewState extends State<EmergencyView> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     final Map<String, dynamic>? arguments = Get.arguments as Map<String, dynamic>?;
@@ -198,6 +217,7 @@ class _EmergencyViewState extends State<EmergencyView> {
 
     _updateEstimatedTime(latitude, longitude);
     final Map args = Get.arguments;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -243,139 +263,134 @@ class _EmergencyViewState extends State<EmergencyView> {
       )
           : Stack(
         children: [
-        GoogleMap(
-        mapType: MapType.terrain,
-        zoomGesturesEnabled: true,
-        mapToolbarEnabled: true,
-        compassEnabled: true,
-        zoomControlsEnabled: true,
-        myLocationEnabled: true,
-        myLocationButtonEnabled: true,
-        polylines: Set<Polyline>.of(_polylines),
-        onMapCreated: (controller) {
-          _controller = controller;
+          GoogleMap(
+            mapType: MapType.terrain,
+            zoomGesturesEnabled: true,
+            mapToolbarEnabled: true,
+            compassEnabled: true,
+            zoomControlsEnabled: true,
+            myLocationEnabled: true,
+            myLocationButtonEnabled: true,
+            polylines: Set<Polyline>.of(_polylines),
+            onMapCreated: (controller) {
+              _controller = controller;
 
-          // Tambahkan marker pada posisi log dan leng dari API
-          setState(() {
-            _markers.add(
-              Marker(
-                markerId: const MarkerId('apiLocation'),
-                position: LatLng(latitude, longitude),
-                icon: _customIcon ?? BitmapDescriptor.defaultMarker,
-              ),
-            );
-          });
+              // Tambahkan marker pada posisi log dan leng dari API
+              setState(() {
+                _markers.add(
+                  Marker(
+                    markerId: const MarkerId('apiLocation'),
+                    position: LatLng(latitude, longitude),
+                    icon: _customIcon ?? BitmapDescriptor.defaultMarker,
+                  ),
+                );
+              });
 
-          // Dapatkan polyline ke tujuan
-          double destinationLatitude = 0.0; // Ganti dengan latitude tujuan
-          double destinationLongitude = 0.0; // Ganti dengan longitude tujuan
-          _getPolyline(
-            latitude,
-            longitude,
-            destinationLatitude,
-            destinationLongitude,
-          );
-        },
-        initialCameraPosition: CameraPosition(
-          target: LatLng(latitude, longitude),
-          zoom: 14,
-        ),
-        markers: Set<Marker>.of(_markers),
-        padding: const EdgeInsets.only(bottom: 240),
-      ),
-      SlidingUpPanel(
-        controller: _panelController,
-        panel: _buildSlidingPanel(),
-        minHeight: 230,
-        maxHeight: MediaQuery.of(context).size.height * 0.9,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        parallaxEnabled: true,
-        parallaxOffset: 0.5,
-      ),
-      Align(
-        alignment: Alignment.bottomCenter,
-        child: BottomAppBar(
-          height: 65,
-          elevation: 0,
-          color: Colors.white,
-          shape: const CircularNotchedRectangle(),
-          child: Container(
-            width: double.infinity,
-            color: Colors.white,
-            child:
-          ElevatedButton(
-                      onPressed: () async {
-                        setState(() {
-                          isLoading = true;
-                        });
-                        String idKaryawan = GetStorage().read('idKaryawan') ?? '';
-                        try {
-                          if (isMenujuLokasi) {
-                            var response = await API.MenujudiLokasiID(
-                              idkaryawan: idKaryawan,
-                              kodebooking: args['kode_booking'] ?? '',
-                              kodepelanggan: args['tipe_svc'] ?? '',
-                              kodekendaraan: args['kode_kendaraan'] ?? '',
-                            );
-                            if (response.success == true) {  // Asumsi response memiliki field 'status'
-                              setState(() {
-                                isMenujuLokasi = false;
-                              });
-                            }
-                          } else {
-                            var response = await API.TibadiLokasiID(
-                              idkaryawan: idKaryawan,
-                              kodebooking: args['kode_booking'] ?? '',
-                              kodepelanggan: args['tipe_svc'] ?? '',
-                              kodekendaraan: args['kode_kendaraan'] ?? '',
-                            );
-                          }
-                        } catch (e) {
-                          // Handle error
-                          print('Error: $e');
-                        } finally {
+              // Dapatkan polyline ke tujuan
+              _getPolyline(
+                _currentPosition!.latitude,
+                _currentPosition!.longitude,
+                latitude,
+                longitude,
+              );
+            },
+            initialCameraPosition: CameraPosition(
+              target: LatLng(latitude, longitude),
+              zoom: 14,
+            ),
+            markers: Set<Marker>.of(_markers),
+            padding: const EdgeInsets.only(bottom: 240),
+          ),
+          SlidingUpPanel(
+            controller: _panelController,
+            panel: _buildSlidingPanel(),
+            minHeight: 230,
+            maxHeight: MediaQuery.of(context).size.height * 0.9,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            parallaxEnabled: true,
+            parallaxOffset: 0.5,
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: BottomAppBar(
+              height: 65,
+              elevation: 0,
+              color: Colors.white,
+              shape: const CircularNotchedRectangle(),
+              child: Container(
+                width: double.infinity,
+                color: Colors.white,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    setState(() {
+                      isLoading = true;
+                    });
+                    String idKaryawan = GetStorage().read('idKaryawan') ?? '';
+                    try {
+                      if (isMenujuLokasi) {
+                        var response = await API.MenujudiLokasiID(
+                          idkaryawan: idKaryawan,
+                          kodebooking: args['kode_booking'] ?? '',
+                          kodepelanggan: args['tipe_svc'] ?? '',
+                          kodekendaraan: args['kode_kendaraan'] ?? '',
+                        );
+                        if (response.success == true) {
                           setState(() {
-                            isLoading = false;
+                            isMenujuLokasi = false;
                           });
                         }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: isMenujuLokasi ? Colors.blue : Colors.green,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
+                      } else {
+                        var response = await API.TibadiLokasiID(
+                          idkaryawan: idKaryawan,
+                          kodebooking: args['kode_booking'] ?? '',
+                          kodepelanggan: args['tipe_svc'] ?? '',
+                          kodekendaraan: args['kode_kendaraan'] ?? '',
+                        );
+                      }
+                    } catch (e) {
+                      print('Error: $e');
+                    } finally {
+                      setState(() {
+                        isLoading = false;
+                      });
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: isMenujuLokasi ? Colors.blue : Colors.green,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: isLoading
+                      ? Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      CircularProgressIndicator(
+                        color: Colors.white,
                       ),
-                      child: isLoading
-                          ? Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          CircularProgressIndicator(
-                            color: Colors.white,
-                          ),
-                          SizedBox(width: 10),
-                          Text(
-                            'Loading...',
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      )
-                          : Text(
-                        isMenujuLokasi ? 'Menuju lokasi' : 'Tiba dilokasi',
-                        style: const TextStyle(
+                      SizedBox(width: 10),
+                      Text(
+                        'Loading...',
+                        style: TextStyle(
+                          fontSize: 11,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
                       ),
-                    ),
+                    ],
+                  )
+                      : Text(
+                    isMenujuLokasi ? 'Menuju lokasi' : 'Tiba dilokasi',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
                   ),
+                ),
               ),
-
+            ),
+          ),
         ],
       ),
     );
@@ -384,6 +399,7 @@ class _EmergencyViewState extends State<EmergencyView> {
   Widget _buildSlidingPanel() {
     final Map<String, dynamic>? arguments = Get.arguments as Map<String, dynamic>?;
     final String hp = arguments?['hp'] ?? '';
+    final String location = arguments?['location'] ?? '';
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -407,37 +423,47 @@ class _EmergencyViewState extends State<EmergencyView> {
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 10,),
-                Container(
-                  margin: EdgeInsets.only(right: 100, left: 100),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
-                        spreadRadius: 5,
-                        blurRadius: 10,
-                        offset: Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(' Directions', style: GoogleFonts.nunito(fontWeight: FontWeight.bold)),
-                      IconButton(
-                        icon: Icon(Icons.directions),
-                        onPressed: () async {
-                          final String googleMapsUrl = "https://www.google.com/maps/dir/?api=1&destination=$LatLng&travelmode=driving";
-                          if (await canLaunch(googleMapsUrl)) {
-                            await launch(googleMapsUrl);
-                          } else {
-                            throw 'Could not launch $googleMapsUrl';
-                          }
-                        },
-                      ),
-                    ],
+                InkWell(
+                  onTap: () async {
+                    final String googleMapsUrl = "https://www.google.com/maps/dir/?api=1&destination=$location&travelmode=driving";
+                    if (await canLaunch(googleMapsUrl)) {
+                      await launch(googleMapsUrl);
+                    } else {
+                      throw 'Could not launch $googleMapsUrl';
+                    }
+                  },
+                  child: Container(
+                    margin: EdgeInsets.only(right: 100, left: 100),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.1),
+                          spreadRadius: 5,
+                          blurRadius: 10,
+                          offset: Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(' Directions', style: GoogleFonts.nunito(fontWeight: FontWeight.bold)),
+                        IconButton(
+                          icon: Icon(Icons.directions),
+                          onPressed: () async {
+                            final String googleMapsUrl = "https://www.google.com/maps/dir/?api=1&destination=$location&travelmode=driving";
+                            if (await canLaunch(googleMapsUrl)) {
+                              await launch(googleMapsUrl);
+                            } else {
+                              throw 'Could not launch $googleMapsUrl';
+                            }
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 SizedBox(height: 10,),
@@ -451,6 +477,4 @@ class _EmergencyViewState extends State<EmergencyView> {
       ],
     );
   }
-
 }
-

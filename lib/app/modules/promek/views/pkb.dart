@@ -9,6 +9,7 @@ import 'package:search_page/search_page.dart';
 import '../../../componen/loading_cabang_shimmer.dart';
 import '../../../componen/loading_search_shimmer.dart';
 import '../../../componen/loading_shammer_booking.dart';
+import '../../../componen/loading_shammer_history.dart';
 import '../../../data/data_endpoint/pkb.dart';
 import '../../../data/data_endpoint/profile.dart';
 import '../../../data/endpoint.dart';
@@ -264,7 +265,7 @@ class _PKBlistState extends State<PKBlist>
                 future: API.PKBID(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator());
+                    return Center(child: Loadingshammer());
                   } else if (snapshot.hasError) {
                     return Center(child: Text('Error: ${snapshot.error}'));
                   } else if (!snapshot.hasData ||
