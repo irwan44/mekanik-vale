@@ -12,7 +12,7 @@ import '../../../routes/app_pages.dart';
 class HomeController extends GetxController {
   var selectedIndex = 0.obs;
   final PageController pageController = PageController();
-
+  final TextEditingController catatan = TextEditingController();
   void changeTabIndex(int index) {
     selectedIndex.value = index;
     pageController.jumpToPage(index);

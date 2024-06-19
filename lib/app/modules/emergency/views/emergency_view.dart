@@ -101,6 +101,7 @@ class _EmergencyViewState extends State<EmergencyView> {
   }
 
   Future<void> _getPolyline(double startLatitude, double startLongitude, double endLatitude, double endLongitude) async {
+    print('Getting polyline...');
     PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
       'YOUR_API_KEY', // Ganti dengan API key Google Maps Anda
       PointLatLng(startLatitude, startLongitude),
@@ -186,31 +187,12 @@ class _EmergencyViewState extends State<EmergencyView> {
     }
   }
 
-  void _launchPhoneCall(String phoneNumber) async {
-    final Uri phoneLaunchUri = Uri(scheme: 'tel', path: phoneNumber);
-
-    try {
-      if (await canLaunch(phoneLaunchUri.toString())) {
-        await launch(phoneLaunchUri.toString());
-      } else {
-        final AndroidIntent intent = AndroidIntent(
-          action: 'action_view',
-          data: phoneLaunchUri.toString(),
-        );
-        await intent.launch();
-      }
-    } catch (e) {
-      print('Error launching phone call: $e');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final Map<String, dynamic>? arguments = Get.arguments as Map<String, dynamic>?;
     final String location = arguments?['location'] ?? '';
     final String hp = arguments?['hp'] ?? '';
 
-    // Pisahkan log dan leng dari string location
     List<String> coordinates = location.isEmpty ? [] : location.split(',');
     double latitude = coordinates.isNotEmpty ? double.parse(coordinates[0]) : 0.0;
     double longitude = coordinates.length > 1 ? double.parse(coordinates[1]) : 0.0;
@@ -275,7 +257,6 @@ class _EmergencyViewState extends State<EmergencyView> {
             onMapCreated: (controller) {
               _controller = controller;
 
-              // Tambahkan marker pada posisi log dan leng dari API
               setState(() {
                 _markers.add(
                   Marker(
@@ -285,8 +266,6 @@ class _EmergencyViewState extends State<EmergencyView> {
                   ),
                 );
               });
-
-              // Dapatkan polyline ke tujuan
               _getPolyline(
                 _currentPosition!.latitude,
                 _currentPosition!.longitude,

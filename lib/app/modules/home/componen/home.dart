@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:mekanik/app/modules/home/componen/stats_grid.dart';
+import 'package:mekanik/app/routes/app_pages.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import '../../../componen/color.dart';
 import '../../../componen/loading_cabang_shimmer.dart';
 import '../../../data/data_endpoint/profile.dart';
 import '../../../data/endpoint.dart';
+import '../absen/view_absen.dart';
 import '../controllers/home_controller.dart';
 import 'bar_chart.dart';
 
@@ -30,6 +33,7 @@ class _StatsScreenState extends State<StatsScreen> {
     super.initState();
   }
 
+
   @override
   Widget build(BuildContext context) {
     controller.checkForUpdate();
@@ -39,7 +43,11 @@ class _StatsScreenState extends State<StatsScreen> {
         centerTitle: false,
         automaticallyImplyLeading: false,
         actions: [
-          Container(
+          InkWell(
+            onTap: () {
+            Get.toNamed(Routes.AbsenView);
+            },
+      child: Container(
             padding: const EdgeInsets.all(5),
             decoration: const BoxDecoration(
               color: Colors.redAccent,
@@ -51,10 +59,10 @@ class _StatsScreenState extends State<StatsScreen> {
               Icon(Icons.warning,
               color: Colors.yellow,
               size: 18,
+                  ),
+                ],
               ),
-              ],
             ),
-
           ),
         SizedBox(width: 10,)
         ],

@@ -21,6 +21,7 @@ abstract class Routes {
   static const STARTSTOPPKB = _Paths.STARTSTOPPKB;
   static const EmergencyView = _Paths.EmergencyView;
   static const BOKING2 = _Paths.BOKING2;
+  static const AbsenView = _Paths.AbsenView;
 }
 
 abstract class _Paths {
@@ -43,4 +44,5 @@ abstract class _Paths {
   static const STARTSTOPPKB = '/startstoppkb';
   static const EmergencyView = '/EmergencyView';
   static const BOKING2 = '/BOKING2';
+  static const AbsenView = '/AbsenView';
 }

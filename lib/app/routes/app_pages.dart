@@ -15,6 +15,7 @@ import '../modules/general_checkup/bindings/general_checkup_binding.dart';
 import '../modules/general_checkup/views/general_checkup_view.dart';
 import '../modules/history/bindings/history_binding.dart';
 import '../modules/history/views/history_view.dart';
+import '../modules/home/absen/view_absen.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/componen/buttomnavigationbar.dart';
 import '../modules/profile/bindings/profile_binding.dart';
@@ -141,6 +142,12 @@ class AppPages {
       transition: Transition.downToUp,
       name: _Paths.EmergencyView,
       page: () => const EmergencyView(),
+      binding: mergencyBinding(),
+    ),
+    GetPage(
+      transition: Transition.downToUp,
+      name: _Paths.AbsenView,
+      page: () => const AbsenView(),
       binding: mergencyBinding(),
     ),
   ];

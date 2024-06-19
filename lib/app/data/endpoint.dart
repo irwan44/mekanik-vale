@@ -9,6 +9,10 @@ import 'package:mekanik/app/componen/color.dart';
 import 'package:mekanik/app/data/data_endpoint/update_keterangan.dart';
 import 'package:mekanik/app/data/publik.dart';
 import '../routes/app_pages.dart';
+import 'data_endpoint/absenhistory.dart';
+import 'data_endpoint/abseninfo.dart';
+import 'data_endpoint/absenmnasuk.dart';
+import 'data_endpoint/absenpulang.dart';
 import 'data_endpoint/approve.dart';
 import 'data_endpoint/boking.dart';
 import 'data_endpoint/bookingmasuk.dart';
@@ -70,6 +74,10 @@ class API {
   static const _getpRrosesMekanikPKB = '$_baseUrl/mekanik/pkb/get-mekanik-promek';
   static const _getpMenujuLokasi = '$_baseUrl/mekanik/menuju-lokasi';
   static const _getpTibadLokasi = '$_baseUrl/mekanik/tiba-lokasi';
+  static const _getAbsen = '$_baseUrl/mekanik/absen/insert';
+  static const _getPulang = '$_baseUrl/mekanik/absen/update';
+  static const _getdetailapsen = '$_baseUrl/mekanik/absen';
+  static const _getHistotyapsen = '$_baseUrl/mekanik/absen/history';
   static final _controller = Publics.controller;
 
 
@@ -376,7 +384,155 @@ class API {
     }
   }
   //Beda
+  // Beda
+  static Future<Absen> InfoAbsenID() async {
+    final token = Publics.controller.getToken.value ?? '';
+    var data = {"token": token};
+    try {
+      var response = await Dio().get(
+        _getdetailapsen,
+        options: Options(
+          headers: {
+            "Content-Type": "application/json",
+          },
+        ),
+        queryParameters: data,
+      );
 
+      if (response.statusCode == 404) {
+        throw Exception("Tidak ada data general checkup.");
+      }
+
+      final obj = Absen.fromJson(response.data);
+
+      if (obj.message == null) {
+        throw Exception("Data Mekanik kosong.");
+      }
+
+      return obj;
+    } catch (e) {
+      throw e;
+    }
+  }
+  //Beda
+  //Beda
+  static Future<AbsenHistory> AbsenHistoryID({
+    required String idkaryawan,
+  }) async {
+    final data = {
+      "id_karyawan": idkaryawan,
+
+    };
+
+    try {
+      final token = Publics.controller.getToken.value ?? '';
+      print('Token: $token');
+
+      var response = await Dio().get(
+        _getHistotyapsen,
+        data: data,
+        options: Options(
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $token",
+          },
+        ),
+      );
+
+      print('Response: ${response.data}');
+
+      final obj = AbsenHistory.fromJson(response.data);
+
+      if (obj.massage == 'Invalid token: Expired') {
+        Get.offAllNamed(Routes.SIGNIN);
+        Get.snackbar(
+          obj.massage.toString(),
+          obj.massage.toString(),
+        );
+      }
+      return obj;
+    } catch (e) {
+      print('Error: $e');
+      throw e;
+    }
+  }
+  // Beda
+  //Beda
+  static Future<AbsenMasuk> AbsenMasukID({
+    required String idkaryawan,
+  }) async {
+    final data = {
+      "id_karyawan": idkaryawan,
+    };
+    try {
+      final token = Publics.controller.getToken.value ?? '';
+      print('Token: $token');
+      var response = await Dio().post(
+        _getAbsen,
+        data: data,
+        options: Options(
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $token",
+          },
+        ),
+      );
+
+      print('Response: ${response.data}');
+      final obj = AbsenMasuk.fromJson(response.data);
+      if (obj.message == 'Invalid token: Expired') {
+        Get.offAllNamed(Routes.SIGNIN);
+        Get.snackbar(
+          obj.message.toString(),
+          obj.message.toString(),
+        );
+      }
+      return obj;
+    } catch (e) {
+      print('Error: $e');
+      throw e;
+    }
+  }
+  // Beda
+//Beda
+  static Future<AbsenMasuk> AbsenPulangID({
+    required String id,
+    required String keterangan,
+  }) async {
+    final data = {
+      "id": id,
+      "keterangan": keterangan,
+    };
+    try {
+      final token = Publics.controller.getToken.value ?? '';
+      print('Token: $token');
+      var response = await Dio().post(
+        _getPulang,
+        data: data,
+        options: Options(
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $token",
+          },
+        ),
+      );
+
+      print('Response: ${response.data}');
+      final obj = AbsenMasuk.fromJson(response.data);
+      if (obj.message == 'Invalid token: Expired') {
+        Get.offAllNamed(Routes.SIGNIN);
+        Get.snackbar(
+          obj.message.toString(),
+          obj.message.toString(),
+        );
+      }
+      return obj;
+    } catch (e) {
+      print('Error: $e');
+      throw e;
+    }
+  }
+  //Beda
 //Beda
   static Future<Estimasi> estimasiId({
     required String idkaryawan,
