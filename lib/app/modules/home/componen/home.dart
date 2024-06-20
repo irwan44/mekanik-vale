@@ -6,8 +6,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:mekanik/app/modules/home/componen/stats_grid.dart';
 import 'package:mekanik/app/routes/app_pages.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 import '../../../componen/color.dart';
 import '../../../componen/loading_cabang_shimmer.dart';
+import '../../../data/data_endpoint/abseninfo.dart';
 import '../../../data/data_endpoint/profile.dart';
 import '../../../data/endpoint.dart';
 import '../absen/view_absen.dart';
@@ -47,22 +50,60 @@ class _StatsScreenState extends State<StatsScreen> {
             onTap: () {
             Get.toNamed(Routes.AbsenView);
             },
-      child: Container(
-            padding: const EdgeInsets.all(5),
-            decoration: const BoxDecoration(
-              color: Colors.redAccent,
-              borderRadius: BorderRadius.all(Radius.circular(10))
-            ),
-            child: const Row( children: [
-              Text('Anda belum Absen', style: TextStyle(color: Colors.white,  fontWeight: FontWeight.bold),),
-              SizedBox(width: 10,),
-              Icon(Icons.warning,
-              color: Colors.yellow,
-              size: 18,
+      child:  FutureBuilder<Absen>(
+        future: API.InfoAbsenID(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const CircularProgressIndicator();
+          } else if (snapshot.hasError) {
+            return Text('Error: ${snapshot.error}');
+          } else {
+            if (snapshot.data != null) {
+              final absen = snapshot.data!.dataAbsen?.tglAbsen ?? "";
+              if (absen.isNotEmpty) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 10,),
+                    Container(
+                      padding: const EdgeInsets.all(5),
+                      decoration: const BoxDecoration(
+                        color: Colors.green,
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                      ),
+                      child: const Row(
+                        children: [
+                          Text('Anda Sudah Absen', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
+                          SizedBox(width: 10,),
+                          Icon(Icons.celebration_rounded, color: Colors.yellow, size: 18,),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              } else {
+                return   Container(
+                  padding: const EdgeInsets.all(5),
+                  decoration: const BoxDecoration(
+                    color: Colors.redAccent,
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
                   ),
-                ],
-              ),
-            ),
+                  child: const Row(
+                    children: [
+                      Text('Anda Belum Absen', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
+                      SizedBox(width: 10,),
+                      Icon(Icons.celebration_rounded, color: Colors.yellow, size: 18,),
+                    ],
+                  ),
+                );
+              }
+            } else {
+              return const Text('Tidak ada data');
+            }
+          }
+        },
+      ),
           ),
         SizedBox(width: 10,)
         ],

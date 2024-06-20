@@ -64,6 +64,14 @@ class HistoryAbsensi extends StatelessWidget {
                 ],
               ),
               SizedBox(height: 8.0),
+              Text(
+                'Keterangan :',
+                style: TextStyle(fontSize: 16.0, color: MyColors.appPrimaryColor),
+              ),
+              Text(
+                items.keterangan ?? '',
+                style: TextStyle(fontSize: 16.0),
+              ),
               Divider(),
             ],
           ),

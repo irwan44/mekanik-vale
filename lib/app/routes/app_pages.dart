@@ -12,6 +12,7 @@ import '../modules/detail_history/views/detail_history_view.dart';
 import '../modules/emergency/bindings/emergency_binding.dart';
 import '../modules/emergency/views/emergency_view.dart';
 import '../modules/general_checkup/bindings/general_checkup_binding.dart';
+import '../modules/general_checkup/componen/startstop/startstop_p2h.dart';
 import '../modules/general_checkup/views/general_checkup_view.dart';
 import '../modules/history/bindings/history_binding.dart';
 import '../modules/history/views/history_view.dart';
@@ -81,7 +82,7 @@ class AppPages {
     GetPage(
       transition: Transition.downToUp,
       name: _Paths.GENERAL_CHECKUP,
-      page: () => GeneralCheckupView(),
+      page: () => StartStopViewG2H(),
       binding: GeneralCheckupBinding(),
     ),
     GetPage(

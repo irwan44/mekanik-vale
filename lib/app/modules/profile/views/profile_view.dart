@@ -62,7 +62,8 @@ class _ProfileViewState extends State<ProfileView> {
   @override
   Widget build(BuildContext context) {
     controller.checkForUpdate();
-    return Scaffold(
+    return
+      Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
         surfaceTintColor: Colors.transparent,

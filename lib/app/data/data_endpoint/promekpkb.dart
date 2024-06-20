@@ -1,5 +1,5 @@
 class PromePKB {
-  int? status; // Changed from bool? to int?
+  int? status;
   String? message;
 
   PromePKB({this.status, this.message});

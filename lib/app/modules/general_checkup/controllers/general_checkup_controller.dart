@@ -30,6 +30,10 @@ class GeneralCheckupController extends GetxController {
   late String kendaraan;
   final TextEditingController odometer = TextEditingController(text: '');
   final TextEditingController mekanik = TextEditingController();
+  void setInitialValues(Map args) {
+    mesin.text = args['no_mesin'] ?? '';
+    odometer.text = args['odometer'] ?? '';
+  }
 
   void setData({
     required String id,

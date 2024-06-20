@@ -42,14 +42,14 @@ class DataPromek {
   String? hp;
   String? email;
   String? posisi;
-  String? group;
+  Null? group;
   int? useApp;
   int? deleted;
   String? createdBy;
   String? createdAt;
   String? updatedAt;
   int? cabangId;
-  String? companyId;
+  Null? companyId;
 
   DataPromek(
       {this.promekId,

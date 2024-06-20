@@ -25,6 +25,7 @@ import 'data_endpoint/kategory.dart';
 import 'data_endpoint/login.dart';
 import 'data_endpoint/mekanik.dart';
 import 'data_endpoint/mekanik_pkb.dart';
+import 'data_endpoint/mekanikp2h.dart';
 import 'data_endpoint/mekanikpromekid.dart';
 import 'data_endpoint/menujulokasi.dart';
 import 'data_endpoint/pkb.dart';
@@ -51,6 +52,7 @@ class API {
   static const _getTooking = '$_baseUrl/mekanik/booking';
   static const _getGeneral = '$_baseUrl/mekanik/general-checkup';
   static const _getMekanik = '$_baseUrl/mekanik/get-mekanik';
+  static const _getMekanikbaru = '$_baseUrl/mekanik/modal-promek';
   static const _postApprovek = '$_baseUrl/mekanik/approve-booking';
   static const _postUpprovek = '$_baseUrl/mekanik/unapprove-booking';
   static const _postSubmitGC = '$_baseUrl/mekanik/submit-general-checkup';
@@ -80,7 +82,7 @@ class API {
   static const _getHistotyapsen = '$_baseUrl/mekanik/absen/history';
   static final _controller = Publics.controller;
 
-
+  static final box = GetStorage();
 
   static Future<Token> login({required String email, required String password}) async {
     final data = {
@@ -106,17 +108,18 @@ class API {
           return Token(status: false);
         } else {
           final obj = Token.fromJson(responseData);
-          if (obj.token != null && obj.data!.karyawan != null) {
-            int? idKaryawan = obj.data!.karyawan!.id;
-            GetStorage().write('idKaryawan', idKaryawan);
-            LocalStorages.setToken(obj.token!);
-            Get.snackbar('Selamat Datang', 'Menkanik Bengkelly',
+          if (obj.token != null && obj.data?.karyawan?.id != null) {
+            int idKaryawan = obj.data!.karyawan!.id!;
+            box.write('idKaryawan', idKaryawan);
+            // Simpan token di local storage atau sesuai kebutuhan aplikasi Anda
+            // LocalStorages.setToken(obj.token!);
+            Get.snackbar('Selamat Datang', 'Mekanik Vale Indonesia',
                 backgroundColor: Colors.green,
                 colorText: Colors.white
             );
             Get.offAllNamed(Routes.HOME);
           } else {
-            Get.snackbar('Error', 'tidak ditemukan',
+            Get.snackbar('Error', 'Karyawan tidak ditemukan',
                 backgroundColor: const Color(0xffe5f3e7));
           }
           print('Login successful. Response data: ${obj.toJson()}');
@@ -130,6 +133,10 @@ class API {
       print('Error during login: $e');
       throw e;
     }
+  }
+
+  static int? getStoredIdKaryawan() {
+    return box.read('idKaryawan');
   }
 
 
@@ -354,32 +361,42 @@ class API {
     }
   }
   //Beda
-  static Future<Mekanik> MekanikID() async {
-    final token = Publics.controller.getToken.value ?? '';
-    var data = {"token": token};
+  static Future<MekanikP2H> MekanikID({
+    required String kodebooking,
+  }) async {
+    final data = {
+      "kode_booking": kodebooking,
+    };
+
     try {
+      final token = Publics.controller.getToken.value ?? '';
+      print('Token: $token');
+      print('kode svc : $kodebooking');
+
       var response = await Dio().get(
-        _getMekanik,
+        _getMekanikbaru,
+        data: data,
         options: Options(
           headers: {
             "Content-Type": "application/json",
+            "Authorization": "Bearer $token",
           },
         ),
-        queryParameters: data,
       );
+      print('Response: ${response.data}');
 
-      if (response.statusCode == 404) {
-        throw Exception("Tidak ada data general checkup.");
+      final obj = MekanikP2H.fromJson(response.data);
+
+      if (obj.status == 'Invalid token: Expired') {
+        Get.offAllNamed(Routes.SIGNIN);
+        Get.snackbar(
+          obj.status.toString(),
+          obj.status.toString(),
+        );
       }
-
-      final obj = Mekanik.fromJson(response.data);
-
-      if (obj.message == null) {
-        throw Exception("Data Mekanik kosong.");
-      }
-
       return obj;
     } catch (e) {
+      print('Error: $e');
       throw e;
     }
   }

@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-
-import '../../../data/data_endpoint/pkb.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
+import '../../../data/data_endpoint/detailhistory.dart';
+import '../../../data/data_endpoint/mekanik_pkb.dart';
+import '../../../data/endpoint.dart';
+import '../controllers/promek_controller.dart';
 
 class CardDetailPKB extends StatefulWidget {
   const CardDetailPKB({Key? key}) : super(key: key);
@@ -12,21 +16,19 @@ class CardDetailPKB extends StatefulWidget {
 }
 
 class _CardDetailPKBState extends State<CardDetailPKB> {
-  late Map<String, dynamic> args;
-  late List<Jasa> jasaList;
+  final PromekController controller = Get.put(PromekController());
+  late RefreshController _refreshController;
 
   @override
   void initState() {
+    _refreshController = RefreshController();
     super.initState();
-    args = Get.arguments as Map<String, dynamic>;
-
-    // Retrieve jasa data from args and convert it to List<Jasa>
-    List<dynamic> jasaData = args['jasa'] ?? [];
-    jasaList = jasaData.map((jasaJson) => Jasa.fromJson(jasaJson)).toList();
   }
 
   @override
   Widget build(BuildContext context) {
+    final Map args = Get.arguments;
+
     return Container(
       padding: const EdgeInsets.all(10),
       margin: const EdgeInsets.all(10),
@@ -49,7 +51,7 @@ class _CardDetailPKBState extends State<CardDetailPKB> {
             args['tipe_svc'] ?? '',
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              color: Colors.blue,
+              color: Colors.blue, // Example color
               fontSize: 18,
             ),
           ),
@@ -57,7 +59,8 @@ class _CardDetailPKBState extends State<CardDetailPKB> {
           _buildInfoRow('Tanggal & Jam PKB:', args['tgl_pkb'] ?? ''),
           _buildInfoRow('Jam Selesai:', args['jam_selesai'] ?? '-'),
           _buildInfoRow('Cabang:', args['nama_cabang'] ?? ''),
-          _buildInfoRow('Kode PKB:', args['kode_pkb'] ?? '', color: Colors.green),
+          _buildInfoRow('Kode PKB:', args['kode_pkb'] ?? '',
+              color: Colors.green),
           _buildInfoRow('Tipe Pelanggan:', args['tipe_pelanggan'] ?? ''),
           const Divider(color: Colors.grey),
           const SizedBox(height: 10),
@@ -65,12 +68,12 @@ class _CardDetailPKBState extends State<CardDetailPKB> {
             'Detail Pelanggan',
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              color: Colors.blue,
+              color: Colors.blue, // Example color
               fontSize: 16,
             ),
           ),
           _buildDetailText('Nama:', args['nama'] ?? ''),
-          _buildDetailText('No Handphone:', args['hp'] ?? ''),
+          _buildDetailText('No Handphone:', args['telp'] ?? ''),
           _buildDetailText('Alamat:', args['alamat'] ?? ''),
           const Divider(color: Colors.grey),
           const SizedBox(height: 10),
@@ -78,7 +81,7 @@ class _CardDetailPKBState extends State<CardDetailPKB> {
             'Kendaraan Pelanggan',
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              color: Colors.blue,
+              color: Colors.blue, // Example color
               fontSize: 16,
             ),
           ),
@@ -92,16 +95,74 @@ class _CardDetailPKBState extends State<CardDetailPKB> {
           const Divider(color: Colors.grey),
           _buildDetailSection('Keluhan:', args['keluhan'] ?? '-'),
           const Divider(color: Colors.grey),
-          _buildJasaSection('Jasa Service', jasaList),
           const SizedBox(height: 10),
+          Text(
+            'Jasa',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.blue, // Example color
+              fontSize: 16,
+            ),
+          ),
+          const SizedBox(height: 10),
+          FutureBuilder<MekanikPKB>(
+            future: API.MeknaikPKBID(kodesvc: args['kode_svc'] ?? ''),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}'));
+              } else {
+                final jasaList = snapshot.data?.dataJasaMekanik?.jasa ?? [];
+                if (jasaList.isEmpty) {
+                  return Container(
+                    height: 200,
+                    alignment: Alignment.center,
+                    child: Text(
+                      'Belum ada Jasa',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red, // Example color
+                      ),
+                    ),
+                  );
+                }
+                return ListView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: jasaList.length,
+                  itemBuilder: (context, index) {
+                    final jasa = jasaList[index];
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          jasa.namaJasa ?? '',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        SizedBox(height: 5),
+                        Text('Harga Jasa:  ${formatCurrency(jasa.hargaJasa)}',
+                            style: TextStyle(
+                              fontSize: 14,
+                            )),
+                        const Divider(),
+                      ],
+                    );
+                  },
+                );
+              }
+            },
+          ),
         ],
       ),
     );
   }
-
   String formatCurrency(int? amount) {
     if (amount == null) {
-      return 'Rp. -';
+      return 'Rp. -'; // or any default value you prefer for null case
     }
     var format = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp');
     return format.format(amount);
@@ -175,52 +236,4 @@ class _CardDetailPKBState extends State<CardDetailPKB> {
       ],
     );
   }
-
-  Widget _buildJasaSection(String title, List<dynamic> jasaList) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.blue,
-            fontSize: 16,
-          ),
-        ),
-        const SizedBox(height: 10),
-        jasaList.isEmpty
-            ? Text(
-          'Tidak ada jasa tersedia',
-          style: TextStyle(color: Colors.grey),
-        )
-            : Column(
-          children: jasaList.map((jasa) {
-            return Container(
-              padding: const EdgeInsets.all(5),
-              margin: const EdgeInsets.symmetric(vertical: 5),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    jasa['nama_jasa'] ?? '',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text('Kode Jasa: ${jasa['kode_jasa'] ?? ''}'),
-                  Text('Harga: ${formatCurrency(jasa['harga_jasa'] ?? 0)}'),
-                ],
-              ),
-            );
-          }).toList(),
-        ),
-      ],
-    );
-  }
-
 }
