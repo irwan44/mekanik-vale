@@ -13,6 +13,7 @@ import '../modules/emergency/bindings/emergency_binding.dart';
 import '../modules/emergency/views/emergency_view.dart';
 import '../modules/general_checkup/bindings/general_checkup_binding.dart';
 import '../modules/general_checkup/componen/startstop/startstop_p2h.dart';
+import '../modules/general_checkup/componen/step_gc.dart';
 import '../modules/general_checkup/views/general_checkup_view.dart';
 import '../modules/history/bindings/history_binding.dart';
 import '../modules/history/views/history_view.dart';
@@ -86,6 +87,12 @@ class AppPages {
       binding: GeneralCheckupBinding(),
     ),
     GetPage(
+      transition: Transition.downToUp,
+      name: _Paths.MyStepperPage,
+      page: () => MyStepperPage(),
+      binding: GeneralCheckupBinding(),
+    ),
+    GetPage(
       transition: Transition.zoom,
       name: _Paths.SPLASHCREEN,
       page: () => SplashcreenView(),
@@ -148,8 +155,8 @@ class AppPages {
     GetPage(
       transition: Transition.downToUp,
       name: _Paths.AbsenView,
-      page: () => const AbsenView(),
-      binding: mergencyBinding(),
+      page: () =>  AbsenView(),
+      binding: HomeBinding(),
     ),
   ];
 }

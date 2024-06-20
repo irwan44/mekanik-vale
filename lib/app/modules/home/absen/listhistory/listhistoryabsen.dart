@@ -53,8 +53,8 @@ class HistoryAbsensi extends StatelessWidget {
                     Text(
                       items.jamMasuk ?? '',
                       style: TextStyle(fontSize: 16.0),
-                      ),
-                    ],
+                    ),
+                  ],
                   ),
                   Icon(Icons.arrow_forward_rounded, color: MyColors.appPrimaryColor,),
                   Text(

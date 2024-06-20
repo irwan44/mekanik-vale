@@ -59,9 +59,9 @@ class _AbsenViewState extends State<AbsenView> {
     bool hasAbsenMasuk = await GetStorage().read('absen_masuk') ?? false;
     bool hasAbsenPulang = await GetStorage().read('absen_pulang') ?? false;
 
-    // Check if it's past 6 AM and user hasn't absen yet
+
     if (jakartaTime.isAfter(sixAM) && !hasAbsenMasuk) {
-      GetStorage().write('absen_masuk', false); // Ensure 'absen_masuk' exists
+      GetStorage().write('absen_masuk', false);
       hasAbsenMasuk = false;
     }
 
@@ -79,7 +79,7 @@ class _AbsenViewState extends State<AbsenView> {
     try {
       final absen = await API.InfoAbsenID();
       setState(() {
-        id = absen?.dataAbsen?.id.toString() ?? '';
+        id = absen?.dataAbsen?.id?.toString() ?? '';
         print('$id');
       });
     } catch (e) {
@@ -144,7 +144,7 @@ class _AbsenViewState extends State<AbsenView> {
                   const SizedBox(height: 20,),
                   IconButton(
                     icon: const Icon(Icons.close, color: Colors.white),
-                      onPressed: () => Navigator.of(context).pop(),
+                    onPressed: () => Navigator.of(context).pop(),
                   ),
                   const SizedBox(height: 20,),
                   Row(

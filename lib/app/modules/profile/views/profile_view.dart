@@ -11,7 +11,6 @@ import '../../../componen/ButtonSubmitWidget.dart';
 import '../../../componen/color.dart';
 import '../../../data/localstorage.dart';
 import '../../../routes/app_pages.dart';
-import '../../general_checkup/views/percobaan.dart';
 import '../../signin/screens/forget_password.dart';
 import '../../signin/screens/password_changed.dart';
 import '../controllers/profile_controller.dart';

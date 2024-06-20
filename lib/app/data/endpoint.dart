@@ -82,7 +82,6 @@ class API {
   static const _getHistotyapsen = '$_baseUrl/mekanik/absen/history';
   static final _controller = Publics.controller;
 
-  static final box = GetStorage();
 
   static Future<Token> login({required String email, required String password}) async {
     final data = {
@@ -108,18 +107,15 @@ class API {
           return Token(status: false);
         } else {
           final obj = Token.fromJson(responseData);
-          if (obj.token != null && obj.data?.karyawan?.id != null) {
-            int idKaryawan = obj.data!.karyawan!.id!;
-            box.write('idKaryawan', idKaryawan);
-            // Simpan token di local storage atau sesuai kebutuhan aplikasi Anda
-            // LocalStorages.setToken(obj.token!);
+          if (obj.token != null) {
+            LocalStorages.setToken(obj.token!);
             Get.snackbar('Selamat Datang', 'Mekanik Vale Indonesia',
                 backgroundColor: Colors.green,
                 colorText: Colors.white
             );
             Get.offAllNamed(Routes.HOME);
           } else {
-            Get.snackbar('Error', 'Karyawan tidak ditemukan',
+            Get.snackbar('Error', 'tidak ditemukan',
                 backgroundColor: const Color(0xffe5f3e7));
           }
           print('Login successful. Response data: ${obj.toJson()}');
@@ -133,10 +129,6 @@ class API {
       print('Error during login: $e');
       throw e;
     }
-  }
-
-  static int? getStoredIdKaryawan() {
-    return box.read('idKaryawan');
   }
 
 

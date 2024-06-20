@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:quickalert/models/quickalert_type.dart';
@@ -7,6 +8,7 @@ import 'package:quickalert/widgets/quickalert_dialog.dart';
 import '../../../componen/color.dart';
 import '../../../data/data_endpoint/gc_mekanik.dart';
 import '../../../data/endpoint.dart';
+import '../../../routes/app_pages.dart';
 
 class MyStepperPage extends StatefulWidget {
   const MyStepperPage({
@@ -44,6 +46,10 @@ class _MyStepperPageState extends State<MyStepperPage>
   bool isSubmitting = false;
   late String kodeBooking;
   late String kategoriKendaraanId;
+  String? nama;
+  String? nama_jenissvc;
+  String? kendaraan;
+  String? nama_tipe;
   final List<String> stepTitles = [
     'Mesin',
     'Mesin',
@@ -70,6 +76,12 @@ class _MyStepperPageState extends State<MyStepperPage>
     kategoriKendaraanId = arguments?['kategori_kendaraan_id'] ?? '';
     print('Kode Booking: $kodeBooking');
     print('kategori_kendaraan_id : $kategoriKendaraanId');
+    kodeBooking = arguments?['kode_booking'];
+    nama = arguments?['nama'];
+    kategoriKendaraanId = arguments?['kategori_kendaraan_id'] ?? '';
+    kendaraan = arguments?['kategori_kendaraan'];
+    nama_jenissvc = arguments?['nama_jenissvc'];
+    nama_tipe = arguments?['nama_tipe'];
   }
 
   @override
@@ -128,7 +140,139 @@ class _MyStepperPageState extends State<MyStepperPage>
             extendBodyBehindAppBar: false,
             appBar: AppBar(
               surfaceTintColor: Colors.transparent,
-              toolbarHeight: 0,
+              systemOverlayStyle: const SystemUiOverlayStyle(
+                statusBarColor: Colors.transparent,
+                statusBarIconBrightness: Brightness.dark,
+                statusBarBrightness: Brightness.light,
+                systemNavigationBarColor: Colors.white,
+              ),
+              title: Container(
+                child: Column(
+                  children: [
+                    const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Edit General Check UP/P2H',
+                          style:
+                          TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(
+                          width: 50,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Nama :',
+                                style: TextStyle(fontSize: 13),
+                              ),
+                              Text(
+                                nama ?? '',
+                                style: const TextStyle(
+                                    fontSize: 13, fontWeight: FontWeight.bold),
+                              ),
+                              const Text(
+                                'Kendaraan :',
+                                style: TextStyle(fontSize: 13),
+                              ),
+                              Text(
+                                nama_tipe ?? '',
+                                style: const TextStyle(
+                                    fontSize: 13, fontWeight: FontWeight.bold),
+                              ),
+                            ]),
+                        Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Jenis Service :',
+                                style: TextStyle(fontSize: 13),
+                              ),
+                              Text(
+                                nama_jenissvc ?? '',
+                                style: const TextStyle(
+                                    fontSize: 13, fontWeight: FontWeight.bold),
+                              ),
+                              const Text(
+                                'Kode Boking :',
+                                style: TextStyle(fontSize: 13),
+                              ),
+                              Text(
+                                kodeBooking ?? '',
+                                style: const TextStyle(
+                                    fontSize: 13, fontWeight: FontWeight.bold),
+                              ),
+                            ]),
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Container(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          backgroundColor: Colors.blue, // foreground
+                        ),
+                        onPressed: () {
+                          Get.toNamed(
+                            Routes.GENERAL_CHECKUP,
+                            arguments: {
+                              'kode_booking': kodeBooking,
+                              'nama': nama,
+                              'kategori_kendaraan_id': kategoriKendaraanId,
+                              'kategori_kendaraan': kendaraan,
+                              'nama_jenissvc': nama_jenissvc,
+                              'nama_tipe': nama_tipe,
+                            },
+                          );
+                          },
+                        child: const Text('Mekanik'),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                  ],
+                ),
+              ),
+              toolbarHeight: 170,
+              leading: IconButton(
+                icon: const Icon(Icons.close, color: Colors.black),
+                onPressed: () {
+                  QuickAlert.show(
+                    barrierDismissible: false,
+                    context: Get.context!,
+                    type: QuickAlertType.confirm,
+                    headerBackgroundColor: Colors.yellow,
+                    text:
+                    'Anda Harus Selesaikan dahulu General Check Up untuk keluar dari Edit General Check Up',
+                    confirmBtnText: 'Kembali',
+                    title: 'Penting !!',
+                    cancelBtnText: 'Keluar',
+                    onCancelBtnTap: () {
+                      Navigator.of(context).popUntil((route) => route.isFirst);
+                    },
+                    confirmBtnColor: Colors.green,
+                  );
+                },
+              ),
+              centerTitle: false,
+              actions: const [],
             ),
             body: SingleChildScrollView(
               child: Column(

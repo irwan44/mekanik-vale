@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:mekanik/app/routes/app_pages.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
@@ -39,17 +40,33 @@ class _StartStopViewG2HState extends State<StartStopViewG2H> with AutomaticKeepA
   List<String> idmekanikList = [];
   bool isLayoutVisible = true;
   late RefreshController _refreshController;
-
+  String? kodeBooking;
+  String? nama;
+  String? nama_jenissvc;
+  String? kategoriKendaraanId;
+  String? kendaraan;
+  String? nama_tipe;
   @override
   void initState() {
     super.initState();
+
+    args = Get.arguments;
+
+    kodeBooking = args['kode_booking'];
+    nama = args['nama'];
+    kategoriKendaraanId = args['kategori_kendaraan_id'] ?? '';
+    kendaraan = args['kategori_kendaraan'];
+    nama_jenissvc = args['nama_jenissvc'];
+    nama_tipe = args['nama_tipe'];
+
     _refreshController = RefreshController();
     additionalInputControllers.values.forEach((controller) => controller.dispose());
     _timer?.cancel();
-    args = Get.arguments;
+
     controller.setInitialValues(args);
     _loadSelectedMechanics();
   }
+
 
   @override
   bool get wantKeepAlive => true;
@@ -415,7 +432,17 @@ class _StartStopViewG2HState extends State<StartStopViewG2H> with AutomaticKeepA
                                           kodejasa: kodejasa,
                                           idmekanik: idmekanik,
                                         );
-
+                                        Get.toNamed(
+                                          Routes.MyStepperPage,
+                                          arguments: {
+                                            'kode_booking': kodeBooking,
+                                            'nama': nama,
+                                            'kategori_kendaraan_id': kategoriKendaraanId,
+                                            'kategori_kendaraan': kendaraan,
+                                            'nama_jenissvc': nama_jenissvc,
+                                            'nama_tipe': nama_tipe,
+                                          },
+                                        );
                                         if (response.status == 200) {
                                           setState(() {
                                             isStopped = !isStopped;
