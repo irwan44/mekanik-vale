@@ -46,5 +46,5 @@ abstract class _Paths {
   static const EmergencyView = '/EmergencyView';
   static const BOKING2 = '/BOKING2';
   static const AbsenView = '/AbsenView';
-  static const MyStepperPage = '/AbsenView';
+  static const MyStepperPage = '/MyStepperPage';
 }

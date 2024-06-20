@@ -58,7 +58,7 @@ class HistoryAbsensi extends StatelessWidget {
                   ),
                   Icon(Icons.arrow_forward_rounded, color: MyColors.appPrimaryColor,),
                   Text(
-                    items.jamKeluar ?? '',
+                    items.jamKeluar ?? 'Belum Pulang',
                     style: TextStyle(fontSize: 16.0),
                   ),
                 ],

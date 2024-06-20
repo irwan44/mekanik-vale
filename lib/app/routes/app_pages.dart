@@ -17,7 +17,7 @@ import '../modules/general_checkup/componen/step_gc.dart';
 import '../modules/general_checkup/views/general_checkup_view.dart';
 import '../modules/history/bindings/history_binding.dart';
 import '../modules/history/views/history_view.dart';
-import '../modules/home/absen/view_absen.dart';
+import '../modules/home/absen/absen_view.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/componen/buttomnavigationbar.dart';
 import '../modules/profile/bindings/profile_binding.dart';
@@ -155,7 +155,7 @@ class AppPages {
     GetPage(
       transition: Transition.downToUp,
       name: _Paths.AbsenView,
-      page: () =>  AbsenView(),
+      page: () =>  const AbsenView(),
       binding: HomeBinding(),
     ),
   ];

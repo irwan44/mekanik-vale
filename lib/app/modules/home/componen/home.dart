@@ -13,7 +13,6 @@ import '../../../componen/loading_cabang_shimmer.dart';
 import '../../../data/data_endpoint/abseninfo.dart';
 import '../../../data/data_endpoint/profile.dart';
 import '../../../data/endpoint.dart';
-import '../absen/view_absen.dart';
 import '../controllers/home_controller.dart';
 import 'bar_chart.dart';
 
