@@ -186,7 +186,13 @@ class _EmergencyViewState extends State<EmergencyView> {
       });
     }
   }
-
+  void _moveCamera(double latitude, double longitude) {
+    _controller.animateCamera(
+      CameraUpdate.newLatLng(
+        LatLng(latitude, longitude),
+      ),
+    );
+  }
   @override
   Widget build(BuildContext context) {
     final Map<String, dynamic>? arguments = Get.arguments as Map<String, dynamic>?;
@@ -379,6 +385,15 @@ class _EmergencyViewState extends State<EmergencyView> {
     final Map<String, dynamic>? arguments = Get.arguments as Map<String, dynamic>?;
     final String hp = arguments?['hp'] ?? '';
     final String location = arguments?['location'] ?? '';
+
+    List<String> coordinates = location.isEmpty ? [] : location.split(',');
+    double latitude = coordinates.isNotEmpty
+        ? double.parse(coordinates[0])
+        : 0.0;
+    double longitude = coordinates.length > 1
+        ? double.parse(coordinates[1])
+        : 0.0;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -391,6 +406,12 @@ class _EmergencyViewState extends State<EmergencyView> {
             borderRadius: BorderRadius.circular(10),
           ),
         ),
+          GestureDetector(
+          onTap: () {
+            _moveCamera(latitude, longitude);
+            _panelController.close();
+    },
+    child:
         Expanded(
           child: SingleChildScrollView(
             child: Column(
@@ -447,11 +468,11 @@ class _EmergencyViewState extends State<EmergencyView> {
                 ),
                 SizedBox(height: 10,),
                 const CardEmergencyPKB(),
-                SizedBox(height: 100,),
                 // Add more CardEmergencyPKB() widgets here if needed
               ],
             ),
           ),
+        ),
         ),
       ],
     );

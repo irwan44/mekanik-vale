@@ -256,10 +256,10 @@ class _DetailHistoryViewState extends State<DetailHistoryView> {
                               return Center(child: Text('Error: ${snapshot.error}'));
                             } else if (snapshot.hasData) {
                               final dataSvcDtlJasa = snapshot.data!.dataSvcDtlJasa;
-                              // Use SizedBox to provide a specific height, or wrap with Flexible if within a Column.
                               return SizedBox(
-                                height: 160, // Set a height that works for your layout
+                                height: 760,
                                 child: ListView.builder(
+                                  physics: NeverScrollableScrollPhysics(),
                                   itemCount: dataSvcDtlJasa?.length ?? 0,
                                   itemBuilder: (context, index) {
                                     return Column(
