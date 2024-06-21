@@ -116,27 +116,7 @@ class _StartStopViewG2HState extends State<StartStopViewG2H> with AutomaticKeepA
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return WillPopScope(
-        onWillPop: () async {
-          QuickAlert.show(
-            barrierDismissible: false,
-            context: Get.context!,
-            type: QuickAlertType.confirm,
-            headerBackgroundColor: Colors.yellow,
-            text:
-            'Anda yakin akan meninggalkan General Check Up untuk keluar dari Edit P2H',
-            confirmBtnText: 'Kembali',
-            title: 'Penting !!',
-            cancelBtnText: 'Keluar',
-            onCancelBtnTap: () {
-              Navigator.of(context).popUntil((route) => route.isFirst);
-            },
-            confirmBtnColor: Colors.green,
-          );
-      return false;
-    },
-    child:
-      Scaffold(
+    return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         forceMaterialTransparency: true,
@@ -153,23 +133,7 @@ class _StartStopViewG2HState extends State<StartStopViewG2H> with AutomaticKeepA
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.close, color: Colors.black),
-          onPressed: () {
-            QuickAlert.show(
-              barrierDismissible: false,
-              context: Get.context!,
-              type: QuickAlertType.confirm,
-              headerBackgroundColor: Colors.yellow,
-              text:
-              'Anda yakin akan meninggalkan General Check Up untuk keluar dari Edit P2H',
-              confirmBtnText: 'Kembali',
-              title: 'Penting !!',
-              cancelBtnText: 'Keluar',
-              onCancelBtnTap: () {
-                Navigator.of(context).popUntil((route) => route.isFirst);
-              },
-              confirmBtnColor: Colors.green,
-            );
-          },
+          onPressed: () => Navigator.of(context).pop(),
         ),
       ),
       body:  SmartRefresher(
@@ -523,8 +487,7 @@ class _StartStopViewG2HState extends State<StartStopViewG2H> with AutomaticKeepA
 
                   }).toList(),
                 ),
-             ],
-            ),
+            ],
           ),
         ),
       ),
