@@ -1500,7 +1500,7 @@ class API {
       final token = Publics.controller.getToken.value ?? '';
       var data = {"token": token};
       var response = await Dio().get(
-        _getTooking,
+        _getHistotyapsen,
         options: Options(
           headers: {
             "Content-Type": "application/json",
@@ -1513,7 +1513,7 @@ class API {
         return;
       }
 
-      final obj = Boking.fromJson(response.data);
+      final obj = AbsenHistory.fromJson(response.data);
 
       if (obj.status == 'Invalid token: Expired') {
         Get.offAllNamed(Routes.SIGNIN);
@@ -1523,11 +1523,11 @@ class API {
         );
       }
 
-      final bookings = obj.dataBooking ?? [];
+      final bookings = obj.historyAbsen ?? [];
       final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
       for (final booking in bookings) {
-        if (booking.bookingStatus == 'Booking') {
+        if (booking.jamMasuk == 'Booking') {
           const AndroidNotificationDetails androidPlatformChannelSpecifics =
           AndroidNotificationDetails(
             'your channel id',
@@ -1541,8 +1541,8 @@ class API {
           NotificationDetails(android: androidPlatformChannelSpecifics);
           await flutterLocalNotificationsPlugin.show(
             0,
-            'Booking Masuk',
-            booking.namaService ?? '',
+            'Absen Hari ini',
+            'Anda belum Absen !!!!',
             platformChannelSpecifics,
             payload: 'item x', // optional, used for onClick event
           );

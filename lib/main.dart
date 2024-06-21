@@ -49,6 +49,9 @@ void startPollingNotifications() {
   Timer.periodic(pollingInterval, (timer) async {
     await API.showBookingNotifications();
   });
+  Timer.periodic(pollingInterval, (timer) async {
+    await API.showAbsenNotifications();
+  });
 }
 
 class MyHttpOverrides extends HttpOverrides {

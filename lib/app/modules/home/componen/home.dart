@@ -12,6 +12,7 @@ import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
 import '../../../componen/color.dart';
 import '../../../componen/loading_cabang_shimmer.dart';
+import '../../../componen/loading_search_shimmer.dart';
 import '../../../data/data_endpoint/absenhistory.dart';
 import '../../../data/data_endpoint/abseninfo.dart';
 import '../../../data/data_endpoint/profile.dart';
@@ -61,82 +62,6 @@ class _StatsScreenState extends State<StatsScreen> {
         centerTitle: false,
         automaticallyImplyLeading: false,
         actions: [
-          FutureBuilder(
-            future: API.AbsenHistoryID(idkaryawan: idkaryawan),
-            builder: (context, snapshot) {
-              if (snapshot.hasData &&
-                  snapshot.connectionState != ConnectionState.waiting &&
-                  snapshot.data != null) {
-                AbsenHistory getDataAcc = snapshot.data!;
-                final currentTime = DateTime.now();
-                HistoryAbsen? matchingAbsen;
-
-                if (getDataAcc.historyAbsen != null && getDataAcc.historyAbsen!.isNotEmpty) {
-                  for (var e in getDataAcc.historyAbsen!) {
-                    if (e.jamMasuk != null) {
-                      final timeStr = e.jamMasuk!;
-                      try {
-                        final jamMasuk = DateFormat('HH:mm').parse(timeStr); // Parse without date
-                        // Compare only hours
-                        if (jamMasuk.hour == currentTime.hour) {
-                          matchingAbsen = e;
-                          break;
-                        }
-                      } catch (e) {
-                        // Handle parsing error if necessary
-                      }
-                    }
-                  }
-                }
-
-                if (matchingAbsen != null) {
-                  final timeStr = matchingAbsen.jamMasuk!;
-                  final jamMasuk = DateFormat('HH:mm').parse(timeStr); // Parse without date
-
-                  return Column(
-                    children: AnimationConfiguration.toStaggeredList(
-                      duration: const Duration(milliseconds: 475),
-                      childAnimationBuilder: (widget) => SlideAnimation(
-                        child: FadeInAnimation(
-                          child: widget,
-                        ),
-                      ),
-                      children: [
-                        HistoryAbsensiIndikator(
-                          items: matchingAbsen,
-                          jamMasuk: DateFormat('HH:mm').format(jamMasuk),
-                        ),
-                      ],
-                    ),
-                  );
-                } else {
-                  return Container(
-                    padding: const EdgeInsets.all(5),
-                    decoration: const BoxDecoration(
-                      color: Colors.redAccent,
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                    ),
-                    child: const Row(
-                      children: [
-                        Text('Anda Belum Absen', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
-                        SizedBox(width: 10,),
-                        Icon(Icons.celebration_rounded, color: Colors.yellow, size: 18,),
-                      ],
-                    ),
-                  );
-                }
-              } else {
-                return SizedBox(
-                  height: Get.height - 250,
-                  child: const SingleChildScrollView(
-                    child: Column(
-                      children: [],
-                    ),
-                  ),
-                );
-              }
-            },
-          ),
           InkWell(
             onTap: () {
             Get.toNamed(Routes.AbsenView);
@@ -145,7 +70,7 @@ class _StatsScreenState extends State<StatsScreen> {
         future: API.InfoAbsenID(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircularProgressIndicator();
+            return const loadsearch();
           } else if (snapshot.hasError) {
             return Text('Error: ${snapshot.error}');
           } else {
