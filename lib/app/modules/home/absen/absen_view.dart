@@ -16,6 +16,7 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
 
+import 'listhistory/absensekarang.dart';
 import 'listhistory/listhistoryabsen.dart';
 
 class AbsenView extends StatefulWidget {
@@ -53,7 +54,7 @@ class _AbsenViewState extends State<AbsenView> {
       final response = await API.AbsenHistoryID(idkaryawan: idkaryawan);
       if (response.historyAbsen != null && response.historyAbsen!.isNotEmpty) {
         final lastAbsen = response.historyAbsen!.last;
-        final absenDateStr = lastAbsen.tglAbsen ?? ''; // Provide a default empty string if null
+        final absenDateStr = lastAbsen.tglAbsen ?? '';
         if (absenDateStr.isNotEmpty) {
           final absenDate = DateFormat('yyyy-MM-dd').parse(absenDateStr);
           final currentDate = DateTime.now();
@@ -88,6 +89,8 @@ class _AbsenViewState extends State<AbsenView> {
       if (response.historyAbsen != null && response.historyAbsen!.isNotEmpty) {
         final lastAbsen = response.historyAbsen!.last;
         final absenDateStr = lastAbsen.tglAbsen ?? ''; // Provide a default empty string if null
+        final jamPulang = lastAbsen.jamKeluar;
+
         if (absenDateStr.isNotEmpty) {
           final absenDate = DateFormat('yyyy-MM-dd').parse(absenDateStr);
           final currentDate = DateTime.now();
@@ -96,7 +99,8 @@ class _AbsenViewState extends State<AbsenView> {
               absenDate.day == currentDate.day;
 
           setState(() {
-            isButtonDisabledpulang = isSameDay && lastAbsen.tglAbsen != null; // Ensure `jamPulang` is not null
+            // If it's the same day and jamPulang is not null, disable the button
+            isButtonDisabledpulang = isSameDay && jamPulang != null;
           });
         } else {
           setState(() {
@@ -115,6 +119,7 @@ class _AbsenViewState extends State<AbsenView> {
       });
     }
   }
+
 
   void _fetchAbsenInfo() async {
     try {
@@ -262,36 +267,69 @@ class _AbsenViewState extends State<AbsenView> {
                         const SizedBox(height: 30,),
                         const Text('Kehadiran Langsung', style: TextStyle(fontWeight: FontWeight.bold),),
                         const SizedBox(height: 10,),
-                        FutureBuilder<Absen>(
-                          future: API.InfoAbsenID(),
+                        FutureBuilder(
+                          future: API.AbsenHistoryID(idkaryawan: idkaryawan),
                           builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting) {
-                              return const CircularProgressIndicator();
-                            } else if (snapshot.hasError) {
-                              return Text('Error: ${snapshot.error}');
-                            } else {
-                              if (snapshot.data != null) {
-                                final absen = snapshot.data!.dataAbsen?.jamMasuk ?? "";
-                                if (absen.isNotEmpty) {
-                                  return Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                            if (snapshot.hasData &&
+                                snapshot.connectionState != ConnectionState.waiting &&
+                                snapshot.data != null) {
+                              AbsenHistory getDataAcc = snapshot.data!;
+                              final currentTime = DateTime.now();
+                              HistoryAbsen? matchingAbsen;
+
+                              if (getDataAcc.historyAbsen != null && getDataAcc.historyAbsen!.isNotEmpty) {
+                                for (var e in getDataAcc.historyAbsen!) {
+                                  if (e.jamMasuk != null) {
+                                    final timeStr = e.jamMasuk!;
+                                    try {
+                                      final jamMasuk = DateFormat('HH:mm').parse(timeStr); // Parse without date
+                                      // Compare only hours
+                                      if (jamMasuk.hour == currentTime.hour) {
+                                        matchingAbsen = e;
+                                        break;
+                                      }
+                                    } catch (e) {
+                                      // Handle parsing error if necessary
+                                    }
+                                  }
+                                }
+                              }
+
+                              if (matchingAbsen != null) {
+                                final timeStr = matchingAbsen.jamMasuk!;
+                                final jamMasuk = DateFormat('HH:mm').parse(timeStr); // Parse without date
+
+                                return Column(
+                                  children: AnimationConfiguration.toStaggeredList(
+                                    duration: const Duration(milliseconds: 475),
+                                    childAnimationBuilder: (widget) => SlideAnimation(
+                                      child: FadeInAnimation(
+                                        child: widget,
+                                      ),
+                                    ),
                                     children: [
-                                      Text(
-                                        absen,
-                                        style: TextStyle(fontSize: 40, color: MyColors.appPrimaryColor, fontWeight: FontWeight.bold),
+                                      HistoryAbsensiSekarang(
+                                        items: matchingAbsen,
+                                        jamMasuk: DateFormat('HH:mm').format(jamMasuk),
                                       ),
                                     ],
-                                  );
-                                } else {
-                                  return Text(
-                                    "Anda belum absen hari ini",
-                                    style: TextStyle(fontSize: 20, color: MyColors.appPrimaryColor, fontWeight: FontWeight.bold),
-                                  );
-                                }
+                                  ),
+                                );
                               } else {
-                                return const Text('Tidak ada data');
+                                return Text(
+                                  "Anda belum absen hari ini",
+                                  style: TextStyle(fontSize: 20, color: MyColors.appPrimaryColor, fontWeight: FontWeight.bold),
+                                );
                               }
+                            } else {
+                              return SizedBox(
+                                height: Get.height - 250,
+                                child: const SingleChildScrollView(
+                                  child: Column(
+                                    children: [],
+                                  ),
+                                ),
+                              );
                             }
                           },
                         ),
@@ -367,71 +405,71 @@ class _AbsenViewState extends State<AbsenView> {
                                   ),
                                 ),
                               ),
-                              ElevatedButton(
-                                onPressed: isButtonDisabledpulang ? null : () {
-                                  QuickAlert.show(
-                                    context: context,
-                                    type: QuickAlertType.warning,
-                                    barrierDismissible: true,
-                                    title: 'Absen pulang untuk hari ini',
-                                    confirmBtnText: 'Absen Pulang',
-                                    confirmBtnColor: MyColors.appPrimaryColor,
-                                    widget: TextFormField(
-                                      controller: controller.catatan,
-                                      decoration: const InputDecoration(
-                                        alignLabelWithHint: true,
-                                        hintText: 'catatan',
-                                        prefixIcon: Icon(
-                                          Icons.mail_lock_rounded,
-                                        ),
-                                      ),
-                                      textInputAction: TextInputAction.next,
-                                    ),
-                                    onConfirmBtnTap: () async {
-                                      Navigator.pop(Get.context!);
-                                      var response = await API.AbsenPulangID(
-                                          id: id,
-                                          keterangan: controller.catatan.text
-                                      );
-                                      if (response.status == 'success') {
-                                        setState(() {
-                                          isButtonDisabledpulang = true;
-                                        });
-                                        QuickAlert.show(
-                                          context: Get.context!,
-                                          type: QuickAlertType.success,
-                                          text: 'Berhasil Absen Pulang',
-                                          onConfirmBtnTap: () {
-                                            Navigator.pop(context);
-                                          },
-                                        );
-                                      } else {
-                                        QuickAlert.show(
-                                          context: Get.context!,
-                                          type: QuickAlertType.error,
-                                          text: response.message,
-                                        );
-                                      }
-                                      _initializeButtonpulangState();
-                                    },
-                                  );
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: MyColors.appPrimaryColor,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                ),
-                                child: const Text(
-                                  'Absen Pulang',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
+                    ElevatedButton(
+                      onPressed: isButtonDisabledpulang ? null : () {
+                        QuickAlert.show(
+                          context: context,
+                          type: QuickAlertType.warning,
+                          barrierDismissible: true,
+                          title: 'Absen pulang untuk hari ini',
+                          confirmBtnText: 'Absen Pulang',
+                          confirmBtnColor: MyColors.appPrimaryColor,
+                          widget: TextFormField(
+                            controller: controller.catatan,
+                            decoration: const InputDecoration(
+                              alignLabelWithHint: true,
+                              hintText: 'catatan',
+                              prefixIcon: Icon(
+                                Icons.mail_lock_rounded,
                               ),
-                            ],
+                            ),
+                            textInputAction: TextInputAction.next,
+                          ),
+                          onConfirmBtnTap: () async {
+                            Navigator.pop(Get.context!);
+                            var response = await API.AbsenPulangID(
+                                id: id,
+                                keterangan: controller.catatan.text
+                            );
+                            if (response.status == 'success') {
+                              setState(() {
+                                isButtonDisabledpulang = true;
+                              });
+                              QuickAlert.show(
+                                context: Get.context!,
+                                type: QuickAlertType.success,
+                                text: 'Berhasil Absen Pulang',
+                                onConfirmBtnTap: () {
+                                  Navigator.pop(context);
+                                },
+                              );
+                            } else {
+                              QuickAlert.show(
+                                context: Get.context!,
+                                type: QuickAlertType.error,
+                                text: response.message,
+                              );
+                            }
+                            _initializeButtonpulangState();
+                          },
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: MyColors.appPrimaryColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: const Text(
+                        'Absen Pulang',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    ],
                           ),
                         ),
                         const SizedBox(height: 10,),
@@ -484,7 +522,6 @@ class _AbsenViewState extends State<AbsenView> {
                             }
                           },
                         ),
-
                       ],
                     ),
                   ),

@@ -116,7 +116,27 @@ class _StartStopViewG2HState extends State<StartStopViewG2H> with AutomaticKeepA
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return Scaffold(
+    return WillPopScope(
+        onWillPop: () async {
+          QuickAlert.show(
+            barrierDismissible: false,
+            context: Get.context!,
+            type: QuickAlertType.confirm,
+            headerBackgroundColor: Colors.yellow,
+            text:
+            'Anda yakin akan meninggalkan General Check Up untuk keluar dari Edit P2H',
+            confirmBtnText: 'Kembali',
+            title: 'Penting !!',
+            cancelBtnText: 'Keluar',
+            onCancelBtnTap: () {
+              Navigator.of(context).popUntil((route) => route.isFirst);
+            },
+            confirmBtnColor: Colors.green,
+          );
+      return false;
+    },
+    child:
+      Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         forceMaterialTransparency: true,
@@ -133,7 +153,23 @@ class _StartStopViewG2HState extends State<StartStopViewG2H> with AutomaticKeepA
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.close, color: Colors.black),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () {
+            QuickAlert.show(
+              barrierDismissible: false,
+              context: Get.context!,
+              type: QuickAlertType.confirm,
+              headerBackgroundColor: Colors.yellow,
+              text:
+              'Anda yakin akan meninggalkan General Check Up untuk keluar dari Edit P2H',
+              confirmBtnText: 'Kembali',
+              title: 'Penting !!',
+              cancelBtnText: 'Keluar',
+              onCancelBtnTap: () {
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              },
+              confirmBtnColor: Colors.green,
+            );
+          },
         ),
       ),
       body:  SmartRefresher(
@@ -487,7 +523,8 @@ class _StartStopViewG2HState extends State<StartStopViewG2H> with AutomaticKeepA
 
                   }).toList(),
                 ),
-            ],
+             ],
+            ),
           ),
         ),
       ),
@@ -605,6 +642,17 @@ class _StartStopViewG2HState extends State<StartStopViewG2H> with AutomaticKeepA
                             kodejasa: kodejasa,
                             idmekanik: idmekanik,
 
+                          );
+                          Get.toNamed(
+                            Routes.MyStepperPage,
+                            arguments: {
+                              'kode_booking': kodeBooking,
+                              'nama': nama,
+                              'kategori_kendaraan_id': kategoriKendaraanId,
+                              'kategori_kendaraan': kendaraan,
+                              'nama_jenissvc': nama_jenissvc,
+                              'nama_tipe': nama_tipe,
+                            },
                           );
                           if (response.status == 200) {
                             setState(() {
