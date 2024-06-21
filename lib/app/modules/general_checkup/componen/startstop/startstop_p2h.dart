@@ -623,24 +623,18 @@ class _StartStopViewG2HState extends State<StartStopViewG2H> with AutomaticKeepA
                               await fetchPromekData(kodebooking, kodejasa, idmekanik);
                             }
                           } else {
-                            QuickAlert.show(
-                              context: Get.context!,
-                              type: QuickAlertType.error,
-                              title: 'Error !!',
-                              text: 'Gagal memperbarui status. Silakan coba lagi.',
-                              confirmBtnText: 'Oke',
-                              confirmBtnColor: Colors.red,
-                            );
+                            HapticFeedback.lightImpact();
+                            setState(() {
+                              const StartStopViewG2H();
+                              _refreshController.refreshCompleted();
+                            });
                           }
                         } catch (e) {
-                          QuickAlert.show(
-                            context: Get.context!,
-                            type: QuickAlertType.error,
-                            title: 'Warning',
-                            text: 'Mekanik yang anda tambah kan sudah selesai mengerjakan jasa yang anda select',
-                            confirmBtnText: 'Oke',
-                            confirmBtnColor: Colors.red,
-                          );
+                          HapticFeedback.lightImpact();
+                          setState(() {
+                            const StartStopViewG2H();
+                            _refreshController.refreshCompleted();
+                          });
                         }
                       },
                       child: Text(isStartedMap[id] == true ? 'Stop' : 'Start'),

@@ -411,9 +411,7 @@ class _EmergencyViewState extends State<EmergencyView> {
             _moveCamera(latitude, longitude);
             _panelController.close();
     },
-    child:
-        Expanded(
-          child: SingleChildScrollView(
+    child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -472,7 +470,6 @@ class _EmergencyViewState extends State<EmergencyView> {
               ],
             ),
           ),
-        ),
         ),
       ],
     );
