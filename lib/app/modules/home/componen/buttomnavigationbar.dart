@@ -62,7 +62,7 @@ class _HomeViewState extends State<HomeView> {
           : CurvedNavigationBar(
         key: _bottomNavigationKey,
         index: _page,
-        items: const [
+        items:  [
           CurvedNavigationBarItem(
             child: Icon(
               Icons.home_outlined,

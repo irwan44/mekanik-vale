@@ -32,7 +32,7 @@
         android:anyDensity="true" />
 
     <application
-        android:label="Vale Mekanik"
+        android:label="Mekanik Vale Indonesia"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

@@ -222,8 +222,9 @@ class _CardDetailPKBState extends State<CardDetailPKB> {
         ),
         Container(
           padding: const EdgeInsets.all(5),
+          width: double.infinity,
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey),
+            color: Colors.grey[100],
             borderRadius: BorderRadius.circular(5),
           ),
           child: Text(

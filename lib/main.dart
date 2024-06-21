@@ -68,7 +68,7 @@ class MyApp extends StatelessWidget {
     final token = Publics.controller.getToken.value;
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      title: "Vale Mekanik",
+      title: "Mekanik Vale Indonesia",
       initialRoute: token.isEmpty ? AppPages.INITIAL : Routes.SPLASHCREEN,
       getPages: AppPages.routes,
       theme: ThemeData(
