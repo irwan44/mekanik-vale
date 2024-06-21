@@ -39,11 +39,8 @@ class _AbsenViewState extends State<AbsenView> {
   void initState() {
     super.initState();
     _updateTime();
-    _initializeButtonState();
     _fetchAbsenInfo();
     _fetchidkaryawan();
-    _updateTime();
-    _initializeButtonState();
   }
 
   @override
@@ -52,22 +49,71 @@ class _AbsenViewState extends State<AbsenView> {
   }
 
   void _initializeButtonState() async {
-    final now = DateTime.now();
-    final jakartaTime = now.toUtc().add(const Duration(hours: 7));
-    final sixAM = DateTime(jakartaTime.year, jakartaTime.month, jakartaTime.day, 6, 0);
+    try {
+      final response = await API.AbsenHistoryID(idkaryawan: idkaryawan);
+      if (response.historyAbsen != null && response.historyAbsen!.isNotEmpty) {
+        final lastAbsen = response.historyAbsen!.last;
+        final absenDateStr = lastAbsen.tglAbsen ?? ''; // Provide a default empty string if null
+        if (absenDateStr.isNotEmpty) {
+          final absenDate = DateFormat('yyyy-MM-dd').parse(absenDateStr);
+          final currentDate = DateTime.now();
+          final isSameDay = absenDate.year == currentDate.year &&
+              absenDate.month == currentDate.month &&
+              absenDate.day == currentDate.day;
 
-    bool hasAbsenMasuk = await GetStorage().read('absen_masuk') ?? false;
-    bool hasAbsenPulang = await GetStorage().read('absen_pulang') ?? false;
+          setState(() {
+            isButtonDisabled = isSameDay;
+          });
+        } else {
+          setState(() {
+            isButtonDisabled = false;
+          });
+        }
+      } else {
+        setState(() {
+          isButtonDisabled = false;
+        });
+      }
+    } catch (e) {
+      print('Error initializing button state: $e');
+      setState(() {
+        isButtonDisabled = false;
+      });
+    }
+  }
 
+  void _initializeButtonpulangState() async {
+    try {
+      final response = await API.AbsenHistoryID(idkaryawan: idkaryawan);
+      if (response.historyAbsen != null && response.historyAbsen!.isNotEmpty) {
+        final lastAbsen = response.historyAbsen!.last;
+        final absenDateStr = lastAbsen.tglAbsen ?? ''; // Provide a default empty string if null
+        if (absenDateStr.isNotEmpty) {
+          final absenDate = DateFormat('yyyy-MM-dd').parse(absenDateStr);
+          final currentDate = DateTime.now();
+          final isSameDay = absenDate.year == currentDate.year &&
+              absenDate.month == currentDate.month &&
+              absenDate.day == currentDate.day;
 
-    setState(() {
-      isButtonDisabled = hasAbsenMasuk || jakartaTime.isBefore(sixAM);
-      isButtonDisabledpulang = hasAbsenPulang || jakartaTime.isBefore(sixAM);
-    });
-
-    print('Waktu Jakarta: $jakartaTime');
-    print('Absen Masuk: $hasAbsenMasuk, Absen Pulang: $hasAbsenPulang');
-    print('Batas Waktu: 6AM: $sixAM');
+          setState(() {
+            isButtonDisabledpulang = isSameDay && lastAbsen.tglAbsen != null; // Ensure `jamPulang` is not null
+          });
+        } else {
+          setState(() {
+            isButtonDisabledpulang = false;
+          });
+        }
+      } else {
+        setState(() {
+          isButtonDisabledpulang = false;
+        });
+      }
+    } catch (e) {
+      print('Error initializing button pulang state: $e');
+      setState(() {
+        isButtonDisabledpulang = false;
+      });
+    }
   }
 
   void _fetchAbsenInfo() async {
@@ -81,6 +127,7 @@ class _AbsenViewState extends State<AbsenView> {
       print('Error fetching absen info: $e');
     }
   }
+
   void _fetchidkaryawan() async {
     try {
       final idkaryawan2 = await API.profileiD();
@@ -88,10 +135,13 @@ class _AbsenViewState extends State<AbsenView> {
         idkaryawan = idkaryawan2?.data?.id.toString() ?? '';
         print('$idkaryawan');
       });
+      _initializeButtonState();
+      _initializeButtonpulangState(); // Ensure this is called after idkaryawan is fetched
     } catch (e) {
       print('Error fetching absen info: $e');
     }
   }
+
   void _updateTime() {
     final now = DateTime.now();
     setState(() {
@@ -277,11 +327,10 @@ class _AbsenViewState extends State<AbsenView> {
                                     onConfirmBtnTap: () async {
                                       Navigator.pop(context);
                                       var response = await API.AbsenMasukID(
-                                        idkaryawan: idkaryawan,
-                                      );
+                                          idkaryawan: idkaryawan);
                                       if (response.status == 'success') {
-                                        await GetStorage().write('absen_masuk', true);
                                         setState(() {
+                                          const AbsenView();
                                           isButtonDisabled = true;
                                         });
                                         QuickAlert.show(
@@ -337,21 +386,33 @@ class _AbsenViewState extends State<AbsenView> {
                                         ),
                                       ),
                                       textInputAction: TextInputAction.next,
-                                      keyboardType: TextInputType.phone,
                                     ),
                                     onConfirmBtnTap: () async {
+                                      Navigator.pop(Get.context!);
                                       var response = await API.AbsenPulangID(
                                           id: id,
                                           keterangan: controller.catatan.text
                                       );
                                       if (response.status == 'success') {
-                                        await GetStorage().write('absen_pulang', true);
                                         setState(() {
                                           isButtonDisabledpulang = true;
                                         });
-                                        _initializeButtonState(); // Refresh button state after absen pulang
+                                        QuickAlert.show(
+                                          context: Get.context!,
+                                          type: QuickAlertType.success,
+                                          text: 'Berhasil Absen Pulang',
+                                          onConfirmBtnTap: () {
+                                            Navigator.pop(context);
+                                          },
+                                        );
+                                      } else {
+                                        QuickAlert.show(
+                                          context: Get.context!,
+                                          type: QuickAlertType.error,
+                                          text: response.message,
+                                        );
                                       }
-                                      Navigator.pop(Get.context!);
+                                      _initializeButtonpulangState();
                                     },
                                   );
                                 },
@@ -390,23 +451,20 @@ class _AbsenViewState extends State<AbsenView> {
                           ),
                         ),
                         FutureBuilder(
-                          future: API.AbsenHistoryID(
-                              idkaryawan: idkaryawan),
+                          future: API.AbsenHistoryID(idkaryawan: idkaryawan),
                           builder: (context, snapshot) {
                             if (snapshot.hasData &&
-                                snapshot.connectionState !=
-                                    ConnectionState.waiting &&
+                                snapshot.connectionState != ConnectionState.waiting &&
                                 snapshot.data != null) {
                               AbsenHistory getDataAcc = snapshot.data!;
                               return Column(
                                 children: AnimationConfiguration.toStaggeredList(
                                   duration: const Duration(milliseconds: 475),
-                                  childAnimationBuilder: (widget) =>
-                                      SlideAnimation(
-                                        child: FadeInAnimation(
-                                          child: widget,
-                                        ),
-                                      ),
+                                  childAnimationBuilder: (widget) => SlideAnimation(
+                                    child: FadeInAnimation(
+                                      child: widget,
+                                    ),
+                                  ),
                                   children: getDataAcc.historyAbsen != null
                                       ? getDataAcc.historyAbsen!
                                       .map((e) {
@@ -420,14 +478,13 @@ class _AbsenViewState extends State<AbsenView> {
                                   height: Get.height - 250,
                                   child: const SingleChildScrollView(
                                     child: Column(
-                                      children: [
-                                      ],
+                                      children: [],
                                     ),
-                                  )
-                              );
+                                  ));
                             }
                           },
                         ),
+
                       ],
                     ),
                   ),
@@ -447,6 +504,7 @@ class _AbsenViewState extends State<AbsenView> {
   void _onRefresh() async {
     HapticFeedback.lightImpact();
     setState(() {
+      const AbsenView(); // if you only want to refresh the list you can place this, so the two can be inside setState
       _initializeButtonState(); // Refresh button state after pull to refresh
       _refreshController.refreshCompleted();
     });
