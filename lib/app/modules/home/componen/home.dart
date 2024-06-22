@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:mekanik/app/modules/home/componen/stats_grid.dart';
@@ -33,13 +32,13 @@ class _StatsScreenState extends State<StatsScreen> {
   final controller = Get.put(HomeController());
   late RefreshController _refreshController; // the refresh controller
   String idkaryawan = '';
-  final _scaffoldKey =
-      GlobalKey<ScaffoldState>(); // this is our key to the scaffold widget
+  final _scaffoldKey = GlobalKey<ScaffoldState>(); // this is our key to the scaffold widget
+
   @override
   void initState() {
-    _refreshController =
-        RefreshController(); // we have to use initState because this part of the app have to restart
+    _refreshController = RefreshController(); // we have to use initState because this part of the app have to restart
     super.initState();
+    _fetchidkaryawan();
   }
 
   void _fetchidkaryawan() async {
@@ -53,10 +52,12 @@ class _StatsScreenState extends State<StatsScreen> {
       print('Error fetching absen info: $e');
     }
   }
+
   @override
   Widget build(BuildContext context) {
     controller.checkForUpdate();
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
         centerTitle: false,
@@ -64,72 +65,100 @@ class _StatsScreenState extends State<StatsScreen> {
         actions: [
           InkWell(
             onTap: () {
-            Get.toNamed(Routes.AbsenView);
+              Get.toNamed(Routes.AbsenView);
             },
-      child:  FutureBuilder<Absen>(
-        future: API.InfoAbsenID(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const loadsearch();
-          } else if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}');
-          } else {
-            if (snapshot.data != null) {
-              final absen = snapshot.data!.dataAbsen?.tglAbsen ?? "";
-              if (absen.isNotEmpty) {
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: 10,),
-                    Container(
+            child: FutureBuilder(
+              future: API.AbsenHistoryID(idkaryawan: idkaryawan),
+              builder: (context, snapshot) {
+                if (snapshot.hasData &&
+                    snapshot.connectionState != ConnectionState.waiting &&
+                    snapshot.data != null) {
+                  AbsenHistory getDataAcc = snapshot.data!;
+                  final currentTime = DateTime.now();
+                  HistoryAbsen? matchingAbsen;
+
+                  if (getDataAcc.historyAbsen != null && getDataAcc.historyAbsen!.isNotEmpty) {
+                    for (var e in getDataAcc.historyAbsen!) {
+                      if (e.jamMasuk != null && e.tglAbsen != null) {
+                        final dateStr = e.tglAbsen!;
+                        final timeStr = e.jamMasuk!;
+                        final dateTimeStr = '$dateStr $timeStr';
+                        try {
+                          final jamMasuk = DateFormat('yyyy-MM-dd HH:mm').parse(dateTimeStr);
+
+                          // Compare date and hours
+                          final isSameDay = jamMasuk.year == currentTime.year &&
+                              jamMasuk.month == currentTime.month &&
+                              jamMasuk.day == currentTime.day;
+
+                          if (isSameDay && (jamMasuk.hour == currentTime.hour || jamMasuk.isBefore(currentTime))) {
+                            matchingAbsen = e;
+                            break;
+                          }
+                        } catch (e) {
+                          // Handle parsing error if necessary
+                        }
+                      }
+                    }
+                  }
+
+                  if (matchingAbsen != null) {
+                    final timeStr = matchingAbsen.jamMasuk!;
+                    final jamMasuk = DateFormat('HH:mm').parse(timeStr); // Parse without date
+
+                    return Column(
+                      children: AnimationConfiguration.toStaggeredList(
+                        duration: const Duration(milliseconds: 475),
+                        childAnimationBuilder: (widget) => SlideAnimation(
+                          child: FadeInAnimation(
+                            child: widget,
+                          ),
+                        ),
+                        children: [
+                          HistoryAbsensiIndikator(
+                            items: matchingAbsen,
+                            jamMasuk: DateFormat('HH:mm').format(jamMasuk),
+                          ),
+                        ],
+                      ),
+                    );
+                  } else {
+                    return Container(
                       padding: const EdgeInsets.all(5),
                       decoration: const BoxDecoration(
-                        color: Colors.green,
+                        color: Colors.redAccent,
                         borderRadius: BorderRadius.all(Radius.circular(10)),
                       ),
                       child: const Row(
                         children: [
-                          Text('Anda Sudah Absen', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
-                          SizedBox(width: 10,),
-                          Icon(Icons.celebration_rounded, color: Colors.yellow, size: 18,),
+                          Text('Anda Belum Absen', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                          SizedBox(width: 10),
+                          Icon(Icons.celebration_rounded, color: Colors.yellow, size: 18),
                         ],
                       ),
+                    );
+                  }
+                } else {
+                  return SizedBox(
+                    height: Get.height - 250,
+                    child: const SingleChildScrollView(
+                      child: Column(
+                        children: [],
+                      ),
                     ),
-                  ],
-                );
-              } else {
-                return   Container(
-                  padding: const EdgeInsets.all(5),
-                  decoration: const BoxDecoration(
-                    color: Colors.redAccent,
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                  ),
-                  child: const Row(
-                    children: [
-                      Text('Anda Belum Absen', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
-                      SizedBox(width: 10,),
-                      Icon(Icons.celebration_rounded, color: Colors.yellow, size: 18,),
-                    ],
-                  ),
-                );
-              }
-            } else {
-              return const Text('Tidak ada data');
-            }
-          }
-        },
-      ),
+                  );
+                }
+              },
+            ),
           ),
-        SizedBox(width: 10,)
+          SizedBox(width: 10),
         ],
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'Dashboard',
-              style: TextStyle(
-                  color: MyColors.appPrimaryColor, fontWeight: FontWeight.bold),
+              style: TextStyle(color: MyColors.appPrimaryColor, fontWeight: FontWeight.bold),
             ),
             FutureBuilder<Profile>(
               future: API.profileiD(),
@@ -164,46 +193,47 @@ class _StatsScreenState extends State<StatsScreen> {
         ),
         backgroundColor: Colors.white,
       ),
-      body: SmartRefresher(
-        controller: _refreshController,
-        enablePullDown: true,
-        header: const WaterDropHeader(),
-        onLoading: _onLoading,
-        onRefresh: _onRefresh,
-        child: CustomScrollView(
-          physics: const ClampingScrollPhysics(),
-          slivers: <Widget>[
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 10.0),
-              sliver: SliverToBoxAdapter(
-                child: StatsGrid(),
-              ),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return SmartRefresher(
+            controller: _refreshController,
+            enablePullDown: true,
+            header: const WaterDropHeader(),
+            onLoading: _onLoading,
+            onRefresh: _onRefresh,
+            child: CustomScrollView(
+              physics: const ClampingScrollPhysics(),
+              slivers: <Widget>[
+                SliverPadding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                  sliver: SliverToBoxAdapter(
+                    child: StatsGrid(),
+                  ),
+                ),
+                SliverPadding(
+                  padding: const EdgeInsets.only(top: 20.0),
+                  sliver: SliverToBoxAdapter(
+                    child: BarChartSample2(),
+                  ),
+                ),
+              ],
             ),
-            SliverPadding(
-              padding: const EdgeInsets.only(top: 20.0),
-              sliver: SliverToBoxAdapter(
-                child: BarChartSample2(),
-              ),
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
 
   _onLoading() {
-    _refreshController
-        .loadComplete(); // after data returned,set the //footer state to idle
+    _refreshController.loadComplete(); // after data returned,set the //footer state to idle
   }
 
   _onRefresh() {
     HapticFeedback.lightImpact();
     setState(() {
-// so whatever you want to refresh it must be inside the setState
+      // so whatever you want to refresh it must be inside the setState
       const StatsScreen(); // if you only want to refresh the list you can place this, so the two can be inside setState
-      _refreshController
-          .refreshCompleted(); // request complete,the header will enter complete state,
-// resetFooterState : it will set the footer state from noData to idle
+      _refreshController.refreshCompleted(); // request complete,the header will enter complete state,
     });
   }
 }

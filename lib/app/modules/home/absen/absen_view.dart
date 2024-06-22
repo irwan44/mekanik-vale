@@ -279,12 +279,19 @@ class _AbsenViewState extends State<AbsenView> {
 
                               if (getDataAcc.historyAbsen != null && getDataAcc.historyAbsen!.isNotEmpty) {
                                 for (var e in getDataAcc.historyAbsen!) {
-                                  if (e.jamMasuk != null) {
+                                  if (e.jamMasuk != null && e.tglAbsen != null) {
+                                    final dateStr = e.tglAbsen!;
                                     final timeStr = e.jamMasuk!;
+                                    final dateTimeStr = '$dateStr $timeStr';
                                     try {
-                                      final jamMasuk = DateFormat('HH:mm').parse(timeStr); // Parse without date
-                                      // Compare only hours
-                                      if (jamMasuk.hour == currentTime.hour) {
+                                      final jamMasuk = DateFormat('yyyy-MM-dd HH:mm').parse(dateTimeStr);
+
+                                      // Compare date and hours
+                                      final isSameDay = jamMasuk.year == currentTime.year &&
+                                          jamMasuk.month == currentTime.month &&
+                                          jamMasuk.day == currentTime.day;
+
+                                      if (isSameDay && (jamMasuk.hour == currentTime.hour || jamMasuk.isBefore(currentTime))) {
                                         matchingAbsen = e;
                                         break;
                                       }
