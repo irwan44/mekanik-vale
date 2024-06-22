@@ -524,18 +524,6 @@ class _StartStopViewState extends State<StartStopView> with AutomaticKeepAliveCl
           const SizedBox(height: 10),
           const Text('History :', style: TextStyle(fontWeight: FontWeight.bold),),
           if (historyData.containsKey(id))
-          // Column(
-          //   crossAxisAlignment: CrossAxisAlignment.start,
-          //   children: historyData[id]!.map((proses) {
-          //     return Column(
-          //       crossAxisAlignment: CrossAxisAlignment.start,
-          //       children: [
-          //         Text('Start Promek: ${proses.startPromek ?? 'N/A'}'),
-          //         Text('Stop Promek: ${proses.stopPromek ?? 'N/A'}'),
-          //       ],
-          //     );
-          //   }).toList(),
-          // ),
             const SizedBox(height: 10,),
           ElevatedButton(
             onPressed: () async {
