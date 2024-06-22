@@ -352,7 +352,7 @@ class _AbsenViewState extends State<AbsenView> {
                         const SizedBox(height: 10,),
                         const Text('Jam kerja', style: TextStyle(fontWeight: FontWeight.bold,),),
                         const SizedBox(height: 10,),
-                        const Text('08:00 AM - 05:00 PM', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),),
+                        const Text('07:00 AM - 15:30 PM', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),),
                         const SizedBox(height: 20,),
                         Container(
                           margin: const EdgeInsets.symmetric(horizontal: 20),

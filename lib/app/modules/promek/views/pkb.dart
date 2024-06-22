@@ -272,7 +272,30 @@ class _PKBlistState extends State<PKBlist>
                   } else if (!snapshot.hasData ||
                       (snapshot.data as PKB).dataPKB == null ||
                       (snapshot.data as PKB).dataPKB!.isEmpty) {
-                    return Center(child: Text('Belum ada data PKB Service'));
+                    return Container(
+                      height: 500,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            'assets/icons/booking.png',
+                            width: 100.0,
+                            height: 100.0,
+                            fit: BoxFit.cover,
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Text(
+                            'Belum ada data PKB',
+                            style: TextStyle(
+                                color: MyColors.appPrimaryColor,
+                                fontWeight: FontWeight.bold),
+                          )
+                        ],
+                      ),
+                    );
                   } else {
                     PKB getDataAcc = snapshot.data as PKB;
                     List<DataPKB> sortedDataPKB =

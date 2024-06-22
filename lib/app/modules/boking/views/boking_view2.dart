@@ -402,14 +402,56 @@ class _BokingView2State extends State<BokingView2> {
                     child: Loadingshammer(),
                   );
                 } else if (snapshot.hasError) {
-                  return const Center(
-                    child: Text('Belum ada data booking.'),
+                  return Container(
+                    height: 500,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          'assets/icons/booking.png',
+                          width: 100.0,
+                          height: 100.0,
+                          fit: BoxFit.cover,
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Text(
+                          'Belum ada data Booking',
+                          style: TextStyle(
+                              color: MyColors.appPrimaryColor,
+                              fontWeight: FontWeight.bold),
+                        )
+                      ],
+                    ),
                   );
                 } else if (snapshot.hasData) {
                   Boking getDataAcc = snapshot.data!;
                   if (getDataAcc.status == false) {
-                    return const Center(
-                      child: Text('Belum ada data booking.'),
+                    return Container(
+                      height: 500,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            'assets/icons/booking.png',
+                            width: 100.0,
+                            height: 100.0,
+                            fit: BoxFit.cover,
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Text(
+                            'Belum ada data Booking',
+                            style: TextStyle(
+                                color: MyColors.appPrimaryColor,
+                                fontWeight: FontWeight.bold),
+                          )
+                        ],
+                      ),
                     );
                   } else if (getDataAcc.message == 'Invalid token: Expired') {
                     Get.offAllNamed(Routes.SIGNIN);
