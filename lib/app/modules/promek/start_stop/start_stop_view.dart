@@ -541,7 +541,11 @@ class _StartStopViewState extends State<StartStopView> with AutomaticKeepAliveCl
   }
 
   Widget buildStopContainer(String id) {
-    return Container(child: null);
+    return Container(
+      height: 0,
+        decoration: BoxDecoration(
+        ),
+        child: null);
   }
 
   Future<void> handleMechanicAction(String id, String role) async {
