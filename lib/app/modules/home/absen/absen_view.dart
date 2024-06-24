@@ -92,15 +92,8 @@ class _AbsenViewState extends State<AbsenView> {
         final jamPulang = lastAbsen.jamKeluar;
 
         if (absenDateStr.isNotEmpty) {
-          final absenDate = DateFormat('yyyy-MM-dd').parse(absenDateStr);
-          final currentDate = DateTime.now();
-          final isSameDay = absenDate.year == currentDate.year &&
-              absenDate.month == currentDate.month &&
-              absenDate.day == currentDate.day;
-
           setState(() {
-            // If it's the same day and jamPulang is not null, disable the button
-            isButtonDisabledpulang = isSameDay && jamPulang != null;
+            isButtonDisabledpulang = jamPulang != null;
           });
         } else {
           setState(() {

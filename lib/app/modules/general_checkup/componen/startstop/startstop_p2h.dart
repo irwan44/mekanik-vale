@@ -353,9 +353,10 @@ class _StartStopViewG2HState extends State<StartStopViewG2H> with AutomaticKeepA
                           bool isStopped = specificItem.stopPromek == null || specificItem.stopPromek == 'N/A';
                           String promekId = specificItem.promekId.toString();
 
-                          return Container(
+                          return Column(children: [
+                            Container(
                             padding: const EdgeInsets.all(10),
-                            margin: EdgeInsets.only(right: 20, left: 20, bottom: 20),
+                            margin: EdgeInsets.only(right: 20, left: 20, bottom: 5),
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(10),
@@ -471,11 +472,33 @@ class _StartStopViewG2HState extends State<StartStopViewG2H> with AutomaticKeepA
                                     style: ElevatedButton.styleFrom(
                                       foregroundColor: Colors.white,
                                       backgroundColor: isStopped ? Colors.red : Colors.green,
+                                        ),
+                                      ),
                                     ),
-                                  ),
+                                  ],
                                 ),
-                              ],
+                              ),
+                            ElevatedButton(
+                              onPressed: () async {
+                                Get.toNamed(
+                                  Routes.MyStepperPage,
+                                  arguments: {
+                                    'kode_booking': kodeBooking,
+                                    'nama': nama,
+                                    'kategori_kendaraan_id': kategoriKendaraanId,
+                                    'kategori_kendaraan': kendaraan,
+                                    'nama_jenissvc': nama_jenissvc,
+                                    'nama_tipe': nama_tipe,
+                                  },
+                                );
+                                },
+                              child: Text('Cek General Check Up'),
+                              style: ElevatedButton.styleFrom(
+                                foregroundColor: Colors.white,
+                                backgroundColor: MyColors.appPrimaryColor,
+                              ),
                             ),
+                            ],
                           );
                         } else {
                           return Center(

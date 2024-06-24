@@ -71,7 +71,7 @@ class ApproveView extends GetView<ApproveController> {
                             context: Get.context!,
                             type: QuickAlertType.loading,
                             headerBackgroundColor: Colors.yellow,
-                            text: 'Buat Estimasi......',
+                            text: 'Approve......',
                           );
                           Navigator.pop(Get.context!);
                           await API.approveId(
@@ -147,7 +147,7 @@ class ApproveView extends GetView<ApproveController> {
                             ),
                           ),
                           textInputAction: TextInputAction.next,
-                          keyboardType: TextInputType.phone,
+                          keyboardType: TextInputType.text,
                           onChanged: (value) => message = value,
                         ),
                         onConfirmBtnTap: () async {
