@@ -561,6 +561,7 @@ class _BokingView2State extends State<BokingView2> {
                                           'alamat': e.alamat ?? '',
                                           'hp': e.hp ?? '',
                                           'hp_pic': e.hpPic ?? '',
+                                          'booking_id': e.bookingId ?? '',
                                           'kategori_kendaraan': e.kategoriKendaraan ?? '',
                                         },
                                       );

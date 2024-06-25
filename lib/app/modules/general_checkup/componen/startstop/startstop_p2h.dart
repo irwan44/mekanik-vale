@@ -41,6 +41,7 @@ class _StartStopViewG2HState extends State<StartStopViewG2H> with AutomaticKeepA
   bool isLayoutVisible = true;
   late RefreshController _refreshController;
   String? kodeBooking;
+  int? BookingId;
   String? nama;
   String? nama_jenissvc;
   String? kategoriKendaraanId;
@@ -51,8 +52,8 @@ class _StartStopViewG2HState extends State<StartStopViewG2H> with AutomaticKeepA
     super.initState();
 
     args = Get.arguments;
-
     kodeBooking = args['kode_booking'];
+    BookingId = int.tryParse(args['booking_id'].toString());
     nama = args['nama'];
     kategoriKendaraanId = args['kategori_kendaraan_id'] ?? '';
     kendaraan = args['kategori_kendaraan'];
@@ -436,8 +437,10 @@ class _StartStopViewG2HState extends State<StartStopViewG2H> with AutomaticKeepA
                                         Get.toNamed(
                                           Routes.MyStepperPage,
                                           arguments: {
+                                            'booking_id': BookingId.toString(),
                                             'kode_booking': kodeBooking,
                                             'nama': nama,
+                                            'id_mekanik': idmekanik,
                                             'kategori_kendaraan_id': kategoriKendaraanId,
                                             'kategori_kendaraan': kendaraan,
                                             'nama_jenissvc': nama_jenissvc,
@@ -480,11 +483,14 @@ class _StartStopViewG2HState extends State<StartStopViewG2H> with AutomaticKeepA
                               ),
                             ElevatedButton(
                               onPressed: () async {
+                                String idmekanik = id;
                                 Get.toNamed(
                                   Routes.MyStepperPage,
                                   arguments: {
+                                    'booking_id': BookingId.toString(),
                                     'kode_booking': kodeBooking,
                                     'nama': nama,
+                                    'id_mekanik': idmekanik,
                                     'kategori_kendaraan_id': kategoriKendaraanId,
                                     'kategori_kendaraan': kendaraan,
                                     'nama_jenissvc': nama_jenissvc,

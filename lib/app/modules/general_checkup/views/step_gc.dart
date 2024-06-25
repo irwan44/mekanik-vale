@@ -45,6 +45,8 @@ class _MyStepperPageState extends State<MyStepperPage>
   int currentStep = 0;
   bool isSubmitting = false;
   late String kodeBooking;
+  late String BookingId;
+  late String idmekanik;
   late String kategoriKendaraanId;
   String? nama;
   String? nama_jenissvc;
@@ -72,11 +74,13 @@ class _MyStepperPageState extends State<MyStepperPage>
     deskripsiControllers = {};
     final Map<String, dynamic>? arguments =
         Get.arguments as Map<String, dynamic>?;
-    kodeBooking = arguments?['booking_id'] ?? '';
-    kategoriKendaraanId = arguments?['kategori_kendaraan_id'] ?? '';
-    print('Kode Booking: $kodeBooking');
-    print('kategori_kendaraan_id : $kategoriKendaraanId');
     kodeBooking = arguments?['kode_booking'];
+    BookingId = arguments?['booking_id'] ?? '';
+    idmekanik = arguments?['id_mekanik'] ?? '';
+    kategoriKendaraanId = arguments?['kategori_kendaraan_id'] ?? '';
+    print('Booking ID: $BookingId');
+    print('ID mekanik: $idmekanik');
+    print('kategori_kendaraan_id : $kategoriKendaraanId');
     nama = arguments?['nama'];
     kategoriKendaraanId = arguments?['kategori_kendaraan_id'] ?? '';
     kendaraan = arguments?['kategori_kendaraan'];
@@ -232,6 +236,7 @@ class _MyStepperPageState extends State<MyStepperPage>
                           Get.toNamed(
                             Routes.GENERAL_CHECKUP,
                             arguments: {
+                              'booking_id': BookingId,
                               'kode_booking': kodeBooking,
                               'nama': nama,
                               'kategori_kendaraan_id': kategoriKendaraanId,
@@ -287,9 +292,8 @@ class _MyStepperPageState extends State<MyStepperPage>
                       setState(() {
                         submitForm(context);
                         if (currentStep < stepTitles.length - 1) {
-                          currentStep += 1; // Pindah ke langkah berikutnya
+                          currentStep += 1;
                         } else {
-                          // Jika pengguna berada di langkah terakhir, tampilkan dialog konfirmasi
                           QuickAlert.show(
                             context: context,
                             type: QuickAlertType.confirm,
@@ -639,7 +643,7 @@ class _MyStepperPageState extends State<MyStepperPage>
                   "gcu_id": gcu.gcuId.toString(),
                   "status": dropdownValues[gcu.gcuId],
                   "description": deskripsiControllers[gcu.gcuId]?.text ??
-                      '', // Use deskripsiControllers
+                      '',
                 },
               )
               .toList();
@@ -651,10 +655,13 @@ class _MyStepperPageState extends State<MyStepperPage>
 
           generalCheckupList.add(generalCheckupObj);
           final kodeBooking = this.kodeBooking ?? '';
+          final BookingId = this.BookingId ?? '';
+          final idmekanik = this.idmekanik ?? '';
 
           if (kodeBooking.isNotEmpty) {
             final combinedData = {
-              "booking_id": kodeBooking,
+              "booking_id": BookingId,
+              "id_mekanik": idmekanik,
               "general_checkup": [
                 {
                   "sub_heading_id": getDataAcc.subHeadingId,

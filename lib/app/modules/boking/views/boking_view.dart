@@ -502,6 +502,7 @@ class _BokingView2State extends State<BokingView2> {
                                           'alamat': e.alamat ?? '',
                                           'hp': e.hp ?? '',
                                           'hp_pic': e.hpPic ?? '',
+                                          'booking_id': e.bookingId ?? '',
                                           'kategori_kendaraan': e.kategoriKendaraan ?? '',
                                         },
                                       );
@@ -531,6 +532,7 @@ class _BokingView2State extends State<BokingView2> {
                                             'transmisi': e.transmisi ?? '',
                                             'nama_tipe': e.namaTipe ?? '',
                                             'alamat': e.alamat ?? '',
+                                            'booking_id': e.bookingId ?? '',
                                             'status': e.bookingStatus ?? '',
                                           },
                                         );
@@ -573,6 +575,7 @@ class _BokingView2State extends State<BokingView2> {
                                               'transmisi': e.transmisi ?? '',
                                               'nama_tipe': e.namaTipe ?? '',
                                               'alamat': e.alamat ?? '',
+                                              'booking_id': e.bookingId ?? '',
                                               'status': e.bookingStatus ?? '',
                                             },
                                           );
@@ -600,6 +603,7 @@ class _BokingView2State extends State<BokingView2> {
                                               'transmisi': e.transmisi ?? '',
                                               'nama_tipe': e.namaTipe ?? '',
                                               'alamat': e.alamat ?? '',
+                                              'booking_id': e.bookingId ?? '',
                                               'status': e.bookingStatus ?? '',
                                             },
                                           );
