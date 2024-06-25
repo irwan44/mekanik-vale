@@ -434,13 +434,14 @@ class _StartStopViewG2HState extends State<StartStopViewG2H> with AutomaticKeepA
                                           kodejasa: kodejasa,
                                           idmekanik: idmekanik,
                                         );
+                                        String IDmekanik = id;
                                         Get.toNamed(
                                           Routes.MyStepperPage,
                                           arguments: {
                                             'booking_id': BookingId.toString(),
                                             'kode_booking': kodeBooking,
                                             'nama': nama,
-                                            'id_mekanik': idmekanik,
+                                            'id_mekanik': IDmekanik,
                                             'kategori_kendaraan_id': kategoriKendaraanId,
                                             'kategori_kendaraan': kendaraan,
                                             'nama_jenissvc': nama_jenissvc,
