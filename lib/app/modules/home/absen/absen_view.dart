@@ -31,7 +31,7 @@ class _AbsenViewState extends State<AbsenView> {
   String _currentDate = '';
   bool isButtonDisabled = false;
   bool isButtonDisabledpulang = false;
-  String id = '';
+  String idabsen = '';
   String idkaryawan = '';
   final controller = Get.put(HomeController());
   final _refreshController = RefreshController();
@@ -116,15 +116,21 @@ class _AbsenViewState extends State<AbsenView> {
 
   void _fetchAbsenInfo() async {
     try {
-      final absen = await API.InfoAbsenID();
+      final absen = await API.AbsenHistoryID(idkaryawan: idkaryawan);
       setState(() {
-        id = absen?.dataAbsen?.id.toString() ?? '';
-        print('$id');
+        if (absen?.historyAbsen != null && absen!.historyAbsen!.isNotEmpty) {
+          // Assuming you want the id of the first element in the list
+          idabsen = absen.historyAbsen![0].id.toString();
+        } else {
+          idabsen = '';
+        }
+        print('$idabsen');
       });
     } catch (e) {
       print('Error fetching absen info: $e');
     }
   }
+
 
   void _fetchidkaryawan() async {
     try {
@@ -405,69 +411,127 @@ class _AbsenViewState extends State<AbsenView> {
                                   ),
                                 ),
                               ),
-                    ElevatedButton(
-                      onPressed: isButtonDisabledpulang ? null : () {
-                        QuickAlert.show(
-                          context: context,
-                          type: QuickAlertType.warning,
-                          barrierDismissible: true,
-                          title: 'Absen pulang untuk hari ini',
-                          confirmBtnText: 'Absen Pulang',
-                          confirmBtnColor: MyColors.appPrimaryColor,
-                          widget: TextFormField(
-                            controller: controller.catatan,
-                            decoration: const InputDecoration(
-                              alignLabelWithHint: true,
-                              hintText: 'catatan',
-                              prefixIcon: Icon(
-                                Icons.mail_lock_rounded,
+                    FutureBuilder(
+                      future: API.AbsenHistoryID(idkaryawan: idkaryawan),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return CircularProgressIndicator();
+                        } else if (snapshot.hasError) {
+                          return Text('Error: ${snapshot.error}');
+                        } else if (!snapshot.hasData || snapshot.data == null) {
+                          return SizedBox(
+                            height: Get.height - 250,
+                            child: SingleChildScrollView(
+                              child: Column(
+                                children: [],
                               ),
                             ),
-                            textInputAction: TextInputAction.next,
-                          ),
-                          onConfirmBtnTap: () async {
-                            Navigator.pop(Get.context!);
-                            var response = await API.AbsenPulangID(
-                                id: id,
-                                keterangan: controller.catatan.text
+                          );
+                        } else {
+                          AbsenHistory getDataAcc = snapshot.data!;
+
+                          // Check if historyAbsen is empty or null
+                          if (getDataAcc.historyAbsen == null || getDataAcc.historyAbsen!.isEmpty) {
+                            return ElevatedButton(
+                              onPressed: ()async {
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: MyColors.appPrimaryColor,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              child: const Text(
+                                'Absen Pulang',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
                             );
-                            if (response.status == 'success') {
-                              setState(() {
-                                isButtonDisabledpulang = true;
-                              });
+                          }
+
+                          var itemId = getDataAcc.historyAbsen!.first.id; // Example: getting the first item's id
+
+                          return ElevatedButton(
+                            onPressed: isButtonDisabledpulang || itemId == null ? null : () async {
                               QuickAlert.show(
-                                context: Get.context!,
-                                type: QuickAlertType.success,
-                                text: 'Berhasil Absen Pulang',
-                                onConfirmBtnTap: () {
-                                  Navigator.pop(context);
+                                context: context,
+                                type: QuickAlertType.warning,
+                                barrierDismissible: true,
+                                title: 'Absen pulang untuk hari ini',
+                                confirmBtnText: 'Absen Pulang',
+                                confirmBtnColor: MyColors.appPrimaryColor,
+                                widget: TextFormField(
+                                  controller: controller.catatan,
+                                  decoration: const InputDecoration(
+                                    alignLabelWithHint: true,
+                                    hintText: 'catatan',
+                                    prefixIcon: Icon(
+                                      Icons.mail_lock_rounded,
+                                    ),
+                                  ),
+                                  textInputAction: TextInputAction.next,
+                                ),
+                                onConfirmBtnTap: () async {
+                                  Navigator.pop(Get.context!);
+
+                                  if (itemId == null) {
+                                    // Handle the case where itemId is null
+                                    QuickAlert.show(
+                                      context: Get.context!,
+                                      type: QuickAlertType.error,
+                                      text: 'ID not available',
+                                    );
+                                    return;
+                                  }
+
+                                  var response = await API.AbsenPulangID(
+                                    id: itemId.toString(),
+                                    keterangan: controller.catatan.text,
+                                  );
+
+                                  if (response.status == 'success') {
+                                    setState(() {
+                                      isButtonDisabledpulang = true;
+                                    });
+                                    QuickAlert.show(
+                                      context: Get.context!,
+                                      type: QuickAlertType.success,
+                                      text: 'Berhasil Absen Pulang',
+                                      onConfirmBtnTap: () {
+                                        Navigator.pop(context);
+                                      },
+                                    );
+                                  } else {
+                                    QuickAlert.show(
+                                      context: Get.context!,
+                                      type: QuickAlertType.error,
+                                      text: response.message,
+                                    );
+                                  }
+                                  _initializeButtonpulangState();
                                 },
                               );
-                            } else {
-                              QuickAlert.show(
-                                context: Get.context!,
-                                type: QuickAlertType.error,
-                                text: response.message,
-                              );
-                            }
-                            _initializeButtonpulangState();
-                          },
-                        );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: MyColors.appPrimaryColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            child: const Text(
+                              'Absen Pulang',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          );
+                        }
                       },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: MyColors.appPrimaryColor,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      child: const Text(
-                        'Absen Pulang',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
                     ),
                     ],
                           ),

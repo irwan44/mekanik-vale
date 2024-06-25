@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../componen/color.dart';
 import '../../../data/data_endpoint/gc_mekanik.dart';
 import '../../../data/endpoint.dart';
@@ -773,6 +774,31 @@ class _GcuItemState extends State<GcuItem> {
   void initState() {
     super.initState();
     dropdownValueLocal = widget.dropdownValue;
+    _loadDropdownValue();
+    _loadDescription();
+  }
+
+  Future<void> _loadDropdownValue() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      dropdownValueLocal = prefs.getString('dropdownValue_${widget.gcu.gcu}') ?? widget.dropdownValue;
+    });
+  }
+
+  Future<void> _saveDropdownValue(String? value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('dropdownValue_${widget.gcu.gcu}', value ?? '');
+  }
+
+  Future<void> _loadDescription() async {
+    final prefs = await SharedPreferences.getInstance();
+    final description = prefs.getString('description_${widget.gcu.gcu}') ?? '';
+    widget.deskripsiController.text = description;
+  }
+
+  Future<void> _saveDescription(String description) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('description_${widget.gcu.gcu}', description);
   }
 
   @override
@@ -799,6 +825,7 @@ class _GcuItemState extends State<GcuItem> {
                 onChanged: (String? value) {
                   setState(() {
                     dropdownValueLocal = value;
+                    _saveDropdownValue(value);
                   });
                   widget.onDropdownChanged(value);
                 },
@@ -815,6 +842,7 @@ class _GcuItemState extends State<GcuItem> {
         if (dropdownValueLocal == 'NOT_OKE')
           TextField(
             onChanged: (text) {
+              _saveDescription(text);
               widget.onDescriptionChanged(text);
             },
             controller: widget.deskripsiController,
