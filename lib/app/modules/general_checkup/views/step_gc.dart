@@ -298,7 +298,7 @@ class _MyStepperPageState extends State<MyStepperPage>
                             context: context,
                             type: QuickAlertType.confirm,
                             text:
-                                'Simpan data General Check Up ke database bangkelly',
+                                'Simpan data General Check Up ke database Vale Indonesia',
                             confirmBtnText: 'Submit',
                             cancelBtnText: 'Exit',
                             title: 'Submit General Check Up',
@@ -324,20 +324,20 @@ class _MyStepperPageState extends State<MyStepperPage>
                                   context: Get.context!,
                                   type: QuickAlertType.success,
                                   headerBackgroundColor: Colors.yellow,
-                                  text: 'Booking has been Unapproving',
+                                  text: 'General CheckUp berhasil dibuat',
                                   confirmBtnText: 'Kembali',
                                   cancelBtnText: 'Kembali',
                                   confirmBtnColor: Colors.green,
                                 );
                               } catch (e) {
-                                Navigator.of(context)
-                                    .popUntil((route) => route.isFirst);
+                                Navigator.pop(context, true);
+                                Get.toNamed(Routes.BOKING2);
                                 QuickAlert.show(
                                   barrierDismissible: false,
                                   context: Get.context!,
                                   type: QuickAlertType.success,
                                   headerBackgroundColor: Colors.yellow,
-                                  text: 'Booking has been Unapproving',
+                                  text: 'General CheckUp berhasil dibuat',
                                   confirmBtnText: 'Kembali',
                                   cancelBtnText: 'Kembali',
                                   confirmBtnColor: Colors.green,
