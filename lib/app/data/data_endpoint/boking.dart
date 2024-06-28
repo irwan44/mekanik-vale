@@ -34,10 +34,10 @@ class DataBooking {
   String? bookingStatus;
   String? jamBooking;
   String? tglBooking;
-  Null? pic;
-  Null? hpPic;
+  String? pic;
+  String? hpPic;
   String? keluhan;
-  Null? perintahKerja;
+  String? perintahKerja;
   String? status;
   String? typeOrder;
   String? location;

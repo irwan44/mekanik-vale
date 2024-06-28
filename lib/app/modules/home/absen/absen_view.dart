@@ -16,8 +16,12 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
 
+import '../../../routes/app_pages.dart';
 import 'listhistory/absensekarang.dart';
+import 'listhistory/indikator.dart';
 import 'listhistory/listhistoryabsen.dart';
+import 'listhistory/tombolabsen.dart';
+import 'listhistory/tombolabsenpulang.dart';
 
 class AbsenView extends StatefulWidget {
   const AbsenView({Key? key}) : super(key: key);
@@ -55,6 +59,7 @@ class _AbsenViewState extends State<AbsenView> {
       if (response.historyAbsen != null && response.historyAbsen!.isNotEmpty) {
         final lastAbsen = response.historyAbsen!.last;
         final absenDateStr = lastAbsen.tglAbsen ?? '';
+
         if (absenDateStr.isNotEmpty) {
           final absenDate = DateFormat('yyyy-MM-dd').parse(absenDateStr);
           final currentDate = DateTime.now();
@@ -83,17 +88,24 @@ class _AbsenViewState extends State<AbsenView> {
     }
   }
 
+
   void _initializeButtonpulangState() async {
     try {
       final response = await API.AbsenHistoryID(idkaryawan: idkaryawan);
       if (response.historyAbsen != null && response.historyAbsen!.isNotEmpty) {
         final lastAbsen = response.historyAbsen!.last;
-        final absenDateStr = lastAbsen.tglAbsen ?? ''; // Provide a default empty string if null
+        final absenDateStr = lastAbsen.tglAbsen ?? '';
         final jamPulang = lastAbsen.jamKeluar;
 
         if (absenDateStr.isNotEmpty) {
+          final absenDate = DateFormat('yyyy-MM-dd').parse(absenDateStr);
+          final currentDate = DateTime.now();
+          final isSameDay = absenDate.year == currentDate.year &&
+              absenDate.month == currentDate.month &&
+              absenDate.day == currentDate.day;
+
           setState(() {
-            isButtonDisabledpulang = jamPulang != null;
+            isButtonDisabledpulang = isSameDay && jamPulang != null;
           });
         } else {
           setState(() {
@@ -114,12 +126,14 @@ class _AbsenViewState extends State<AbsenView> {
   }
 
 
+
+
   void _fetchAbsenInfo() async {
     try {
       final absen = await API.AbsenHistoryID(idkaryawan: idkaryawan);
       setState(() {
         if (absen?.historyAbsen != null && absen!.historyAbsen!.isNotEmpty) {
-          // Assuming you want the id of the first element in the list
+
           idabsen = absen.historyAbsen![0].id.toString();
         } else {
           idabsen = '';
@@ -284,8 +298,6 @@ class _AbsenViewState extends State<AbsenView> {
                                     final dateTimeStr = '$dateStr $timeStr';
                                     try {
                                       final jamMasuk = DateFormat('yyyy-MM-dd HH:mm').parse(dateTimeStr);
-
-                                      // Compare date and hours
                                       final isSameDay = jamMasuk.year == currentTime.year &&
                                           jamMasuk.month == currentTime.month &&
                                           jamMasuk.day == currentTime.day;
@@ -359,181 +371,321 @@ class _AbsenViewState extends State<AbsenView> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              ElevatedButton(
-                                onPressed: isButtonDisabled ? null : () {
-                                  QuickAlert.show(
-                                    context: Get.context!,
-                                    type: QuickAlertType.info,
-                                    headerBackgroundColor: MyColors.appPrimaryColor,
-                                    title: 'Absen untuk hari ini',
-                                    confirmBtnText: 'Absen Sekarang',
-                                    confirmBtnColor: MyColors.appPrimaryColor,
-                                    onConfirmBtnTap: () async {
-                                      Navigator.pop(context);
-                                      var response = await API.AbsenMasukID(
-                                          idkaryawan: idkaryawan);
-                                      if (response.status == 'success') {
-                                        setState(() {
-                                          const AbsenView();
-                                          isButtonDisabled = true;
-                                        });
-                                        QuickAlert.show(
-                                          context: Get.context!,
-                                          type: QuickAlertType.success,
-                                          text: 'Berhasil Absen',
-                                          onConfirmBtnTap: () {
-                                            Navigator.pop(context);
-                                          },
-                                        );
-                                      } else {
-                                        QuickAlert.show(
-                                          context: Get.context!,
-                                          type: QuickAlertType.error,
-                                          text: response.message,
-                                        );
+                              FutureBuilder(
+                                future: API.AbsenHistoryID(idkaryawan: idkaryawan),
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasData &&
+                                      snapshot.connectionState != ConnectionState.waiting &&
+                                      snapshot.data != null) {
+                                    AbsenHistory getDataAcc = snapshot.data!;
+                                    final currentTime = DateTime.now();
+                                    HistoryAbsen? matchingAbsen;
+
+                                    if (getDataAcc.historyAbsen != null && getDataAcc.historyAbsen!.isNotEmpty) {
+                                      for (var e in getDataAcc.historyAbsen!) {
+                                        if (e.jamMasuk != null && e.tglAbsen != null) {
+                                          final dateStr = e.tglAbsen!;
+                                          final timeStr = e.jamMasuk!;
+                                          final dateTimeStr = '$dateStr $timeStr';
+                                          try {
+                                            final jamMasuk = DateFormat('yyyy-MM-dd HH:mm').parse(dateTimeStr);
+
+                                            // Compare date and hours
+                                            final isSameDay = jamMasuk.year == currentTime.year &&
+                                                jamMasuk.month == currentTime.month &&
+                                                jamMasuk.day == currentTime.day;
+
+                                            if (isSameDay && (jamMasuk.hour == currentTime.hour || jamMasuk.isBefore(currentTime))) {
+                                              matchingAbsen = e;
+                                              break;
+                                            }
+                                          } catch (e) {
+                                            // Handle parsing error if necessary
+                                          }
+                                        }
                                       }
-                                      _initializeButtonState(); // Refresh button state after absen
-                                    },
-                                  );
+                                    }
+
+                                    if (matchingAbsen != null) {
+                                      final timeStr = matchingAbsen.jamMasuk!;
+                                      final jamMasuk = DateFormat('HH:mm').parse(timeStr);
+                                      return Column(
+                                        children: AnimationConfiguration.toStaggeredList(
+                                          duration: const Duration(milliseconds: 475),
+                                          childAnimationBuilder: (widget) => SlideAnimation(
+                                            child: FadeInAnimation(
+                                              child: widget,
+                                            ),
+                                          ),
+                                          children: [
+                                            HistoryAbsensiTombol(
+                                              items: matchingAbsen,
+                                              jamMasuk: DateFormat('HH:mm').format(jamMasuk),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    } else {
+                                      return Container(
+                                        decoration: const BoxDecoration(
+                                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                                        ),
+                                        child: ElevatedButton(
+                                          onPressed: ()  async {
+                                            var response = await API.AbsenMasukID(idkaryawan: idkaryawan);
+                                            if (response.status == 'success') {
+                                              setState(() {
+                                                isButtonDisabled = true;
+                                              });
+                                              QuickAlert.show(
+                                                context: context,
+                                                type: QuickAlertType.success,
+                                                text: 'Berhasil Absen',
+                                                onConfirmBtnTap: () {
+                                                  Navigator.pop(context);
+                                                },
+                                              );
+                                              _initializeButtonState();
+                                            } else {
+                                              QuickAlert.show(
+                                                context: context,
+                                                type: QuickAlertType.error,
+                                                text: response.message,
+                                              );
+                                            }
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: MyColors.appPrimaryColor,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(10),
+                                            ),
+                                          ),
+                                          child: Text(
+                                            'Absen Masuk',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  } else {
+                                    return SizedBox(
+                                      height: Get.height - 250,
+                                      child: const SingleChildScrollView(
+                                        child: Column(
+                                          children: [],
+                                        ),
+                                      ),
+                                    );
+                                  }
                                 },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: MyColors.appPrimaryColor,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                ),
-                                child: const Text(
-                                  'Absen Masuk',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
                               ),
                     FutureBuilder(
                       future: API.AbsenHistoryID(idkaryawan: idkaryawan),
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return CircularProgressIndicator();
-                        } else if (snapshot.hasError) {
-                          return Text('Error: ${snapshot.error}');
-                        } else if (!snapshot.hasData || snapshot.data == null) {
-                          return SizedBox(
-                            height: Get.height - 250,
-                            child: SingleChildScrollView(
-                              child: Column(
-                                children: [],
-                              ),
-                            ),
-                          );
-                        } else {
+                        if (snapshot.hasData &&
+                            snapshot.connectionState != ConnectionState.waiting &&
+                            snapshot.data != null) {
                           AbsenHistory getDataAcc = snapshot.data!;
+                          final currentTime = DateTime.now();
+                          HistoryAbsen? matchingAbsen;
 
-                          // Check if historyAbsen is empty or null
-                          if (getDataAcc.historyAbsen == null || getDataAcc.historyAbsen!.isEmpty) {
-                            return ElevatedButton(
-                              onPressed: ()async {
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: MyColors.appPrimaryColor,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
+                          if (getDataAcc.historyAbsen != null && getDataAcc.historyAbsen!.isNotEmpty) {
+                            for (var e in getDataAcc.historyAbsen!) {
+                              if (e.jamKeluar != null && e.tglAbsen != null) {
+                                final dateStr = e.tglAbsen!;
+                                final timeStr = e.jamKeluar!;
+                                final dateTimeStr = '$dateStr $timeStr';
+                                try {
+                                  final jamMasuk = DateFormat('yyyy-MM-dd HH:mm').parse(dateTimeStr);
+
+                                  // Compare date and hours
+                                  final isSameDay = jamMasuk.year == currentTime.year &&
+                                      jamMasuk.month == currentTime.month &&
+                                      jamMasuk.day == currentTime.day;
+
+                                  if (isSameDay && (jamMasuk.hour == currentTime.hour || jamMasuk.isBefore(currentTime))) {
+                                    matchingAbsen = e;
+                                    break;
+                                  }
+                                } catch (e) {
+                                  // Handle parsing error if necessary
+                                }
+                              }
+                            }
+                          }
+
+                          if (matchingAbsen != null) {
+                            final timeStr = matchingAbsen.jamKeluar!;
+                            final jamMasuk = DateFormat('HH:mm').parse(timeStr);
+                            return Column(
+                              children: AnimationConfiguration.toStaggeredList(
+                                duration: const Duration(milliseconds: 475),
+                                childAnimationBuilder: (widget) => SlideAnimation(
+                                  child: FadeInAnimation(
+                                    child: widget,
+                                  ),
                                 ),
+                                children: [
+                                  HistoryAbsensiTombolPulang(
+                                    items: matchingAbsen,
+                                    jamMasuk: DateFormat('HH:mm').format(jamMasuk),
+                                  ),
+                                ],
                               ),
-                              child: const Text(
-                                'Absen Pulang',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
+                            );
+                          } else {
+                            return Container(
+                              decoration: const BoxDecoration(
+                                borderRadius: BorderRadius.all(Radius.circular(10)),
+                              ),
+                              child: FutureBuilder(
+                                future: API.AbsenHistoryID(idkaryawan: idkaryawan),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState == ConnectionState.waiting) {
+                                    return ElevatedButton(
+                                      onPressed: () async {},
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.grey.shade200,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        'Absen Pulang',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: MyColors.appPrimaryColor,
+                                        ),
+                                      ),
+                                    );
+                                  } else if (snapshot.hasError) {
+                                    return Text('Error: ${snapshot.error}');
+                                  } else if (!snapshot.hasData || snapshot.data == null) {
+                                    return SizedBox(
+                                      height: Get.height - 250,
+                                      child: SingleChildScrollView(
+                                        child: Column(
+                                          children: [],
+                                        ),
+                                      ),
+                                    );
+                                  } else {
+                                    AbsenHistory getDataAcc = snapshot.data!;
+                                    if (getDataAcc.historyAbsen == null || getDataAcc.historyAbsen!.isEmpty) {
+                                      return ElevatedButton(
+                                        onPressed: () async {},
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: MyColors.appPrimaryColor,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(10),
+                                          ),
+                                        ),
+                                        child: const Text(
+                                          'Absen Pulang',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                    var itemId = getDataAcc.historyAbsen!.first.id; // Example: getting the first item's id
+                                    return ElevatedButton(
+                                      onPressed: isButtonDisabledpulang || itemId == null ? null : () async {
+                                        QuickAlert.show(
+                                          context: context,
+                                          type: QuickAlertType.warning,
+                                          barrierDismissible: true,
+                                          title: 'Absen pulang untuk hari ini',
+                                          confirmBtnText: 'Absen Pulang',
+                                          confirmBtnColor: MyColors.appPrimaryColor,
+                                          widget: TextFormField(
+                                            controller: controller.catatan,
+                                            decoration: const InputDecoration(
+                                              alignLabelWithHint: true,
+                                              hintText: 'catatan',
+                                              prefixIcon: Icon(
+                                                Icons.mail_lock_rounded,
+                                              ),
+                                            ),
+                                            textInputAction: TextInputAction.next,
+                                          ),
+                                          onConfirmBtnTap: () async {
+                                            Navigator.pop(Get.context!);
+                                            if (itemId == null) {
+                                              // Handle the case where itemId is null
+                                              QuickAlert.show(
+                                                context: Get.context!,
+                                                type: QuickAlertType.error,
+                                                text: 'ID not available',
+                                              );
+                                              return;
+                                            }
+
+                                            var response = await API.AbsenPulangID(
+                                              id: itemId.toString(),
+                                              keterangan: controller.catatan.text,
+                                            );
+
+                                            if (response.status == 'success') {
+                                              setState(() {
+                                                isButtonDisabledpulang = true;
+                                              });
+                                              QuickAlert.show(
+                                                context: Get.context!,
+                                                type: QuickAlertType.success,
+                                                text: 'Berhasil Absen Pulang',
+                                              );
+                                            } else {
+                                              QuickAlert.show(
+                                                context: Get.context!,
+                                                type: QuickAlertType.error,
+                                                text: response.message,
+                                              );
+                                            }
+                                            _initializeButtonpulangState();
+                                          },
+                                        );
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: MyColors.appPrimaryColor,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                      ),
+                                      child: const Text(
+                                        'Absen Pulang',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                },
                               ),
                             );
                           }
-
-                          var itemId = getDataAcc.historyAbsen!.first.id; // Example: getting the first item's id
-
-                          return ElevatedButton(
-                            onPressed: isButtonDisabledpulang || itemId == null ? null : () async {
-                              QuickAlert.show(
-                                context: context,
-                                type: QuickAlertType.warning,
-                                barrierDismissible: true,
-                                title: 'Absen pulang untuk hari ini',
-                                confirmBtnText: 'Absen Pulang',
-                                confirmBtnColor: MyColors.appPrimaryColor,
-                                widget: TextFormField(
-                                  controller: controller.catatan,
-                                  decoration: const InputDecoration(
-                                    alignLabelWithHint: true,
-                                    hintText: 'catatan',
-                                    prefixIcon: Icon(
-                                      Icons.mail_lock_rounded,
-                                    ),
-                                  ),
-                                  textInputAction: TextInputAction.next,
-                                ),
-                                onConfirmBtnTap: () async {
-                                  Navigator.pop(Get.context!);
-
-                                  if (itemId == null) {
-                                    // Handle the case where itemId is null
-                                    QuickAlert.show(
-                                      context: Get.context!,
-                                      type: QuickAlertType.error,
-                                      text: 'ID not available',
-                                    );
-                                    return;
-                                  }
-
-                                  var response = await API.AbsenPulangID(
-                                    id: itemId.toString(),
-                                    keterangan: controller.catatan.text,
-                                  );
-
-                                  if (response.status == 'success') {
-                                    setState(() {
-                                      isButtonDisabledpulang = true;
-                                    });
-                                    QuickAlert.show(
-                                      context: Get.context!,
-                                      type: QuickAlertType.success,
-                                      text: 'Berhasil Absen Pulang',
-                                      onConfirmBtnTap: () {
-                                        Navigator.pop(context);
-                                      },
-                                    );
-                                  } else {
-                                    QuickAlert.show(
-                                      context: Get.context!,
-                                      type: QuickAlertType.error,
-                                      text: response.message,
-                                    );
-                                  }
-                                  _initializeButtonpulangState();
-                                },
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: MyColors.appPrimaryColor,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            child: const Text(
-                              'Absen Pulang',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                        } else {
+                          return SizedBox(
+                            height: Get.height - 250,
+                            child: const SingleChildScrollView(
+                              child: Column(
+                                children: [],
                               ),
                             ),
                           );
                         }
                       },
                     ),
-                    ],
+                            ],
                           ),
                         ),
                         const SizedBox(height: 10,),
