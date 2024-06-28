@@ -26,11 +26,11 @@ class HistoryView2 extends StatefulWidget {
 class _HistoryView2State extends State<HistoryView2> with SingleTickerProviderStateMixin {
   final controller = Get.put(HistoryController());
   late TabController _tabController;
-  String selectedStatus = 'Semua';
   String selectedService = 'Repair & Maintenance';
   String selectedServicegc = 'General Check UP/P2H';
   late List<RefreshController> _refreshControllers;
-
+  String selectedStatus = 'Semua';
+  List<String> statusOptions = ['Semua', 'ESTIMASI', 'PKB', 'PKB TUTUP', 'INVOICE'];
   @override
   void initState() {
     _tabController = TabController(length: 2, vsync: this);
@@ -166,10 +166,31 @@ class _HistoryView2State extends State<HistoryView2> with SingleTickerProviderSt
                                   }),
                         ),
                       ),
-                      child: Icon(
-                        Icons.search_rounded,
-                        color: MyColors.appPrimaryColor,
-                      ),
+                      child: Container(
+                          padding: EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.15),
+                                spreadRadius: 5,
+                                blurRadius: 10,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.search_rounded,
+                                color: MyColors.appPrimaryColor,
+                              ),
+                              SizedBox(width: 10,),
+                              Text('Pencarian')
+                            ],
+                          )
+                      )
                     );
                   } else {
                     return Center(
@@ -218,76 +239,116 @@ class _HistoryView2State extends State<HistoryView2> with SingleTickerProviderSt
   }
 
   Widget _buildTabContent(String tabService) {
-    return SmartRefresher(
-      controller: _refreshControllers[_getTabIndex(
-          tabService)], // Use _getTabIndex to get the appropriate RefreshController index
-      enablePullDown: true,
-      header: const WaterDropHeader(),
-      onRefresh: () => _onRefresh(tabService),
-      onLoading: () => _onLoading(tabService),
-      child: SingleChildScrollView(
-        child: Container(
-          child: Column(
-            children: [
-              FutureBuilder(
-                future: API.HistoryID(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const LoadingshammerHistory();
-                  } else if (snapshot.hasError) {
-                    return Center(
-                      child: Text('Error: ${snapshot.error}'),
-                    );
-                  } else if (snapshot.hasData) {
-                    final data = snapshot.data!.dataHistory ?? [];
-                    List<DataHistory> filteredData = [];
-                    if (selectedStatus == 'Semua') {
-                      filteredData = data
-                          .where((item) => item.tipeSvc == tabService)
-                          .toList();
-                    } else {
-                      filteredData = data
-                          .where((item) =>
-                      item.status == selectedStatus &&
-                          item.tipeSvc == tabService)
-                          .toList();
-                    }
-                    return filteredData.isEmpty
-                        ? const Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // No queues
-                      ],
-                    )
-                        : Column(
-                      children: filteredData
-                          .map(
-                            (e) => HistoryList(
-                          items: e,
-                          onTap: () {
-                            Get.toNamed(
-                              Routes.DETAIL_HISTORY,
-                              arguments: {
-                                'kode_svc': e.kodeSvc ?? '',
-                              },
-                            );
-                          },
-                        ),
-                      )
-                          .toList(),
-                    );
-                  } else {
-                    return const Column(
-                      children: [],
-                    );
-                  }
-                },
+    return Column(
+      children: [
+        SizedBox(height: 10,),
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 10),
+          margin: EdgeInsets.symmetric(horizontal: 20),
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.15),
+                spreadRadius: 5,
+                blurRadius: 10,
+                offset: const Offset(0, 3),
               ),
             ],
           ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              isExpanded: true,
+              value: selectedStatus,
+              items: statusOptions.map((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  selectedStatus = newValue!;
+                });
+              },
+            ),
+          ),
         ),
-      ),
+        Expanded(
+          child: SmartRefresher(
+            controller: _refreshControllers[_getTabIndex(tabService)],
+            enablePullDown: true,
+            header: const WaterDropHeader(),
+            onRefresh: () => _onRefresh(tabService),
+            onLoading: () => _onLoading(tabService),
+            child: SingleChildScrollView(
+              child: Container(
+                child: Column(
+                  children: [
+                    FutureBuilder(
+                      future: API.HistoryID(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const LoadingshammerHistory();
+                        } else if (snapshot.hasError) {
+                          return Center(
+                            child: Text('Error: ${snapshot.error}'),
+                          );
+                        } else if (snapshot.hasData) {
+                          final data = snapshot.data!.dataHistory ?? [];
+                          List<DataHistory> filteredData = [];
+                          if (selectedStatus == 'Semua') {
+                            filteredData = data
+                                .where((item) => item.tipeSvc == tabService)
+                                .toList();
+                          } else {
+                            filteredData = data
+                                .where((item) =>
+                            item.status == selectedStatus &&
+                                item.tipeSvc == tabService)
+                                .toList();
+                          }
+                          return filteredData.isEmpty
+                              ? const Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // No queues
+                            ],
+                          )
+                              : Column(
+                            children: filteredData
+                                .map(
+                                  (e) => HistoryList(
+                                items: e,
+                                onTap: () {
+                                  Get.toNamed(
+                                    Routes.DETAIL_HISTORY,
+                                    arguments: {
+                                      'kode_svc': e.kodeSvc ?? '',
+                                    },
+                                  );
+                                },
+                              ),
+                            )
+                                .toList(),
+                          );
+                        } else {
+                          return const Column(
+                            children: [],
+                          );
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 

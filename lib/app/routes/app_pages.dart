@@ -22,6 +22,7 @@ import '../modules/home/componen/buttomnavigationbar.dart';
 import '../modules/profile/bindings/profile_binding.dart';
 import '../modules/profile/views/profile_view.dart';
 import '../modules/promek/bindings/promek_binding.dart';
+import '../modules/promek/detail/card_detailpkpsperepart.dart';
 import '../modules/promek/detail/detailpkb.dart';
 import '../modules/promek/start_stop/start_stop_view.dart';
 import '../modules/promek/views/pkb.dart';
@@ -149,6 +150,12 @@ class AppPages {
       transition: Transition.downToUp,
       name: _Paths.EmergencyView,
       page: () => const EmergencyView(),
+      binding: mergencyBinding(),
+    ),
+    GetPage(
+      transition: Transition.downToUp,
+      name: _Paths.CardDetailPKBSperepart,
+      page: () => const CardDetailPKBSperepart(),
       binding: mergencyBinding(),
     ),
     GetPage(

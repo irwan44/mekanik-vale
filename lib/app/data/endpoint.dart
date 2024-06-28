@@ -17,6 +17,7 @@ import 'data_endpoint/approve.dart';
 import 'data_endpoint/boking.dart';
 import 'data_endpoint/bookingmasuk.dart';
 import 'data_endpoint/detailhistory.dart';
+import 'data_endpoint/detailsperpart.dart';
 import 'data_endpoint/estimasi.dart';
 import 'data_endpoint/gc_mekanik.dart';
 import 'data_endpoint/general_chackup.dart';
@@ -40,6 +41,7 @@ import 'data_endpoint/submit_finish.dart';
 import 'data_endpoint/submit_gc.dart';
 import 'data_endpoint/tibadilokasi.dart';
 import 'data_endpoint/unapprove.dart';
+import 'data_endpoint/uploadperpart.dart';
 import 'localstorage.dart';
 import 'package:http/http.dart' as http;
 
@@ -68,6 +70,7 @@ class API {
   static const _getServiceSelesai = '$_baseUrl/mekanik/get-service-selesai';
   static const _getDikerjakan = '$_baseUrl/mekanik/get-dikerjakan';
   static const _getDetailhistory = '$_baseUrl/mekanik/get-detail-history';
+  static const _getDetailphotosparepart = '$_baseUrl/mekanik/detail-photo-sparepart';
   static const _getpkb = '$_baseUrl/mekanik/get-pkb';
   static const _getmekanikpkb = '$_baseUrl/mekanik/pkb/get-jasa-mekanik';
   static const _getInsetpromekpkb = '$_baseUrl/mekanik/pkb/insert-promek';
@@ -80,6 +83,7 @@ class API {
   static const _getPulang = '$_baseUrl/mekanik/absen/update';
   static const _getdetailapsen = '$_baseUrl/mekanik/absen';
   static const _getHistotyapsen = '$_baseUrl/mekanik/absen/history';
+  static const _getListSperpart = '$_baseUrl/mekanik/photo-sparepart';
   static final _controller = Publics.controller;
 
 
@@ -1405,6 +1409,47 @@ class API {
     }
   }
 //Beda
+// Beda
+  static Future<DetailSpertpart> DetailSpertpartID({
+    required String kodesvc,
+  }) async {
+    final data = {
+      "kode_svc": kodesvc,
+    };
+
+    try {
+      final token = Publics.controller.getToken.value ?? '';
+      print('Token: $token');
+
+      var response = await Dio().get(
+        _getDetailphotosparepart,
+        data: data,
+        options: Options(
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $token",
+          },
+        ),
+      );
+
+      print('Response: ${response.data}');
+
+      final obj = DetailSpertpart.fromJson(response.data);
+
+      if (obj.message == 'Invalid token: Expired') {
+        Get.offAllNamed(Routes.SIGNIN);
+        Get.snackbar(
+          obj.message.toString(),
+          obj.message.toString(),
+        );
+      }
+      return obj;
+    } catch (e) {
+      print('Error: $e');
+      throw e;
+    }
+  }
+//Beda
   static Future<PKB> PKBID() async {
     try {
       final token = Publics.controller.getToken.value ?? '';
@@ -1423,6 +1468,40 @@ class API {
       print('Response: ${response.data}');
 
       final obj = PKB.fromJson(response.data);
+
+      if (obj.message == 'Invalid token: Expired') {
+        Get.offAllNamed(Routes.SIGNIN);
+        Get.snackbar(
+          obj.message.toString(),
+          obj.message.toString(),
+        );
+      }
+      return obj;
+    } catch (e) {
+      print('Error: $e');
+      throw e;
+    }
+  }
+  //Beda
+  // Beda
+  static Future<UploadSpertpart> ListSperpartID() async {
+    try {
+      final token = Publics.controller.getToken.value ?? '';
+      print('Token: $token');
+
+      var response = await Dio().get(
+        _getListSperpart,
+        options: Options(
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $token",
+          },
+        ),
+      );
+
+      print('Response: ${response.data}');
+
+      final obj = UploadSpertpart.fromJson(response.data);
 
       if (obj.message == 'Invalid token: Expired') {
         Get.offAllNamed(Routes.SIGNIN);

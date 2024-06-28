@@ -12,20 +12,22 @@ import '../../../componen/loading_shammer_booking.dart';
 import '../../../componen/loading_shammer_history.dart';
 import '../../../data/data_endpoint/pkb.dart';
 import '../../../data/data_endpoint/profile.dart';
+import '../../../data/data_endpoint/uploadperpart.dart';
 import '../../../data/endpoint.dart';
 import '../../../data/localstorage.dart';
 import '../../../routes/app_pages.dart';
 import '../componen/card_pkb.dart';
+import '../componen/card_uploadperpart.dart';
 
-class PKBlist extends StatefulWidget {
-  const PKBlist({Key? key}) : super(key: key);
+class PKBUploadlist extends StatefulWidget {
+  const PKBUploadlist({Key? key}) : super(key: key);
 
   @override
-  State<PKBlist> createState() => _PKBlistState();
+  State<PKBUploadlist> createState() => _PKBUploadlistState();
 }
 
-class _PKBlistState extends State<PKBlist>
-    with AutomaticKeepAliveClientMixin<PKBlist> {
+class _PKBUploadlistState extends State<PKBUploadlist>
+    with AutomaticKeepAliveClientMixin<PKBUploadlist> {
   late RefreshController _refreshController;
 
   @override
@@ -37,9 +39,9 @@ class _PKBlistState extends State<PKBlist>
   @override
   bool get wantKeepAlive => true;
 
-  Future<void> handleBookingTap(DataPKB e) async {
+  Future<void> handleBookingTap(DataPhotosparepart e) async {
     Get.toNamed(
-      Routes.DETAILPKB,
+      Routes.CardDetailPKBSperepart,
       arguments: {
         'id': e.id ?? '',
         'kode_booking': e.kodeBooking ?? '',
@@ -124,15 +126,15 @@ class _PKBlistState extends State<PKBlist>
         'otp_expiry': e.otpExpiry ?? '',
         'gambar': e.gambar ?? '',
         'nama_cabang': e.namaCabang ?? '',
-        'nama_merk': e.namaMerk ?? '',
-        'nama_tipe': e.namaTipe ?? '',
-        'status': e.status ?? '',
-        'jasa': e.jasa?.map((j) => {
-          'nama_jasa': j.namaJasa ?? '',
-          'kode_jasa': j.kodeJasa ?? '',
-          'harga': j.hargaJasa ?? 0, // Adjust this to the correct type
-        }).toList() ?? [],
-        'parts': e.parts ?? [], // Adjust this if 'parts' is not null
+        // 'nama_merk': e.namaMerk ?? '',
+        // 'nama_tipe': e.namaTipe ?? '',
+        // 'status': e.status ?? '',
+        // 'jasa': e.jasa?.map((j) => {
+        //   'nama_jasa': j.namaJasa ?? '',
+        //   'kode_jasa': j.kodeJasa ?? '',
+        //   'harga': j.hargaJasa ?? 0,
+        // }).toList() ?? [],
+        // 'parts': e.parts ?? [],
       },
     );
   }
@@ -147,89 +149,88 @@ class _PKBlistState extends State<PKBlist>
       appBar: AppBar(
           automaticallyImplyLeading: false,
           forceMaterialTransparency: true,
-        title: FutureBuilder(
-          future: API.PKBID(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: loadsearch(),
-              );
-            } else if (snapshot.hasData && snapshot.data != null) {
-              final data = snapshot.data!.dataPKB;
+            title: FutureBuilder(
+              future: API.ListSperpartID(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: loadsearch(),
+                  );
+                } else if (snapshot.hasData && snapshot.data != null) {
+                  final data = snapshot.data!.dataPhotosparepart;
 
-              if (data != null && data.isNotEmpty) {
-                return InkWell(
-                  onTap: () => showSearch(
-                    context: context,
-                    delegate: SearchPage<DataPKB>(
-                      items: data,
-                      searchLabel: 'Cari PKB Service',
-                      searchStyle: GoogleFonts.nunito(color: Colors.black),
-                      showItemsOnEmpty: true,
-                      failure: Center(
-                        child: Text(
-                          'History Tidak Dtemukan :(',
-                          style: GoogleFonts.nunito(),
+                  if (data != null && data.isNotEmpty) {
+                    return InkWell(
+                      onTap: () => showSearch(
+                        context: context,
+                        delegate: SearchPage<DataPhotosparepart>(
+                          items: data,
+                          searchLabel: 'Cari PKB Service',
+                          searchStyle: GoogleFonts.nunito(color: Colors.black),
+                          showItemsOnEmpty: true,
+                          failure: Center(
+                            child: Text(
+                              'History Tidak Dtemukan :(',
+                              style: GoogleFonts.nunito(),
+                            ),
+                          ),
+                          filter: (booking) => [
+                            booking.nama,
+                            booking.noPolisi,
+                            booking.createdByPkb,
+                            booking.createdBy,
+                            booking.tglEstimasi,
+                            booking.tipeSvc,
+                            booking.kodePkb,
+                            booking.kodePelanggan,
+                          ],
+                          builder: (items) => pkblistSperpart(
+                            items: items,
+                            onTap: () {
+                              handleBookingTap(items);
+                            },
+                          ),
                         ),
                       ),
-                      filter: (booking) => [
-                        booking.nama,
-                        booking.noPolisi,
-                        booking.status,
-                        booking.createdByPkb,
-                        booking.createdBy,
-                        booking.tglEstimasi,
-                        booking.tipeSvc,
-                        booking.kodePkb,
-                        booking.kodePelanggan,
-                      ],
-                      builder: (items) => pkblist(
-                        items: items,
-                        onTap: () {
-                          handleBookingTap(items);
-                        },
-                      ),
-                    ),
-                  ),
-                  child: Container(
-                    width: double.infinity,
-                    margin: EdgeInsets.only(top: 10, bottom: 10),
-                    padding: EdgeInsets.symmetric(vertical: 10),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.15),
-                          spreadRadius: 5,
-                          blurRadius: 10,
-                          offset: const Offset(0, 3),
+                      child: Container(
+                        width: double.infinity,
+                        margin: EdgeInsets.only(top: 10, bottom: 10),
+                        padding: EdgeInsets.symmetric(vertical: 10),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.15),
+                              spreadRadius: 5,
+                              blurRadius: 10,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                    child: Row(children: [
-                      SizedBox(width: 10,),
-                        Icon(Icons.search_rounded, color: MyColors.appPrimaryColor,),
-                      SizedBox(width: 10,),
-                      Text('Pencarian PKB Service',  style: TextStyle(fontSize: 14, color: MyColors.appPrimaryColor),)
-                    ],),
-                  ),
-                );
-              } else {
-                return Center(
-                  child: Text(
-                    'Pencarian',
-                    style: GoogleFonts.nunito(fontSize: 16),
-                  ),
-                );
-              }
-            } else {
-              return Center(
-                child: loadsearch(),
-              );
-            }
-          },
-        ),
+                        child: Row(children: [
+                          SizedBox(width: 10,),
+                          Icon(Icons.search_rounded, color: MyColors.appPrimaryColor,),
+                          SizedBox(width: 10,),
+                          Text('Pencarian List Sperepart',  style: TextStyle(fontSize: 14, color: MyColors.appPrimaryColor),)
+                        ],),
+                      ),
+                    );
+                  } else {
+                    return Center(
+                      child: Text(
+                        'Pencarian',
+                        style: GoogleFonts.nunito(fontSize: 16),
+                      ),
+                    );
+                  }
+                } else {
+                  return Center(
+                    child: loadsearch(),
+                  );
+                }
+              },
+            ),
       ),
       body: SmartRefresher(
         controller: _refreshController,
@@ -241,7 +242,7 @@ class _PKBlistState extends State<PKBlist>
           child: Column(
             children: [
               FutureBuilder(
-                future: API.PKBID(),
+                future: API.ListSperpartID(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Center(child: Loadingshammer());
@@ -265,8 +266,8 @@ class _PKBlistState extends State<PKBlist>
                       ),
                     );
                   } else if (!snapshot.hasData ||
-                      (snapshot.data as PKB).dataPKB == null ||
-                      (snapshot.data as PKB).dataPKB!.isEmpty) {
+                      (snapshot.data as UploadSpertpart).dataPhotosparepart == null ||
+                      (snapshot.data as UploadSpertpart).dataPhotosparepart!.isEmpty) {
                     return Container(
                       height: 500,
                       child: Column(
@@ -283,7 +284,7 @@ class _PKBlistState extends State<PKBlist>
                             height: 10,
                           ),
                           Text(
-                            'Belum ada data PKB',
+                            'Belum ada data Foto Sperepart',
                             style: TextStyle(
                                 color: MyColors.appPrimaryColor,
                                 fontWeight: FontWeight.bold),
@@ -292,9 +293,9 @@ class _PKBlistState extends State<PKBlist>
                       ),
                     );
                   } else {
-                    PKB getDataAcc = snapshot.data as PKB;
-                    List<DataPKB> sortedDataPKB =
-                    getDataAcc.dataPKB!.toList();
+                    UploadSpertpart getDataAcc = snapshot.data as UploadSpertpart;
+                    List<DataPhotosparepart> sortedDataPKB =
+                    getDataAcc.dataPhotosparepart!.toList();
                     sortedDataPKB.sort((a, b) {
                       int extractNumber(String kodePkb) {
                         RegExp regex = RegExp(r'(\d+)$');
@@ -316,7 +317,7 @@ class _PKBlistState extends State<PKBlist>
                           ),
                         ),
                         children: sortedDataPKB.map((e) {
-                          return pkblist(
+                          return pkblistSperpart(
                             items: e,
                             onTap: () {
                               handleBookingTap(e);

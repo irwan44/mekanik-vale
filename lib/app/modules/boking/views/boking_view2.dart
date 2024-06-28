@@ -316,10 +316,31 @@ class _BokingView2State extends State<BokingView2> {
                           ),
                         ),
                       ),
-                      child: Icon(
-                        Icons.search_rounded,
-                        color: MyColors.appPrimaryColor,
-                      ),
+                      child: Container(
+                          padding: EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.15),
+                                spreadRadius: 5,
+                                blurRadius: 10,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.search_rounded,
+                                color: MyColors.appPrimaryColor,
+                              ),
+                              SizedBox(width: 10,),
+                              Text('Pencarian')
+                            ],
+                          )
+                      )
                     );
                   } else {
                     return Center(

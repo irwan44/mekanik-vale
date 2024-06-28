@@ -301,10 +301,31 @@ class _BokingView2State extends State<BokingView2> {
                           ),
                         ),
                       ),
-                      child: Icon(
-                        Icons.search_rounded,
-                        color: MyColors.appPrimaryColor,
-                      ),
+                      child: Container(
+                        padding: EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.15),
+                                spreadRadius: 5,
+                                blurRadius: 10,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.search_rounded,
+                              color: MyColors.appPrimaryColor,
+                            ),
+                            SizedBox(width: 10,),
+                            Text('Pencarian')
+                          ],
+                        )
+                      )
                     );
                   } else {
                     return Center(
@@ -386,14 +407,56 @@ class _BokingView2State extends State<BokingView2> {
                     child: Loadingshammer(),
                   );
                 } else if (snapshot.hasError) {
-                  return const Center(
-                    child: Text('Belum ada data booking.'),
+                  return Container(
+                    height: 500,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          'assets/icons/booking.png',
+                          width: 100.0,
+                          height: 100.0,
+                          fit: BoxFit.cover,
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Text(
+                          'Belum ada data Booking',
+                          style: TextStyle(
+                              color: MyColors.appPrimaryColor,
+                              fontWeight: FontWeight.bold),
+                        )
+                      ],
+                    ),
                   );
                 } else if (snapshot.hasData) {
                   Boking getDataAcc = snapshot.data!;
                   if (getDataAcc.status == false) {
-                    return const Center(
-                      child: Text('Belum ada data booking.'),
+                    return Container(
+                      height: 500,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            'assets/icons/booking.png',
+                            width: 100.0,
+                            height: 100.0,
+                            fit: BoxFit.cover,
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Text(
+                            'Belum ada data Booking',
+                            style: TextStyle(
+                                color: MyColors.appPrimaryColor,
+                                fontWeight: FontWeight.bold),
+                          )
+                        ],
+                      ),
                     );
                   } else if (getDataAcc.message == 'Invalid token: Expired') {
                     Get.offAllNamed(Routes.SIGNIN);
@@ -473,113 +536,168 @@ class _BokingView2State extends State<BokingView2> {
                       children: filteredList.map(
                             (e) => BokingList(
                           items: e,
-                          onTap: () async {
-                            HapticFeedback.lightImpact();
-                            if (kDebugMode) {
-                              print('Nilai e.namaService: ${e.namaService ?? ''}');
-                            }
-                            if (e.bookingStatus != null && e.namaService != null) {
-                              String kategoriKendaraanId = '';
-
-                              // Ambil kategori kendaraan id jika dibutuhkan
-                              final generalData = await API.kategoriID();
-                              if (generalData != null) {
-                                final matchingKategori = generalData.dataKategoriKendaraan?.firstWhere(
-                                      (kategori) => kategori.kategoriKendaraan == e.kategoriKendaraan,
-                                  orElse: () => DataKategoriKendaraan(kategoriKendaraanId: '', kategoriKendaraan: ''),
-                                );
-
-                                if (matchingKategori != null && matchingKategori is DataKategoriKendaraan) {
-                                  kategoriKendaraanId = matchingKategori.kategoriKendaraanId ?? '';
+                              onTap: () async {
+                                HapticFeedback.lightImpact();
+                                if (kDebugMode) {
+                                  print('Nilai e.namaService: ${e.namaService ?? ''}');
                                 }
-                              }
+                                if (e.bookingStatus != null && e.namaService != null) {
+                                  String kategoriKendaraanId = '';
+                                  final generalData = await API.kategoriID();
+                                  if (generalData != null) {
+                                    final matchingKategori = generalData.dataKategoriKendaraan?.firstWhere(
+                                          (kategori) => kategori.kategoriKendaraan == e.kategoriKendaraan,
+                                      orElse: () => DataKategoriKendaraan(kategoriKendaraanId: '', kategoriKendaraan: ''),
+                                    );
 
-                              if (e.bookingStatus!.toLowerCase() == 'booking') {
-                                Get.toNamed(
-                                  Routes.APPROVE,
-                                  arguments: {
-                                    'tgl_booking': e.tglBooking ?? '',
-                                    'jam_booking': e.jamBooking ?? '',
-                                    'nama': e.nama ?? '',
-                                    'kode_kendaraan': e.kodeKendaraan ?? '',
-                                    'kode_pelanggan': e.kodePelanggan ?? '',
-                                    'kode_booking': e.kodeBooking ?? '',
-                                    'nama_jenissvc': e.namaService ?? '',
-                                    'no_polisi': e.noPolisi ?? '',
-                                    'nama_merk': e.namaMerk ?? '',
-                                    'keluhan': e.keluhan ?? '',
-                                    'tahun': e.tahun ?? '',
-                                    'warna': e.warna ?? '',
-                                    'type_order': e.typeOrder ?? '',
-                                    'booking_id': e.tglBooking ?? '',
-                                    'nama_tipe': e.namaTipe ?? '',
-                                    'alamat': e.alamat ?? '',
-                                    'hp': e.hp ?? '',
-                                    'hp_pic': e.hpPic ?? '',
-                                    'booking_id': e.bookingId ?? '',
-                                    'kategori_kendaraan': e.kategoriKendaraan ?? '',
-                                  },
-                                );
-                              } else if (e.bookingStatus!.toLowerCase() == 'approve') {
-                                if (e.typeOrder != null && e.typeOrder!.toLowerCase() == 'emergency service') {
-                                  Get.toNamed(
-                                    Routes.EmergencyView,
-                                    arguments: {
-                                      'tgl_booking': e.tglBooking ?? '',
-                                      'booking_id': e.bookingId.toString(),
-                                      'jam_booking': e.jamBooking ?? '',
-                                      'nama': e.nama ?? '',
-                                      'location': e.location ?? '',
-                                      'kode_booking': e.kodeBooking ?? '',
-                                      'kode_kendaraan': e.kodeKendaraan ?? '',
-                                      'kode_pelanggan': e.kodePelanggan ?? '',
-                                      'nama_jenissvc': e.namaService ?? '',
-                                      'no_polisi': e.noPolisi ?? '',
-                                      'tahun': e.tahun ?? '',
-                                      'keluhan': e.keluhan ?? '',
-                                      'type_order': e.typeOrder ?? '',
-                                      'kategori_kendaraan': e.kategoriKendaraan ?? '',
-                                      'kategori_kendaraan_id': '',
-                                      'warna': e.warna ?? '',
-                                      'hp': e.hp ?? '',
-                                      'nama_merk': e.namaMerk ?? '',
-                                      'transmisi': e.transmisi ?? '',
-                                      'nama_tipe': e.namaTipe ?? '',
-                                      'alamat': e.alamat ?? '',
-                                      'booking_id': e.bookingId ?? '',
-                                      'status': e.bookingStatus ?? '',
-                                    },
-                                  );
-                                } else {
-                                  if (e.namaService!.toLowerCase() == 'repair & maintenance') {
+                                    if (matchingKategori != null && matchingKategori is DataKategoriKendaraan) {
+                                      kategoriKendaraanId = matchingKategori.kategoriKendaraanId ?? '';
+                                    }
+                                  }
+                                  if (e.bookingStatus!.toLowerCase() == 'booking') {
                                     Get.toNamed(
-                                      Routes.REPAIR_MAINTENEN,
+                                      Routes.APPROVE,
                                       arguments: {
                                         'tgl_booking': e.tglBooking ?? '',
-                                        'booking_id': e.bookingId.toString(),
                                         'jam_booking': e.jamBooking ?? '',
                                         'nama': e.nama ?? '',
-                                        'kode_booking': e.kodeBooking ?? '',
                                         'kode_kendaraan': e.kodeKendaraan ?? '',
                                         'kode_pelanggan': e.kodePelanggan ?? '',
+                                        'kode_booking': e.kodeBooking ?? '',
                                         'nama_jenissvc': e.namaService ?? '',
                                         'no_polisi': e.noPolisi ?? '',
-                                        'tahun': e.tahun ?? '',
-                                        'keluhan': e.keluhan ?? '',
-                                        'type_order': e.typeOrder ?? '',
-                                        'kategori_kendaraan_id': kategoriKendaraanId,
-                                        'kategori_kendaraan': e.kategoriKendaraan ?? '',
-                                        'warna': e.warna ?? '',
-                                        'hp': e.hp ?? '',
                                         'nama_merk': e.namaMerk ?? '',
-                                        'transmisi': e.transmisi ?? '',
+                                        'keluhan': e.keluhan ?? '',
+                                        'tahun': e.tahun ?? '',
+                                        'warna': e.warna ?? '',
+                                        'type_order': e.typeOrder ?? '',
+                                        'booking_id': e.tglBooking ?? '',
                                         'nama_tipe': e.namaTipe ?? '',
                                         'alamat': e.alamat ?? '',
+                                        'hp': e.hp ?? '',
+                                        'hp_pic': e.hpPic ?? '',
                                         'booking_id': e.bookingId ?? '',
-                                        'status': e.bookingStatus ?? '',
+                                        'kategori_kendaraan': e.kategoriKendaraan ?? '',
                                       },
                                     );
-                                  } else {
+                                  } else if (e.bookingStatus!.toLowerCase() == 'approve') {
+                                    if (e.typeOrder != null && e.typeOrder!.toLowerCase() == 'emergency service') {
+                                      Get.toNamed(
+                                        Routes.EmergencyView,
+                                        arguments: {
+                                          'tgl_booking': e.tglBooking ?? '',
+                                          'booking_id': e.bookingId.toString(),
+                                          'jam_booking': e.jamBooking ?? '',
+                                          'nama': e.nama ?? '',
+                                          'location': e.location ?? '',
+                                          'kode_booking': e.kodeBooking ?? '',
+                                          'kode_kendaraan': e.kodeKendaraan ?? '',
+                                          'kode_pelanggan': e.kodePelanggan ?? '',
+                                          'nama_jenissvc': e.namaService ?? '',
+                                          'no_polisi': e.noPolisi ?? '',
+                                          'tahun': e.tahun ?? '',
+                                          'keluhan': e.keluhan ?? '',
+                                          'type_order': e.typeOrder ?? '',
+                                          'kategori_kendaraan': e.kategoriKendaraan ?? '',
+                                          'kategori_kendaraan_id': '',
+                                          'warna': e.warna ?? '',
+                                          'hp': e.hp ?? '',
+                                          'nama_merk': e.namaMerk ?? '',
+                                          'transmisi': e.transmisi ?? '',
+                                          'nama_tipe': e.namaTipe ?? '',
+                                          'alamat': e.alamat ?? '',
+                                          'booking_id': e.bookingId ?? '',
+                                          'status': e.bookingStatus ?? '',
+                                        },
+                                      );
+                                    } else {
+                                      if (e.namaService!.toLowerCase() == 'repair & maintenance') {
+                                        Get.toNamed(
+                                          Routes.REPAIR_MAINTENEN,
+                                          arguments: {
+                                            'tgl_booking': e.tglBooking ?? '',
+                                            'booking_id': e.bookingId.toString(),
+                                            'jam_booking': e.jamBooking ?? '',
+                                            'nama': e.nama ?? '',
+                                            'kode_booking': e.kodeBooking ?? '',
+                                            'kode_kendaraan': e.kodeKendaraan ?? '',
+                                            'kode_pelanggan': e.kodePelanggan ?? '',
+                                            'nama_jenissvc': e.namaService ?? '',
+                                            'no_polisi': e.noPolisi ?? '',
+                                            'tahun': e.tahun ?? '',
+                                            'keluhan': e.keluhan ?? '',
+                                            'type_order': e.typeOrder ?? '',
+                                            'kategori_kendaraan_id': kategoriKendaraanId,
+                                            'kategori_kendaraan': e.kategoriKendaraan ?? '',
+                                            'warna': e.warna ?? '',
+                                            'hp': e.hp ?? '',
+                                            'nama_merk': e.namaMerk ?? '',
+                                            'transmisi': e.transmisi ?? '',
+                                            'nama_tipe': e.namaTipe ?? '',
+                                            'alamat': e.alamat ?? '',
+                                            'booking_id': e.bookingId ?? '',
+                                            'status': e.bookingStatus ?? '',
+                                          },
+                                        );
+                                      } else if (e.namaService!.toLowerCase() == 'periodical maintenance') {
+                                        Get.toNamed(
+                                          Routes.REPAIR_MAINTENEN,
+                                          arguments: {
+                                            'tgl_booking': e.tglBooking ?? '',
+                                            'booking_id': e.bookingId.toString(),
+                                            'jam_booking': e.jamBooking ?? '',
+                                            'nama': e.nama ?? '',
+                                            'kode_booking': e.kodeBooking ?? '',
+                                            'kode_kendaraan': e.kodeKendaraan ?? '',
+                                            'kode_pelanggan': e.kodePelanggan ?? '',
+                                            'nama_jenissvc': e.namaService ?? '',
+                                            'no_polisi': e.noPolisi ?? '',
+                                            'tahun': e.tahun ?? '',
+                                            'keluhan': e.keluhan ?? '',
+                                            'type_order': e.typeOrder ?? '',
+                                            'kategori_kendaraan_id': kategoriKendaraanId,
+                                            'kategori_kendaraan': e.kategoriKendaraan ?? '',
+                                            'warna': e.warna ?? '',
+                                            'hp': e.hp ?? '',
+                                            'nama_merk': e.namaMerk ?? '',
+                                            'transmisi': e.transmisi ?? '',
+                                            'nama_tipe': e.namaTipe ?? '',
+                                            'alamat': e.alamat ?? '',
+                                            'booking_id': e.bookingId ?? '',
+                                            'status': e.bookingStatus ?? '',
+                                          },
+                                        );
+                                      } else {
+                                        Get.toNamed(
+                                          Routes.GENERAL_CHECKUP,
+                                          arguments: {
+                                            'tgl_booking': e.tglBooking ?? '',
+                                            'booking_id': e.bookingId.toString(),
+                                            'jam_booking': e.jamBooking ?? '',
+                                            'nama': e.nama ?? '',
+                                            'kode_booking': e.kodeBooking ?? '',
+                                            'kode_kendaraan': e.kodeKendaraan ?? '',
+                                            'kode_pelanggan': e.kodePelanggan ?? '',
+                                            'nama_jenissvc': e.namaService ?? '',
+                                            'no_polisi': e.noPolisi ?? '',
+                                            'tahun': e.tahun ?? '',
+                                            'keluhan': e.keluhan ?? '',
+                                            'type_order': e.typeOrder ?? '',
+                                            'kategori_kendaraan_id': kategoriKendaraanId,
+                                            'kategori_kendaraan': e.kategoriKendaraan ?? '',
+                                            'warna': e.warna ?? '',
+                                            'hp': e.hp ?? '',
+                                            'nama_merk': e.namaMerk ?? '',
+                                            'transmisi': e.transmisi ?? '',
+                                            'nama_tipe': e.namaTipe ?? '',
+                                            'alamat': e.alamat ?? '',
+                                            'booking_id': e.bookingId ?? '',
+                                            'status': e.bookingStatus ?? '',
+                                          },
+                                        );
+                                      }
+                                    }
+                                  } else if (e.bookingStatus!.toLowerCase() == 'diproses') {
                                     Get.toNamed(
                                       Routes.GENERAL_CHECKUP,
                                       arguments: {
@@ -607,44 +725,14 @@ class _BokingView2State extends State<BokingView2> {
                                         'status': e.bookingStatus ?? '',
                                       },
                                     );
+                                  } else {
+                                    print('Booking status tidak sesuai dengan kondisi yang ditentukan');
                                   }
+                                } else {
+                                  print('Booking status atau namaService bernilai null');
                                 }
-                              } else if (e.bookingStatus!.toLowerCase() == 'diproses') {
-                                Get.toNamed(
-                                  Routes.GENERAL_CHECKUP,
-                                  arguments: {
-                                    'tgl_booking': e.tglBooking ?? '',
-                                    'booking_id': e.bookingId.toString(),
-                                    'jam_booking': e.jamBooking ?? '',
-                                    'nama': e.nama ?? '',
-                                    'kode_booking': e.kodeBooking ?? '',
-                                    'kode_kendaraan': e.kodeKendaraan ?? '',
-                                    'kode_pelanggan': e.kodePelanggan ?? '',
-                                    'nama_jenissvc': e.namaService ?? '',
-                                    'no_polisi': e.noPolisi ?? '',
-                                    'tahun': e.tahun ?? '',
-                                    'keluhan': e.keluhan ?? '',
-                                    'type_order': e.typeOrder ?? '',
-                                    'kategori_kendaraan_id': kategoriKendaraanId,
-                                    'kategori_kendaraan': e.kategoriKendaraan ?? '',
-                                    'warna': e.warna ?? '',
-                                    'hp': e.hp ?? '',
-                                    'nama_merk': e.namaMerk ?? '',
-                                    'transmisi': e.transmisi ?? '',
-                                    'nama_tipe': e.namaTipe ?? '',
-                                    'alamat': e.alamat ?? '',
-                                    'booking_id': e.bookingId ?? '',
-                                    'status': e.bookingStatus ?? '',
-                                  },
-                                );
-                              } else {
-                                print('Booking status tidak sesuai dengan kondisi yang ditentukan');
-                              }
-                            } else {
-                              print('Booking status atau namaService bernilai null');
-                            }
-                          },
-                        ),
+                              },
+                            ),
                       ).toList(),
                     ),
                   );

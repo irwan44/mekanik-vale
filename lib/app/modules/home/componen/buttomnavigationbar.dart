@@ -13,6 +13,7 @@ import 'package:quickalert/widgets/quickalert_dialog.dart';
 import '../../../data/data_endpoint/boking.dart';
 import '../../boking/views/boking_view.dart';
 import '../../promek/views/pkb.dart';
+import '../../promek/views/view.dart';
 import '../views/home_view.dart';
 
 class HomeView extends StatefulWidget {
@@ -178,7 +179,7 @@ class _HomeViewState extends State<HomeView> {
               },
               children: <Widget>[
                 HomePage(),
-                PKBlist(),
+                StackOver(),
                 BokingView(),
                 HistoryView2(clearCachedBooking: clearCachedBoking),
                 ProfileView(),
