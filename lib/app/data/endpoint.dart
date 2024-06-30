@@ -18,6 +18,7 @@ import 'data_endpoint/boking.dart';
 import 'data_endpoint/bookingmasuk.dart';
 import 'data_endpoint/deletephotosperepart.dart';
 import 'data_endpoint/detailhistory.dart';
+import 'data_endpoint/detailpart.dart';
 import 'data_endpoint/detailsperpart.dart';
 import 'data_endpoint/estimasi.dart';
 import 'data_endpoint/gc_mekanik.dart';
@@ -72,7 +73,7 @@ class API {
   static const _getDikerjakan = '$_baseUrl/mekanik/get-dikerjakan';
   static const _getDetailhistory = '$_baseUrl/mekanik/get-detail-history';
   static const _getDetailphotosparepart = '$_baseUrl/mekanik/detail-photo-sparepart';
-  static const _getpkb = '$_baseUrl/mekanik/pkb-get-pkb';
+  static const _getpkb = '$_baseUrl/mekanik/get-pkb';
   static const _getmekanikpkb = '$_baseUrl/mekanik/pkb/get-jasa-mekanik';
   static const _getInsetpromekpkb = '$_baseUrl/mekanik/pkb/insert-promek';
   static const _getPKBUpdateKeteranganStop = '$_baseUrl/mekanik/pkb/update-keterangan-promek';
@@ -86,6 +87,8 @@ class API {
   static const _getHistotyapsen = '$_baseUrl/mekanik/absen/history';
   static const _getListSperpart = '$_baseUrl/mekanik/photo-sparepart';
   static const _getDeletesPerpart = '$_baseUrl/mekanik/delete-photosparepart';
+  static const _getUploadBeforendAfter = '$_baseUrl/mekanik/insert-photosparepart';
+  static const _getDetailpart = '$_baseUrl/mekanik/get-detail-part';
   static final _controller = Publics.controller;
 
 
@@ -1451,6 +1454,47 @@ class API {
       throw e;
     }
   }
+  // Beda
+  static Future<Getdetailpart> DetailSpertpartIDDetail({
+    required String kodesvc,
+  }) async {
+    final data = {
+      "kode_svc": kodesvc,
+    };
+
+    try {
+      final token = Publics.controller.getToken.value ?? '';
+      print('Token: $token');
+
+      final response = await Dio().post(
+        _getDetailpart,
+        data: data,
+        options: Options(
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $token",
+          },
+        ),
+      );
+
+      print('Response: ${response.data}');
+
+      final obj = Getdetailpart.fromJson(response.data);
+
+      if (obj.message == 'Invalid token: Expired') {
+        Get.offAllNamed(Routes.SIGNIN);
+        Get.snackbar(
+          obj.message.toString(),
+          obj.message.toString(),
+        );
+      }
+      return obj;
+    } catch (e) {
+      print('Error: $e');
+      throw e;
+    }
+  }
+  //Beda
   //Beda
   static Future<DeletPhotoSperepart> DeletesPerpartID({
     required String id,
@@ -1491,6 +1535,7 @@ class API {
       throw e;
     }
   }
+
 //Beda
   static Future<PKB> PKBID() async {
     try {

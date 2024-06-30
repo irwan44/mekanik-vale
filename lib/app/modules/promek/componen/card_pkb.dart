@@ -57,8 +57,13 @@ class pkblist extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Column(children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
                         Text(items.namaCabang?? '', style: const TextStyle(fontWeight: FontWeight.bold),),
+                        Text('Nomor Lambung :'),
+                        Text(items.vinnumber?? 'belum ada nomor lambung', style: const TextStyle(fontWeight: FontWeight.bold),),
                       ],),
                       Container(
                         padding: const EdgeInsets.all(10),
@@ -69,7 +74,7 @@ class pkblist extends StatelessWidget {
                         child: Column(
                           children: [
                             Text(
-                              items.status.toString(),
+                              items.status??'',
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,

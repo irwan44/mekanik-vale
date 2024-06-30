@@ -58,8 +58,13 @@ class pkblistSperpart extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Column(children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
                         Text(items.namaCabang?? '', style: const TextStyle(fontWeight: FontWeight.bold),),
+                        Text('Nomor Lambung :'),
+                        Text(items.vinNumber?? 'belum ada nomor lambung', style: const TextStyle(fontWeight: FontWeight.bold),),
                       ],),
                       // Container(
                       //   padding: const EdgeInsets.all(10),

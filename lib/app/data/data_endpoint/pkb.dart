@@ -115,6 +115,7 @@ class DataPKB {
   String? namaMerk;
   String? namaTipe;
   String? status;
+  String? vinnumber;
   List<Parts>? parts;
   List<Jasa>? jasa;
 
@@ -206,6 +207,7 @@ class DataPKB {
         this.namaMerk,
         this.namaTipe,
         this.status,
+        this.vinnumber,
         this.parts,
         this.jasa});
 
@@ -297,6 +299,7 @@ class DataPKB {
     namaMerk = json['nama_merk'];
     namaTipe = json['nama_tipe'];
     status = json['status'];
+    vinnumber = json['vin_number'];
     if (json['parts'] != null) {
       parts = <Parts>[];
       json['parts'].forEach((v) {

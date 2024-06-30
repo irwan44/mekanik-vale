@@ -422,6 +422,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.0"
+  flutter_reorderable_grid_view:
+    dependency: transitive
+    description:
+      name: flutter_reorderable_grid_view
+      sha256: ac92a49a8411adfda40f75eff44d0958ee879b0f9d6776bb6154c74aa166aaf1
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.0.0"
   flutter_staggered_animations:
     dependency: "direct main"
     description:
@@ -660,10 +668,10 @@ packages:
     dependency: "direct main"
     description:
       name: image_picker
-      sha256: b6951e25b795d053a6ba03af5f710069c99349de9341af95155d52665cb4607c
+      sha256: "021834d9c0c3de46bf0fe40341fa07168407f694d9b2bb18d532dc1261867f7a"
       url: "https://pub.dev"
     source: hosted
-    version: "0.8.9"
+    version: "1.1.2"
   image_picker_android:
     dependency: transitive
     description:
@@ -856,6 +864,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.5.7"
+  multi_image_picker:
+    dependency: "direct main"
+    description:
+      name: multi_image_picker
+      sha256: "3071bef51d4165f152bde7e22b6f6769745acd5939d70b9fc3d0c9137dbd0a15"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.8.01"
+  multi_image_picker_view:
+    dependency: "direct main"
+    description:
+      name: multi_image_picker_view
+      sha256: cc96d5d4aa8c50ff433088fb9c7e7acef50a2aa5c31565b7ffce36a9e0aad191
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.3"
   nested:
     dependency: transitive
     description:

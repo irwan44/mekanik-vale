@@ -9,12 +9,11 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
 import '../../../componen/color.dart';
-import '../../../data/data_endpoint/detailhistory.dart';
 import '../../../data/data_endpoint/detailsperpart.dart';
-import '../../../data/data_endpoint/mekanik_pkb.dart';
 import '../../../data/endpoint.dart';
-import '../controllers/promek_controller.dart';
+import '../../../data/publik.dart';
 import 'imagedetail/imagedetail.dart';
+import 'package:http/http.dart' as http;
 
 class CardDetailPKBSperepart extends StatefulWidget {
   const CardDetailPKBSperepart({Key? key}) : super(key: key);
@@ -26,36 +25,14 @@ class CardDetailPKBSperepart extends StatefulWidget {
 class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
   late RefreshController _refreshController;
   final ImagePicker _picker = ImagePicker();
-  List<AddedImageBefor> _addedImagesBefor = []; // Store AddedImage instead of XFile
-  List<AddedImageAfter> _addedImagesAfter = []; // Store AddedImage instead of XFile
+  List<AddedImageBefor> _addedImagesBefore = [];
+  List<AddedImageAfter> _addedImagesAfter = [];
+  String svcId = '';
+  String kodePkb = '';
+  String kodeSparepart = '';
 
-  Future<void> _pickImageBefore(ImageSource source, String photoType, String namaSparepart, String kodeSparepart) async {
-    final XFile? image = await _picker.pickImage(source: source);
-    if (image != null) {
-      String id = DateTime.now().millisecondsSinceEpoch.toString(); // Generate unique id
-      AddedImageBefor addedImage = AddedImageBefor(id: id, kodeSparepart: kodeSparepart, file: image);
-
-      setState(() {
-        _addedImagesBefor.add(addedImage);
-      });
-      print('Selected image path: ${image.path}');
-    }
-  }
-  Future<void> _pickImageAfter(ImageSource source, String photoType, String namaSparepart, String kodeSparepart) async {
-    final XFile? image = await _picker.pickImage(source: source);
-    if (image != null) {
-      String id = DateTime.now().millisecondsSinceEpoch.toString(); // Generate unique id
-      AddedImageAfter addedImage = AddedImageAfter(id: id, kodeSparepart: kodeSparepart, file: image);
-
-      setState(() {
-        _addedImagesAfter.add(addedImage);
-      });
-      print('Selected image path: ${image.path}');
-    }
-  }
-
-
-  void _showPicker(BuildContext context, String title, String photoType, String? namaSparepart, String? kodeSparepart) {
+  void _showPicker(
+      BuildContext context, String title, String photoType, String? namaSparepart, String? kodeSparepart) {
     showModalBottomSheet(
       showDragHandle: true,
       backgroundColor: Colors.white,
@@ -69,9 +46,16 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
               Container(
                 width: double.infinity,
                 padding: EdgeInsets.symmetric(horizontal: 10),
-                child:Column(
+                child: Column(
                   children: [
-                    Text('Upload Photo $title', style: TextStyle(fontWeight: FontWeight.bold, color: MyColors.appPrimaryColor, fontSize: 15),),
+                    Text(
+                      'Upload Photo $title',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: MyColors.appPrimaryColor,
+                        fontSize: 15,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -81,30 +65,39 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Text('Nama Sparepart :', style: TextStyle(fontWeight: FontWeight.normal),),
-                    Text('$namaSparepart', style: TextStyle(fontWeight: FontWeight.bold),),
+                    Text(
+                      'Nama Sparepart :',
+                      style: TextStyle(fontWeight: FontWeight.normal),
+                    ),
+                    Text(
+                      '$namaSparepart',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   ],
                 ),
               ),
               Container(
-                  padding: EdgeInsets.symmetric(horizontal: 10),
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Text('Kode Sparepart :', style: TextStyle(fontWeight: FontWeight.normal),),
-                        Text('$kodeSparepart', style: TextStyle(fontWeight: FontWeight.bold),),
-                      ])),
-
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Kode Sparepart :',
+                      style: TextStyle(fontWeight: FontWeight.normal),
+                    ),
+                    Text(
+                      '$kodeSparepart',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
               ListTile(
                 leading: const Icon(Icons.photo_library),
                 title: const Text('Gallery'),
                 onTap: () {
-                  if (photoType == 'Before') {
-                    _pickImageBefore(ImageSource.gallery, photoType, namaSparepart!, kodeSparepart!);
-                  } else if (photoType == 'After') {
-                    _pickImageAfter(ImageSource.gallery, photoType, namaSparepart!, kodeSparepart!);
-                  }
+                  _pickImages('Gallery', photoType, kodeSparepart!);
                   Navigator.of(context).pop();
                 },
               ),
@@ -112,11 +105,7 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
                 leading: const Icon(Icons.photo_camera),
                 title: const Text('Camera'),
                 onTap: () {
-                  if (photoType == 'Before') {
-                    _pickImageBefore(ImageSource.camera, photoType, namaSparepart!, kodeSparepart!);
-                  } else if (photoType == 'After') {
-                    _pickImageAfter(ImageSource.camera, photoType, namaSparepart!, kodeSparepart!);
-                  }
+                  _pickImages('Camera', photoType, kodeSparepart!);
                   Navigator.of(context).pop();
                 },
               ),
@@ -127,16 +116,126 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
     );
   }
 
+  Future<void> _pickImages(String sourceType, String photoType, String? kodeSparepart) async {
+    try {
+      List<XFile>? images;
+
+      if (sourceType == 'Gallery') {
+        images = await _picker.pickMultiImage();
+      } else if (sourceType == 'Camera') {
+        final XFile? image = await _picker.pickImage(source: ImageSource.camera);
+        if (image != null) {
+          images = [image];
+        }
+      }
+
+      if (images != null) {
+        for (var image in images) {
+          String id = DateTime.now().millisecondsSinceEpoch.toString();
+
+          if (photoType == 'Before') {
+            AddedImageBefor addedImage = AddedImageBefor(
+              id: id,
+              kodeSparepart: kodeSparepart ?? '', // Default to empty string if kodeSparepart is null
+              file: image,
+            );
+            _addedImagesBefore.add(addedImage);
+          } else if (photoType == 'After') {
+            AddedImageAfter addedImage = AddedImageAfter(
+              id: id,
+              kodeSparepart: kodeSparepart ?? '', // Default to empty string if kodeSparepart is null
+              file: image,
+            );
+            _addedImagesAfter.add(addedImage);
+          }
+
+          await _fetchAbsenInfo(kodeSparepart ?? ''); // Pass empty string if kodeSparepart is null
+          await _uploadImage(File(image.path), kodeSparepart ?? '', kodePkb, photoType); // Pass empty string if kodeSparepart is null
+
+          print('Selected image path: ${image.path}');
+        }
+
+        setState(() {});
+      }
+    } catch (e) {
+      print('Error picking images: $e');
+      // Handle error
+    }
+  }
+
+  Future<void> _uploadImage(File imageFile, String kodeSparepart, String KodePkb, String photoType) async {
+    final token = Publics.controller.getToken.value ?? ''; // Get the token
+    final url = Uri.parse('https://api-vale.techthinkhub.com/api/mekanik/insert-photosparepart');
+    final request = http.MultipartRequest('POST', url);
+
+    // Add the headers
+    request.headers['Authorization'] = 'Bearer $token';
+
+    // Add the fields
+    request.fields['svc_id'] = svcId;
+    request.fields['kode_pkb'] = kodePkb;
+    request.fields['dtl_kode_sparepart'] = kodeSparepart;
+
+    // Determine the current count of images for this type
+    int imageCount = photoType == 'Before' ? _addedImagesBefore.length : _addedImagesAfter.length;
+
+    // Set baris_dtl based on the current count (0-based index)
+    request.fields['baris_dtl'] = imageCount.toString();
+
+    print('svcId: $svcId');
+    print('kodePkb: $kodePkb');
+    print('kodesparepart : $kodeSparepart');
+    print('baris_dtl: ${request.fields['baris_dtl']}');
+
+    // Add the file with appropriate field name based on photoType and index
+    request.files.add(await http.MultipartFile.fromPath(
+      '${photoType == 'Before' ? 'image_before' : 'image_after'}_${imageCount}[]',
+      imageFile.path,
+    ));
+
+    try {
+      final response = await request.send();
+      if (response.statusCode == 200) {
+        print('Image uploaded successfully');
+      } else {
+        print('Image upload failed with status: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error uploading image: $e');
+    }
+  }
+
+
+  Future<void> _fetchAbsenInfo(String kodeSvc) async {
+    try {
+      final UploadSpertpart1 = await API.DetailSpertpartID(kodesvc: kodeSvc);
+      setState(() {
+        if (UploadSpertpart1?.dataPhotosparepart != null) {
+          svcId = UploadSpertpart1.dataPhotosparepart!.dataSvc!.svcId.toString();
+          kodePkb = UploadSpertpart1.dataPhotosparepart!.dataSvc!.kodePkb.toString();
+          print('svcId: $svcId'); // Ensure svcId is correctly set here
+        } else {
+          svcId = '';
+        }
+      });
+    } catch (e) {
+      print('Error fetching absen info: $e');
+    }
+  }
+
+  @override
+  void initState() {
+    _refreshController = RefreshController();
+    final Map<String, dynamic>? arguments = Get.arguments as Map<String, dynamic>?;
+    final String kodeSvc = arguments?['kode_svc'] ?? '';
+    _fetchAbsenInfo(kodeSvc);
+    super.initState();
+  }
+
   void _reloadData() {
     setState(() {
     });
   }
-  @override
-  void initState() {
-    _refreshController = RefreshController();
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     final Map<String, dynamic>? arguments = Get.arguments as Map<String, dynamic>?;
@@ -448,7 +547,7 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
                                                                 photoSparepart,
                                                                 dataSvcDtlJasa?[index].namaSparepart ?? "",
                                                                 dataSvcDtlJasa?[index].kodeSparepart ?? ""
-                                                            ).length + _addedImagesBefor.where((img) => img.kodeSparepart == dataSvcDtlJasa?[index].kodeSparepart).length,
+                                                            ).length + _addedImagesBefore.where((img) => img.kodeSparepart == dataSvcDtlJasa?[index].kodeSparepart).length,
                                                             itemBuilder: (context, photoIndex) {
                                                               if (photoIndex < getBeforePhotos(
                                                                   photoSparepart,
@@ -468,7 +567,7 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
                                                                 return buildPhotoWidget(imageUrl, photoId, kodesparepart);
                                                               } else {
                                                                 // Display newly added images filtered by kodeSparepart
-                                                                final List<AddedImageBefor> filteredAddedImages = _addedImagesBefor.where((img) => img.kodeSparepart == dataSvcDtlJasa?[index].kodeSparepart).toList();
+                                                                final List<AddedImageBefor> filteredAddedImages = _addedImagesBefore.where((img) => img.kodeSparepart == dataSvcDtlJasa?[index].kodeSparepart).toList();
                                                                 final AddedImageBefor addedImage = filteredAddedImages[photoIndex - getBeforePhotos(
                                                                     photoSparepart,
                                                                     dataSvcDtlJasa?[index].namaSparepart ?? "",

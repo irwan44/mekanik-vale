@@ -181,6 +181,7 @@ class _PKBlistState extends State<PKBlist>
                         booking.tglEstimasi,
                         booking.tipeSvc,
                         booking.kodePkb,
+                        booking.vinnumber,
                         booking.kodePelanggan,
                       ],
                       builder: (items) => pkblist(
