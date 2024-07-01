@@ -207,7 +207,7 @@ class pkblistSperpart extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text('Merek :'),
-                    // Text(items.namaMerk??'', style: const TextStyle(fontWeight: FontWeight.bold),),
+                    Text(items.namaMerk??'', style: const TextStyle(fontWeight: FontWeight.bold),),
                     const Text('Warna :'),
                     Text(items.warna??'', style: const TextStyle(fontWeight: FontWeight.bold),),
                   ],
@@ -217,7 +217,7 @@ class pkblistSperpart extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text('Type :'),
-                    // Text(items.namaTipe??'', style: const TextStyle(fontWeight: FontWeight.bold),),
+                    Text(items.namaTipe??'', style: const TextStyle(fontWeight: FontWeight.bold),),
                     const Text('NoPol :'),
                     Text(items.noPolisi??'', style: const TextStyle(fontWeight: FontWeight.bold),),
                   ],

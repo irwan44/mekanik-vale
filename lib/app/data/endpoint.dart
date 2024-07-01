@@ -73,7 +73,7 @@ class API {
   static const _getDikerjakan = '$_baseUrl/mekanik/get-dikerjakan';
   static const _getDetailhistory = '$_baseUrl/mekanik/get-detail-history';
   static const _getDetailphotosparepart = '$_baseUrl/mekanik/detail-photo-sparepart';
-  static const _getpkb = '$_baseUrl/mekanik/get-pkb';
+  static const _getpkb = '$_baseUrl/mekanik/pkb-get-pkb';
   static const _getmekanikpkb = '$_baseUrl/mekanik/pkb/get-jasa-mekanik';
   static const _getInsetpromekpkb = '$_baseUrl/mekanik/pkb/insert-promek';
   static const _getPKBUpdateKeteranganStop = '$_baseUrl/mekanik/pkb/update-keterangan-promek';

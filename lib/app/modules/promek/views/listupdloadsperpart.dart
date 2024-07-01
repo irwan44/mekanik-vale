@@ -8,6 +8,7 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:search_page/search_page.dart';
 import '../../../componen/loading_cabang_shimmer.dart';
 import '../../../componen/loading_search_shimmer.dart';
+import '../../../componen/loading_search_shimmerpkb.dart';
 import '../../../componen/loading_shammer_booking.dart';
 import '../../../componen/loading_shammer_history.dart';
 import '../../../data/data_endpoint/pkb.dart';
@@ -154,7 +155,7 @@ class _PKBUploadlistState extends State<PKBUploadlist>
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(
-                    child: loadsearch(),
+                    child: loadsearchpkb(),
                   );
                 } else if (snapshot.hasData && snapshot.data != null) {
                   final data = snapshot.data!.dataPhotosparepart;

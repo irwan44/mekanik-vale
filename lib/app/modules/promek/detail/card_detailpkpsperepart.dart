@@ -1,7 +1,7 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -32,7 +32,7 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
   String kodeSparepart = '';
 
   void _showPicker(
-      BuildContext context, String title, String photoType, String? namaSparepart, String? kodeSparepart) {
+      BuildContext context, String title, String photoType, String? namaSparepart, String? kodeSparepart,) {
     showModalBottomSheet(
       showDragHandle: true,
       backgroundColor: Colors.white,
@@ -115,7 +115,6 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
       },
     );
   }
-
   Future<void> _pickImages(String sourceType, String photoType, String? kodeSparepart) async {
     try {
       List<XFile>? images;
@@ -130,40 +129,96 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
       }
 
       if (images != null) {
+        // Show loading alert
+        QuickAlert.show(
+          barrierDismissible: true,
+          context: Get.context!,
+          type: QuickAlertType.loading,
+          headerBackgroundColor: Colors.yellow,
+          title: 'Proses Upload',
+          confirmBtnColor: Colors.green,
+        );
+
         for (var image in images) {
           String id = DateTime.now().millisecondsSinceEpoch.toString();
+
+          // Compress image
+          final compressedFile = await _compressImage(File(image.path));
+
+          // Convert the compressed File back to XFile
+          final compressedXFile = XFile(compressedFile.path);
 
           if (photoType == 'Before') {
             AddedImageBefor addedImage = AddedImageBefor(
               id: id,
               kodeSparepart: kodeSparepart ?? '', // Default to empty string if kodeSparepart is null
-              file: image,
+              file: compressedXFile, // Use the compressed XFile
             );
             _addedImagesBefore.add(addedImage);
           } else if (photoType == 'After') {
             AddedImageAfter addedImage = AddedImageAfter(
               id: id,
               kodeSparepart: kodeSparepart ?? '', // Default to empty string if kodeSparepart is null
-              file: image,
+              file: compressedXFile, // Use the compressed XFile
             );
             _addedImagesAfter.add(addedImage);
           }
 
-          await _fetchAbsenInfo(kodeSparepart ?? ''); // Pass empty string if kodeSparepart is null
-          await _uploadImage(File(image.path), kodeSparepart ?? '', kodePkb, photoType); // Pass empty string if kodeSparepart is null
+          await _uploadImage(compressedFile, kodeSparepart ?? '', kodePkb, photoType); // Pass empty string if kodeSparepart is null
 
-          print('Selected image path: ${image.path}');
+          print('Selected image path: ${compressedFile.path}');
         }
+
+        // Dismiss loading alert
+        Navigator.of(Get.context!).pop();
 
         setState(() {});
       }
     } catch (e) {
+      // Dismiss loading alert in case of error
+      Navigator.of(Get.context!).pop();
       print('Error picking images: $e');
       // Handle error
     }
   }
 
-  Future<void> _uploadImage(File imageFile, String kodeSparepart, String KodePkb, String photoType) async {
+  Future<File> _compressImage(File file) async {
+    final filePath = file.absolute.path;
+
+    // Determine the output format based on the file extension
+    CompressFormat format;
+    if (filePath.toLowerCase().endsWith('.jpg') || filePath.toLowerCase().endsWith('.jpeg')) {
+      format = CompressFormat.jpeg;
+    } else if (filePath.toLowerCase().endsWith('.png')) {
+      format = CompressFormat.png;
+    } else if (filePath.toLowerCase().endsWith('.heic')) {
+      format = CompressFormat.heic;
+    } else {
+      throw UnsupportedError('Unsupported file format');
+    }
+
+    final outPath = "${filePath.substring(0, filePath.lastIndexOf('.'))}_compressed${filePath.substring(filePath.lastIndexOf('.'))}";
+
+    final result = await FlutterImageCompress.compressAndGetFile(
+      file.absolute.path,
+      outPath,
+      quality: 70, // Adjust quality as needed
+      minWidth: 1080,
+      minHeight: 1080,
+      format: format,
+    );
+
+    if (result == null) {
+      throw Exception('Image compression failed');
+    }
+
+
+    return File(result.path);
+  }
+
+
+
+  Future<void> _uploadImage(File imageFile, String kodeSparepart, String kodePkb, String photoType) async {
     final token = Publics.controller.getToken.value ?? ''; // Get the token
     final url = Uri.parse('https://api-vale.techthinkhub.com/api/mekanik/insert-photosparepart');
     final request = http.MultipartRequest('POST', url);
@@ -179,7 +234,7 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
     // Determine the current count of images for this type
     int imageCount = photoType == 'Before' ? _addedImagesBefore.length : _addedImagesAfter.length;
 
-    // Set baris_dtl based on the current count (0-based index)
+    // Set baris_dtl based on the current count of files uploaded
     request.fields['baris_dtl'] = imageCount.toString();
 
     print('svcId: $svcId');
@@ -189,7 +244,7 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
 
     // Add the file with appropriate field name based on photoType and index
     request.files.add(await http.MultipartFile.fromPath(
-      '${photoType == 'Before' ? 'image_before' : 'image_after'}_${imageCount}[]',
+      '${photoType == 'Before' ? 'image_before' : 'image_after'}_${imageCount - 1}[]',
       imageFile.path,
     ));
 
@@ -204,6 +259,7 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
       print('Error uploading image: $e');
     }
   }
+
 
 
   Future<void> _fetchAbsenInfo(String kodeSvc) async {
@@ -222,7 +278,6 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
       print('Error fetching absen info: $e');
     }
   }
-
   @override
   void initState() {
     _refreshController = RefreshController();
@@ -321,7 +376,50 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     const Text('Tanggal & Jam Estimasi :'),
-                                    Text('${dataSvc?.tglEstimasi}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                                    Text('${dataSvc?.tglEstimasi??'-'}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                                  ],
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    const Text('Jam Selesai'),
+                                    Text('${dataSvc?.jamSelesai ?? '-'}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(10),
+                        margin: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.15),
+                              spreadRadius: 5,
+                              blurRadius: 10,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    const Text('Tanggal & Jam PKB :'),
+                                    Text('${dataSvc?.tglPkb??'-'}', style: const TextStyle(fontWeight: FontWeight.bold)),
                                   ],
                                 ),
                                 Column(
@@ -345,14 +443,14 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Text('Cabang'),
-                              Text('${dataSvc?.namaCabang}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                              Text('${dataSvc?.namaCabang??'-'}', style: const TextStyle(fontWeight: FontWeight.bold)),
                             ],
                           ),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               const Text('Kode Estimasi'),
-                              Text('${dataSvc?.kodeEstimasi}', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
+                              Text('${dataSvc?.kodeEstimasi??'-'}', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
                             ],
                           ),
                         ],
@@ -369,6 +467,13 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
                               Text('${dataSvc?.tipePelanggan ?? '-'}', style: const TextStyle(fontWeight: FontWeight.bold)),
                             ],
                           ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              const Text('Kode PKB'),
+                              Text('${dataSvc?.kodePkb??'-'}', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
+                            ],
+                          ),
                         ],
                       ),
                       const Divider(color: Colors.grey),
@@ -379,13 +484,13 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text('Nama :'),
-                          Text('${dataSvc?.nama}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                          Text('${dataSvc?.nama??'-'}', style: const TextStyle(fontWeight: FontWeight.bold)),
                           const SizedBox(height: 5),
                           const Text('No Handphone :'),
-                          Text('${dataSvc?.hp}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                          Text('${dataSvc?.hp??'-'}', style: const TextStyle(fontWeight: FontWeight.bold)),
                           const SizedBox(height: 5),
                           const Text('Alamat :'),
-                          Text('${dataSvc?.alamat}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                          Text('${dataSvc?.alamat??'-'}', style: const TextStyle(fontWeight: FontWeight.bold)),
                         ],
                       ),
                       const Divider(color: Colors.grey),
@@ -400,14 +505,14 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Text('Merk :'),
-                              Text('${dataSvc?.namaMerk}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                              Text('${dataSvc?.namaMerk??'-'}', style: const TextStyle(fontWeight: FontWeight.bold)),
                             ],
                           ),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               const Text('Tipe :'),
-                              Text('${dataSvc?.namaTipe}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                              Text('${dataSvc?.namaTipe??'-'}', style: const TextStyle(fontWeight: FontWeight.bold)),
                             ],
                           ),
                         ],
@@ -421,31 +526,48 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Text('Tahun :'),
-                              Text('${dataSvc?.tahun}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                              Text('${dataSvc?.tahun??'-'}', style: const TextStyle(fontWeight: FontWeight.bold)),
                             ],
                           ),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               const Text('Warna :'),
-                              Text('${dataSvc?.warna}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                              Text('${dataSvc?.warna??'-'}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                            ],
+                          ),
+                        ],
+                      ),
+                  Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Odometer :'),
+                    Text('${dataSvc?.odometer??'-'}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                  ],
+                ),Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('No Polisi :'),
+                              Text('${dataSvc?.noPolisi}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                            ],
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              const Text('Nomor Lambung :'),
+                              Text('${dataSvc?.vinNumber??'belum ada nomor lambung'}', style: const TextStyle(fontWeight: FontWeight.bold)),
                             ],
                           ),
                         ],
                       ),
                       const SizedBox(height: 5),
                       const Divider(color: Colors.grey),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text('No Polisi :'),
-                          Text('${dataSvc?.noPolisi}', style: const TextStyle(fontWeight: FontWeight.bold)),
-                        ],
-                      ),
-                      const SizedBox(height: 5),
-                      const Divider(color: Colors.grey),
                       const SizedBox(height: 10),
-                      Text('Sparepart', style: TextStyle(fontWeight: FontWeight.bold, color: MyColors.appPrimaryColor)),
+                      Text('Sparepart', style: TextStyle(fontWeight: FontWeight.bold, color: MyColors.appPrimaryColor, fontSize: 18)),
                       Column(
                         children: [
                             Column(
@@ -453,9 +575,13 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
                                 const SizedBox(height: 10),
                                 if (photoSparepart != null)
                                   Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       for (int index = 0; index < (dataSvcDtlJasa?.length ?? 0); index++)
                                         Column(
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Row(
                                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -490,6 +616,16 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
                                                 ),
                                               ],
                                             ),
+                                            SizedBox(height: 5),
+                                            Text('Kode Sparepart:  ${dataSvcDtlJasa?[index].kodeSparepart}',
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                )),
+                                            SizedBox(height: 5),
+                                            Text('QTY:  ${dataSvcDtlJasa?[index].qtySparepart}',
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                )),
                                             const SizedBox(height: 10),
                                             if (photoSparepart != null)
                                               Column(
@@ -504,7 +640,7 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
                                                           SizedBox(height: 10),
                                                           Text(
                                                             'Before Photos :',
-                                                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                                                            style: TextStyle(fontWeight: FontWeight.bold),
                                                           ),
                                                         ],
                                                       ),
@@ -519,12 +655,14 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
                                                           backgroundColor: MyColors.appPrimaryColor,
                                                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                                                           elevation: 0,
+
                                                         ),
                                                         child: const Text(
                                                           'Upload Photo Before',
                                                           style: TextStyle(
                                                             fontWeight: FontWeight.bold,
                                                             color: Colors.white,
+                                                            fontSize: 12,
                                                           ),
                                                         ),
                                                       ),
@@ -541,7 +679,7 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
                                                         const SizedBox(height: 10),
                                                         SizedBox(
                                                           height: 120,
-                                                          child: ListView.builder(
+                                                          child:ListView.builder(
                                                             scrollDirection: Axis.horizontal,
                                                             itemCount: getBeforePhotos(
                                                                 photoSparepart,
@@ -562,9 +700,13 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
                                                                 );
                                                                 final String imageUrl = photos[photoIndex].photoUrl ?? '';
                                                                 final String photoId = photos[photoIndex].id.toString();
-                                                                final String kodesparepart = photos[photoIndex].kodeSparepart??'';
+                                                                final String kodesparepart = photos[photoIndex].kodeSparepart ?? '';
 
-                                                                return buildPhotoWidget(imageUrl, photoId, kodesparepart);
+                                                                // Ensure only network images are shown
+                                                                if (imageUrl.startsWith('http')) {
+                                                                  return buildPhotoWidget(imageUrl, photoId, kodesparepart);
+                                                                }
+                                                                return SizedBox(); // Return an empty widget if the condition is not met
                                                               } else {
                                                                 // Display newly added images filtered by kodeSparepart
                                                                 final List<AddedImageBefor> filteredAddedImages = _addedImagesBefore.where((img) => img.kodeSparepart == dataSvcDtlJasa?[index].kodeSparepart).toList();
@@ -578,7 +720,8 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
                                                                 final String photoId = addedImage.id;
                                                                 final String kodeSparepart = addedImage.kodeSparepart; // Get kodeSparepart from AddedImage
 
-                                                                return buildPhotoWidget(imageUrl, photoId, kodeSparepart);
+                                                                // Return an empty widget as we are hiding local file images
+                                                                return SizedBox();
                                                               }
                                                             },
                                                           ),
@@ -596,7 +739,7 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
                                                           Text(
                                                             'After Photos :',
                                                             style: TextStyle(
-                                                                fontWeight: FontWeight.bold, fontSize: 18),
+                                                                fontWeight: FontWeight.bold),
                                                           ),
                                                         ],
                                                       ),
@@ -618,6 +761,7 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
                                                           style: TextStyle(
                                                             fontWeight: FontWeight.bold,
                                                             color: Colors.white,
+                                                            fontSize: 12,
                                                           ),
                                                         ),
                                                       ),
@@ -634,44 +778,49 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
                                                         const SizedBox(height: 10),
                                                         SizedBox(
                                                           height: 120,
-                                                          child: ListView.builder(
+                                                          child:ListView.builder(
                                                             scrollDirection: Axis.horizontal,
                                                             itemCount: getAfterPhotos(
-                                                                photoSparepart,
-                                                                dataSvcDtlJasa?[index].namaSparepart ?? "",
-                                                                dataSvcDtlJasa?[index].kodeSparepart ?? ""
+                                                              photoSparepart,
+                                                              dataSvcDtlJasa?[index].namaSparepart ?? "",
+                                                              dataSvcDtlJasa?[index].kodeSparepart ?? "",
                                                             ).length + _addedImagesAfter.where((img) => img.kodeSparepart == dataSvcDtlJasa?[index].kodeSparepart).length,
                                                             itemBuilder: (context, photoIndex) {
                                                               if (photoIndex < getAfterPhotos(
-                                                                  photoSparepart,
-                                                                  dataSvcDtlJasa?[index].namaSparepart ?? "",
-                                                                  dataSvcDtlJasa?[index].kodeSparepart ?? ""
+                                                                photoSparepart,
+                                                                dataSvcDtlJasa?[index].namaSparepart ?? "",
+                                                                dataSvcDtlJasa?[index].kodeSparepart ?? "",
                                                               ).length) {
                                                                 // Display existing photos
                                                                 final List<PhotoSparepart> photos = getAfterPhotos(
-                                                                    photoSparepart,
-                                                                    dataSvcDtlJasa?[index].namaSparepart ?? "",
-                                                                    dataSvcDtlJasa?[index].kodeSparepart ?? ""
+                                                                  photoSparepart,
+                                                                  dataSvcDtlJasa?[index].namaSparepart ?? "",
+                                                                  dataSvcDtlJasa?[index].kodeSparepart ?? "",
                                                                 );
                                                                 final String imageUrl = photos[photoIndex].photoUrl ?? '';
                                                                 final String photoId = photos[photoIndex].id.toString();
-                                                                final String kodesparepart = photos[photoIndex].kodeSparepart??'';
+                                                                final String kodesparepart = photos[photoIndex].kodeSparepart ?? '';
 
-                                                                return buildPhotoWidget(imageUrl, photoId, kodesparepart);
+                                                                // Ensure only network images are shown
+                                                                if (imageUrl.startsWith('http')) {
+                                                                  return buildPhotoWidget(imageUrl, photoId, kodesparepart);
+                                                                }
+                                                                return SizedBox(); // Return an empty widget if the condition is not met
                                                               } else {
                                                                 // Display newly added images filtered by kodeSparepart
                                                                 final List<AddedImageAfter> filteredAddedImages = _addedImagesAfter.where((img) => img.kodeSparepart == dataSvcDtlJasa?[index].kodeSparepart).toList();
                                                                 final AddedImageAfter addedImage = filteredAddedImages[photoIndex - getAfterPhotos(
-                                                                    photoSparepart,
-                                                                    dataSvcDtlJasa?[index].namaSparepart ?? "",
-                                                                    dataSvcDtlJasa?[index].kodeSparepart ?? ""
+                                                                  photoSparepart,
+                                                                  dataSvcDtlJasa?[index].namaSparepart ?? "",
+                                                                  dataSvcDtlJasa?[index].kodeSparepart ?? "",
                                                                 ).length];
 
                                                                 final String imageUrl = addedImage.file.path; // Adjust based on how XFile is stored
                                                                 final String photoId = addedImage.id;
                                                                 final String kodeSparepart = addedImage.kodeSparepart; // Get kodeSparepart from AddedImage
 
-                                                                return buildPhotoWidget(imageUrl, photoId, kodeSparepart);
+                                                                // Return an empty widget as we are hiding local file images
+                                                                return SizedBox();
                                                               }
                                                             },
                                                           ),
@@ -685,8 +834,6 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
                                         ),
                                     ],
                                   ),
-
-                                const Divider(color: Colors.grey),
                               ],
                             ),
                         ],

@@ -37,16 +37,16 @@ class DataPKB {
   String? kodePelanggan;
   String? kodeKendaraan;
   String? odometer;
-  String? pic;
-  String? hpPic;
-  String? kodeMembership;
-  String? kodePaketmember;
+  Null? pic;
+  Null? hpPic;
+  Null? kodeMembership;
+  Null? kodePaketmember;
   String? tipeSvc;
   String? tipePelanggan;
   String? referensi;
-  String? referensiTeman;
+  Null? referensiTeman;
   String? poNumber;
-  String? paketSvc;
+  Null? paketSvc;
   String? tglKeluar;
   String? tglKembali;
   String? kmKeluar;
@@ -83,15 +83,16 @@ class DataPKB {
   String? transmisi;
   String? noRangka;
   String? noMesin;
-  String? modelKaroseri;
+  Null? modelKaroseri;
   String? drivingMode;
   String? power;
   String? kategoriKendaraan;
-  String? jenisKontrak;
+  Null? jenisKontrak;
   String? jenisUnit;
-  String? idPicPerusahaan;
-  String? picIdPelanggan;
+  Null? idPicPerusahaan;
+  Null? picIdPelanggan;
   int? idCustomer;
+  String? vinNumber;
   String? nama;
   String? alamat;
   String? telp;
@@ -99,23 +100,22 @@ class DataPKB {
   String? email;
   String? kontak;
   int? due;
-  String? jenisKontrakX;
+  Null? jenisKontrakX;
   String? namaTagihan;
   String? alamatTagihan;
-  String? telpTagihan;
-  String? npwpTagihan;
-  String? picTagihan;
+  Null? telpTagihan;
+  Null? npwpTagihan;
+  Null? picTagihan;
   String? password;
-  String? rememberToken;
-  String? emailVerifiedAt;
-  String? otp;
-  String? otpExpiry;
+  Null? rememberToken;
+  Null? emailVerifiedAt;
+  Null? otp;
+  Null? otpExpiry;
   String? gambar;
   String? namaCabang;
   String? namaMerk;
   String? namaTipe;
   String? status;
-  String? vinnumber;
   List<Parts>? parts;
   List<Jasa>? jasa;
 
@@ -184,6 +184,7 @@ class DataPKB {
         this.idPicPerusahaan,
         this.picIdPelanggan,
         this.idCustomer,
+        this.vinNumber,
         this.nama,
         this.alamat,
         this.telp,
@@ -207,7 +208,6 @@ class DataPKB {
         this.namaMerk,
         this.namaTipe,
         this.status,
-        this.vinnumber,
         this.parts,
         this.jasa});
 
@@ -276,6 +276,7 @@ class DataPKB {
     idPicPerusahaan = json['id_pic_perusahaan'];
     picIdPelanggan = json['pic_id_pelanggan'];
     idCustomer = json['id_customer'];
+    vinNumber = json['vin_number'];
     nama = json['nama'];
     alamat = json['alamat'];
     telp = json['telp'];
@@ -299,7 +300,6 @@ class DataPKB {
     namaMerk = json['nama_merk'];
     namaTipe = json['nama_tipe'];
     status = json['status'];
-    vinnumber = json['vin_number'];
     if (json['parts'] != null) {
       parts = <Parts>[];
       json['parts'].forEach((v) {
@@ -380,6 +380,7 @@ class DataPKB {
     data['id_pic_perusahaan'] = this.idPicPerusahaan;
     data['pic_id_pelanggan'] = this.picIdPelanggan;
     data['id_customer'] = this.idCustomer;
+    data['vin_number'] = this.vinNumber;
     data['nama'] = this.nama;
     data['alamat'] = this.alamat;
     data['telp'] = this.telp;
@@ -441,8 +442,8 @@ class Parts {
   String? note;
   String? tipe;
   String? kodeSupplier;
-  String? qtyMin;
-  String? qtyMax;
+  int? qtyMin;
+  int? qtyMax;
   String? ukuran;
   String? kualitas;
   int? demandBulanan;

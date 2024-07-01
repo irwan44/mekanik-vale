@@ -63,7 +63,7 @@ class pkblist extends StatelessWidget {
                         children: [
                         Text(items.namaCabang?? '', style: const TextStyle(fontWeight: FontWeight.bold),),
                         Text('Nomor Lambung :'),
-                        Text(items.vinnumber?? 'belum ada nomor lambung', style: const TextStyle(fontWeight: FontWeight.bold),),
+                        Text(items.vinNumber?? 'belum ada nomor lambung', style: const TextStyle(fontWeight: FontWeight.bold),),
                       ],),
                       Container(
                         padding: const EdgeInsets.all(10),
@@ -240,25 +240,23 @@ class StatusColor {
       case 'diproses':
         return Colors.orange;
       case 'estimasi':
-        return Colors.lime;
-      case 'estimasi':
-        return Colors.orange;
+        return Colors.green;
       case 'selesai dikerjakan':
         return Colors.blue;
       case 'pkb':
         return Colors.green;
       case 'pkb tutup':
-        return Colors.yellow;
+        return Colors.redAccent;
       case 'invoice':
-        return Colors.yellow;
+        return Colors.blue;
       case 'lunas':
-        return Colors.yellow;
+        return Colors.green;
       case 'ditolak by sistem':
+        return Colors.red;
+      case 'cancel booking':
         return Colors.red;
       case 'ditolak':
         return Colors.red;
-      case 'selesai dikerjakan':
-        return Colors.green;
       default:
         return Colors.transparent;
     }

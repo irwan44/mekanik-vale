@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import '../../../data/data_endpoint/detailhistory.dart';
+import '../../../data/data_endpoint/detailsperpart.dart';
 import '../../../data/data_endpoint/mekanik_pkb.dart';
 import '../../../data/endpoint.dart';
 import '../controllers/promek_controller.dart';
@@ -92,8 +93,82 @@ class _CardDetailPKBState extends State<CardDetailPKB> {
           _buildInfoRow('Kategori Kendaraan:', args['kategori_kendaraan'] ?? '-'),
           _buildInfoRow('Transmisi:', args['transmisi'] ?? '-'),
           _buildInfoRow('No Polisi:', args['no_polisi'] ?? '-'),
+          _buildInfoRow('Nomor Lambung:', args['vin_number'] ?? 'belum ada nomor lambung'),
           const Divider(color: Colors.grey),
           _buildDetailSection('Keluhan:', args['keluhan'] ?? '-'),
+          const Divider(color: Colors.grey),
+          const SizedBox(height: 10),
+          Text(
+            'Sparepart',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.blue, // Example color
+              fontSize: 16,
+            ),
+          ),
+          const SizedBox(height: 10),
+          FutureBuilder<DetailSpertpart>(
+            future: API.DetailSpertpartID(kodesvc: args['kode_svc'] ?? ''),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}'));
+              } else {
+                final jasaList = snapshot.data?.dataPhotosparepart?.detailSparepart ?? [];
+                if (jasaList.isEmpty) {
+                  return Container(
+                    height: 200,
+                    alignment: Alignment.center,
+                    child: Text(
+                      'Belum ada Jasa',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red, // Example color
+                      ),
+                    ),
+                  );
+                }
+                return ListView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: jasaList.length,
+                  itemBuilder: (context, index) {
+                    final jasa = jasaList[index];
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          jasa.namaSparepart ?? '',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        SizedBox(height: 5),
+                        Text('Harga Jasa:  ${formatCurrency(jasa.hargaSparepart)}',
+                            style: TextStyle(
+                              fontSize: 14,
+                            )),
+                        SizedBox(height: 5),
+                        Text('Kode Sparepart:  ${jasa.kodeSparepart??''}',
+                            style: TextStyle(
+                              fontSize: 14,
+                            )),
+                        SizedBox(height: 5),
+                        Text('QTY:  ${jasa.qtySparepart??''}',
+                            style: TextStyle(
+                              fontSize: 14,
+                            )),
+
+                        const Divider(),
+                      ],
+                    );
+                  },
+                );
+              }
+            },
+          ),
           const Divider(color: Colors.grey),
           const SizedBox(height: 10),
           Text(
@@ -145,6 +220,16 @@ class _CardDetailPKBState extends State<CardDetailPKB> {
                         ),
                         SizedBox(height: 5),
                         Text('Harga Jasa:  ${formatCurrency(jasa.hargaJasa)}',
+                            style: TextStyle(
+                              fontSize: 14,
+                            )),
+                        SizedBox(height: 5),
+                        Text('Kode Jasa:  ${jasa.kodeJasa??''}',
+                            style: TextStyle(
+                              fontSize: 14,
+                            )),
+                        SizedBox(height: 5),
+                        Text('QTY:  ${jasa.qtyJasa??''}',
                             style: TextStyle(
                               fontSize: 14,
                             )),

@@ -102,12 +102,14 @@ class _EmergencyViewState extends State<EmergencyView> {
 
   Future<void> _getPolyline(double startLatitude, double startLongitude, double endLatitude, double endLongitude) async {
     print('Getting polyline...');
-    PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-      'YOUR_API_KEY', // Ganti dengan API key Google Maps Anda
-      PointLatLng(startLatitude, startLongitude),
-      PointLatLng(endLatitude, endLongitude),
-      travelMode: TravelMode.driving,
+
+    final PolylineRequest request = PolylineRequest(
+      origin: PointLatLng(startLatitude, startLongitude),
+      destination: PointLatLng(endLatitude, endLongitude),
+      proxy: Uri.parse('YOUR_PROXY_URL'),
+      mode: TravelMode.driving,
     );
+    PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(request: request);
 
     if (result.status == 'OK') {
       polylineCoordinates.clear();
@@ -131,6 +133,7 @@ class _EmergencyViewState extends State<EmergencyView> {
       print('Error: ${result.errorMessage}');
     }
   }
+
 
   void _moveCameraToPolyline() {
     if (polylineCoordinates.isNotEmpty) {

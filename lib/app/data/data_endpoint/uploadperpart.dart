@@ -94,6 +94,8 @@ class DataPhotosparepart {
   String? picIdPelanggan;
   int? idCustomer;
   String? vinNumber;
+  String? namaMerk;
+  String? namaTipe;
   String? nama;
   String? alamat;
   String? telp;
@@ -181,6 +183,8 @@ class DataPhotosparepart {
         this.picIdPelanggan,
         this.idCustomer,
         this.vinNumber,
+        this.namaMerk,
+        this.namaTipe,
         this.nama,
         this.alamat,
         this.telp,
@@ -268,6 +272,8 @@ class DataPhotosparepart {
     picIdPelanggan = json['pic_id_pelanggan'];
     idCustomer = json['id_customer'];
     vinNumber = json['vin_number'];
+    namaMerk = json['nama_merk'];
+    namaTipe = json['nama_tipe'];
     nama = json['nama'];
     alamat = json['alamat'];
     telp = json['telp'];
@@ -357,6 +363,8 @@ class DataPhotosparepart {
     data['pic_id_pelanggan'] = this.picIdPelanggan;
     data['id_customer'] = this.idCustomer;
     data['vin_number'] = this.vinNumber;
+    data['nama_merk'] = this.namaMerk;
+    data['nama_tipe'] = this.namaTipe;
     data['nama'] = this.nama;
     data['alamat'] = this.alamat;
     data['telp'] = this.telp;

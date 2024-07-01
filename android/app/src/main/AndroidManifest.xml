@@ -22,14 +22,18 @@
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
+    <uses-sdk
+        android:minSdkVersion="19"
+        android:targetSdkVersion="33" />
     <!-- Dukungan layar -->
     <supports-screens
+        android:resizeable="true"
         android:smallScreens="true"
         android:normalScreens="true"
         android:largeScreens="true"
         android:xlargeScreens="true"
         android:anyDensity="true" />
+
 
     <application
         android:label="Mekanik Vale Indonesia"

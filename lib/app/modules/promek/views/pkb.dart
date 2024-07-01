@@ -8,6 +8,7 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:search_page/search_page.dart';
 import '../../../componen/loading_cabang_shimmer.dart';
 import '../../../componen/loading_search_shimmer.dart';
+import '../../../componen/loading_search_shimmerpkb.dart';
 import '../../../componen/loading_shammer_booking.dart';
 import '../../../componen/loading_shammer_history.dart';
 import '../../../data/data_endpoint/pkb.dart';
@@ -125,6 +126,7 @@ class _PKBlistState extends State<PKBlist>
         'gambar': e.gambar ?? '',
         'nama_cabang': e.namaCabang ?? '',
         'nama_merk': e.namaMerk ?? '',
+        'vin_number': e.vinNumber ?? '',
         'nama_tipe': e.namaTipe ?? '',
         'status': e.status ?? '',
         'jasa': e.jasa?.map((j) => {
@@ -152,7 +154,7 @@ class _PKBlistState extends State<PKBlist>
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(
-                child: loadsearch(),
+                child: loadsearchpkb(),
               );
             } else if (snapshot.hasData && snapshot.data != null) {
               final data = snapshot.data!.dataPKB;
@@ -181,7 +183,8 @@ class _PKBlistState extends State<PKBlist>
                         booking.tglEstimasi,
                         booking.tipeSvc,
                         booking.kodePkb,
-                        booking.vinnumber,
+                        booking.vinNumber,
+                        booking.status,
                         booking.kodePelanggan,
                       ],
                       builder: (items) => pkblist(

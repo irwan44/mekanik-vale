@@ -13,6 +13,7 @@ class PromekController extends GetxController {
   final TextEditingController mesin = TextEditingController();
   final TextEditingController pic = TextEditingController();
   final TextEditingController hppic = TextEditingController();
+  final TextEditingController nomberlambung = TextEditingController();
   final TextEditingController nomesin = TextEditingController();
 
   void setInitialValues(Map args) {
@@ -25,6 +26,7 @@ class PromekController extends GetxController {
     hppic.text = args['hp_pic'] ?? '';
     keluhan.text = args['keluhan'] ?? '';
     perintah.text = args['perintah_kerja'] ?? '';
+    nomberlambung.text = args['vin_number'] ?? '';
   }
 
   void printAllData() {
