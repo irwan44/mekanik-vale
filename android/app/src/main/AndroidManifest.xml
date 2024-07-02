@@ -1,7 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.bengkelly.mekanik.co.id">
 
     <!-- Izin aplikasi -->
+
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -39,6 +43,26 @@
         android:label="Mekanik Vale Indonesia"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+
+        <!-- Pusher Channels Service -->
+        <service
+            android:name="com.pusher.pushnotifications.fcm.FCMInstanceIDService"
+            android:exported="true"> <!-- Tambahkan android:exported -->
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+            </intent-filter>
+        </service>
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@mipmap/ic_launcher" />
+        <receiver
+            android:name="com.example.your_app_package_name.WorkManagerBroadcastReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -55,6 +79,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Pusher Activity -->
+        <activity
+            android:name="com.pusher.pushnotifications.reporting.OpenNotificationActivity"
+            android:exported="true"> <!-- Tambahkan android:exported -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+        </activity>
+
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />

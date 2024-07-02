@@ -1,5 +1,5 @@
 name: mekanik
-version: 1.4.2+1
+version: 1.4.4+1
 publish_to: none
 description: A new Flutter project.
 environment: 
@@ -43,7 +43,10 @@ dependencies:
   curved_navigation_bar: ^1.0.3
   flutter:
     sdk: flutter
+  firebase_core: ^2.3.0
+  firebase_messaging: ^14.9.4
   image_picker: ^1.1.2
+  pusher_channels_flutter: ^2.2.1
   multi_image_picker_view: ^1.0.3
   flutter_onboarding_screen: 2.0.2
   flutter_onboarding_slider: 1.0.9
@@ -93,7 +96,7 @@ flutter:
   assets:
     - assets/
     - assets/icons/
-    - assets/sounds/sounds.mp3
+    - assets/sounds/sound.mp3
 
   uses-material-design: true
 

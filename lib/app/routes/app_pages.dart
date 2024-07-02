@@ -24,6 +24,7 @@ import '../modules/profile/views/profile_view.dart';
 import '../modules/promek/bindings/promek_binding.dart';
 import '../modules/promek/detail/card_detailpkpsperepart.dart';
 import '../modules/promek/detail/detailpkb.dart';
+import '../modules/promek/detail/detailpkbview.dart';
 import '../modules/promek/start_stop/start_stop_view.dart';
 import '../modules/promek/views/pkb.dart';
 import '../modules/repair_maintenen/bindings/repair_maintenen_binding.dart';
@@ -162,6 +163,12 @@ class AppPages {
       transition: Transition.downToUp,
       name: _Paths.AbsenView,
       page: () =>  const AbsenView(),
+      binding: HomeBinding(),
+    ),
+    GetPage(
+      transition: Transition.downToUp,
+      name: _Paths.DetailPKBView,
+      page: () =>  const DetailPKBView(),
       binding: HomeBinding(),
     ),
   ];
