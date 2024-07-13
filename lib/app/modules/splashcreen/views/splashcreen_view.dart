@@ -112,7 +112,7 @@ class _SplashcreenViewState extends State<SplashcreenView> {
         ),
         toolbarHeight: 0,
       ),
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.black,
       body: Center(
         child: Column(
           children: [
@@ -145,10 +145,12 @@ class _SplashcreenViewState extends State<SplashcreenView> {
                       ? 800
                       : 20,
               decoration: BoxDecoration(
-                color: _b ? Colors.white : Colors.white,
+                color: _b ? Colors.black : Colors.black,
                 image: const DecorationImage(
-                  image: AssetImage("assets/logo_vale.png"),
-                  fit: BoxFit.contain,
+                  image: AssetImage("assets/logo_autobenz.png",
+                  ),
+                  fit: BoxFit.cover,
+
                 ),
               ),
             ),
@@ -171,7 +173,7 @@ class _SplashcreenViewState extends State<SplashcreenView> {
                       ? 200
                       : 20,
               decoration: BoxDecoration(
-                color: _b ? Colors.white : Colors.white,
+                color: _b ? Colors.black : Colors.black,
                 image: const DecorationImage(
                   image: AssetImage("assets/ic_launcher.png"),
                   fit: BoxFit.contain,

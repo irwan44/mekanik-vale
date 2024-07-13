@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
+import '../../../componen/color.dart';
 import '../../../data/data_endpoint/bookingmasuk.dart';
 import '../../../data/data_endpoint/servicedikerjakan.dart';
 import '../../../data/data_endpoint/serviceselesai.dart';
@@ -22,13 +23,13 @@ class StatsGrid extends StatelessWidget {
               children: <Widget>[
                 _buildFutureStatCard<MasukBooking>(
                   future: API.BookingMasukID(),
-                  color: Colors.orange,
+                  color: Colors.black,
                   onTapRoute: Routes.BOOKINGMASUK,
                   dataLabel: "Booking Masuk",
                 ),
                 _buildFutureStatCard<ServiceSelesaiHome>(
                   future: API.ServiceSelesaiID(),
-                  color: Colors.blue,
+                  color:   MyColors.appPrimaryRED,
                   onTapRoute: null??'',
                   dataLabel: "Service Selesai",
                 ),
@@ -38,13 +39,13 @@ class StatsGrid extends StatelessWidget {
           Flexible(
             child: Row(
               children: <Widget>[
-                _buildFutureStatCard<ServiceDikerjakan>(
+                _buildFutureStatCard2<ServiceDikerjakan>(
                   future: API.DikerjakanID(),
-                  color: Colors.green,
+                  color:  MyColors.appPrimarykuning,
                   onTapRoute: Routes.SELESAIDIKERJAKAN,
                   dataLabel: "Service Dikerjakan",
                 ),
-                _buildStatCard('Invoice', '-', Colors.purple),
+                _buildStatCard('Invoice', '-', Colors.blueGrey),
               ],
             ),
           ),
@@ -128,7 +129,82 @@ class StatsGrid extends StatelessWidget {
       ),
     );
   }
+  Widget _buildFutureStatCard2<T>({
+    required Future<T> future,
+    required Color color,
+    required String onTapRoute,
+    required String dataLabel,
+  }) {
+    return Expanded(
+      child: FutureBuilder<T>(
+        future: future,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return _buildLoadingCard(color);
+          } else if (snapshot.hasError) {
+            return Text('Error: ${snapshot.error}');
+          } else {
+            var data = snapshot.data;
+            var count = '0';
+            var label = dataLabel;
 
+            if (data is MasukBooking) {
+              count = data.countBookingMasuk?.toString() ?? '0';
+            } else if (data is ServiceSelesaiHome) {
+              count = data.countBookingMasuk?.toString() ?? '0';
+            } else if (data is ServiceDikerjakan) {
+              count = data.countDikerjakan?.toString() ?? '0';
+            }
+
+            return InkWell(
+              onTap: () {
+                HapticFeedback.lightImpact();
+                Get.toNamed(onTapRoute);
+              },
+              child: Container(
+                margin: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(10.0),
+                decoration: BoxDecoration(
+                  color: color,
+                  borderRadius: BorderRadius.circular(10.0),
+
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      label,
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 15.0,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      'Hari ini',
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      count,
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+        },
+      ),
+    );
+  }
   Widget _buildLoadingCard(Color color) {
     return Container(
       margin: const EdgeInsets.all(8.0),

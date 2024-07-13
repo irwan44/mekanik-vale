@@ -93,7 +93,7 @@ class _CardDetailPKBState extends State<CardDetailPKB> {
           _buildInfoRow('Kategori Kendaraan:', args['kategori_kendaraan'] ?? '-'),
           _buildInfoRow('Transmisi:', args['transmisi'] ?? '-'),
           _buildInfoRow('No Polisi:', args['no_polisi'] ?? '-'),
-          _buildInfoRow('Nomor Lambung:', args['vin_number'] ?? 'belum ada nomor lambung'),
+          _buildInfoRow('Vin Number:', args['vin_number'] ?? 'belum ada Vin Number'),
           const Divider(color: Colors.grey),
           _buildDetailSection('Keluhan:', args['keluhan'] ?? '-'),
           const Divider(color: Colors.grey),

@@ -48,15 +48,16 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: MyColors.appPrimaryBackground,
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
         automaticallyImplyLeading: false,
         toolbarHeight: 0,
-        systemOverlayStyle: const SystemUiOverlayStyle(
-          statusBarColor: Colors.transparent,
-          statusBarIconBrightness: Brightness.dark,
-          statusBarBrightness: Brightness.light,
-          systemNavigationBarColor: Colors.white,
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: MyColors.appPrimaryDarkmod,
+          statusBarIconBrightness: Brightness.light,
+          statusBarBrightness: Brightness.dark,
+          systemNavigationBarColor: MyColors.appPrimaryDarkmod,
         ),
       ),
       body: WillPopScope(
@@ -80,37 +81,31 @@ class _LoginPageState extends State<LoginPage> {
                   begin: Alignment.bottomCenter,
                   end: Alignment.topCenter,
                   colors: [
-                    Colors.white
-                        .withOpacity(0.0), // Warna transparan di bagian atas
-                    Colors.white
-                        .withOpacity(0.9), // Warna pudar di bagian bawah
-                    Colors.white, // Warna pudar di bagian bawah
+                    MyColors.appPrimaryDarkmod
+                        .withOpacity(0.0),
+                    MyColors.appPrimaryDarkmod
+                        .withOpacity(0.9),
+                    MyColors.appPrimaryDarkmod,
                   ],
                 ),
               ),
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(12.0),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           FadeInAnimation(
                             delay: 1.3,
-                            child: Text(
-                              "Selamat Datang",
-                              style: Common().mediumTheme,
-                            ),
-                          ),
-                          FadeInAnimation(
-                            delay: 1.6,
-                            child: Text(
-                              "VALE Indonesia",
-                              style: Common().titelTheme,
+                            child: Image.asset(
+                              'assets/logo_autobenz.png',
+                              width: 200.0,
+                              fit: BoxFit.cover,
                             ),
                           ),
                         ],
@@ -123,11 +118,19 @@ class _LoginPageState extends State<LoginPage> {
                           children: [
                             FadeInAnimation(
                               delay: 1.9,
-                              child: CustomTextFormField(
-                                hinttext: 'Masukkan email Anda',
-                                obsecuretext: false,
-                                controller:
-                                    _emailController, // Tambahkan controller untuk TextFormField
+                              child: TextFormField(
+                                style: TextStyle(color: Colors.white),
+                                controller: _emailController,
+                                obscureText:false,
+                                decoration: InputDecoration(
+                                    border: OutlineInputBorder(
+                                      borderSide:
+                                      const BorderSide(color: Colors.black),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    contentPadding: EdgeInsets.all(18),
+                                    hintStyle: Common().hinttext,
+                                    hintText: 'Masukkan email Anda'),
                               ),
                             ),
                             const SizedBox(
@@ -136,6 +139,7 @@ class _LoginPageState extends State<LoginPage> {
                             FadeInAnimation(
                               delay: 2.2,
                               child: TextFormField(
+                                style: TextStyle(color: Colors.white),
                                 controller: _passwordController,
                                 obscureText: obscureText,
                                 decoration: InputDecoration(
@@ -144,7 +148,7 @@ class _LoginPageState extends State<LoginPage> {
                                   hintStyle: Common().hinttext,
                                   border: OutlineInputBorder(
                                     borderSide:
-                                        const BorderSide(color: Colors.black),
+                                    const BorderSide(color: Colors.black),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   suffixIcon: IconButton(
@@ -214,7 +218,7 @@ class _LoginPageState extends State<LoginPage> {
                                     Get.snackbar('Gagal Login',
                                         'Username dan Password harus diisi',
                                         backgroundColor: Colors.redAccent,
-                                      colorText: Colors.white
+                                        colorText: Colors.white
                                     );
                                   }
 
@@ -230,7 +234,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     const SizedBox(
-                      height: 305,
+                      height: 205,
                     ),
                   ],
                 ),

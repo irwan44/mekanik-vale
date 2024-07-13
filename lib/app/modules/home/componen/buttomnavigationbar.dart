@@ -45,159 +45,159 @@ class _HomeViewState extends State<HomeView> {
   Widget build(BuildContext context) {
     bool isTablet = MediaQuery.of(context).size.width > 600;
     return WillPopScope(
-        onWillPop: () async {
-      QuickAlert.show(
-        context: Get.context!,
-        type: QuickAlertType.warning,
-        title: 'Apakah Anda ingin keluar ?',
-        onConfirmBtnTap: () {
-          SystemNavigator.pop();
-        },
-      );
-      return true;
-    },
-    child:
+      onWillPop: () async {
+        QuickAlert.show(
+          context: Get.context!,
+          type: QuickAlertType.warning,
+          title: 'Apakah Anda ingin keluar ?',
+          onConfirmBtnTap: () {
+            SystemNavigator.pop();
+          },
+        );
+        return true;
+      },
+      child:
       Scaffold(
-      bottomNavigationBar: isTablet
-          ? null
-          : CurvedNavigationBar(
-        key: _bottomNavigationKey,
-        index: _page,
-        items:  [
-          CurvedNavigationBarItem(
-            child: Icon(
-              Icons.home_outlined,
-              color: Colors.white,
+        bottomNavigationBar: isTablet
+            ? null
+            : CurvedNavigationBar(
+          key: _bottomNavigationKey,
+          index: _page,
+          items:  [
+            CurvedNavigationBarItem(
+              child: Icon(
+                Icons.home_outlined,
+                color: Colors.white,
+              ),
+              label: 'Home',
+              labelStyle: TextStyle(color: Colors.white),
             ),
-            label: 'Home',
-            labelStyle: TextStyle(color: Colors.white),
-          ),
-          CurvedNavigationBarItem(
-            child: Icon(
-              Icons.timer,
-              color: Colors.white,
+            CurvedNavigationBarItem(
+              child: Icon(
+                Icons.timer,
+                color: Colors.white,
+              ),
+              label: 'PKB',
+              labelStyle: TextStyle(color: Colors.white),
             ),
-            label: 'PKB',
-            labelStyle: TextStyle(color: Colors.white),
-          ),
-          CurvedNavigationBarItem(
-            child: Icon(
-              Icons.calendar_month_rounded,
-              color: Colors.white,
+            CurvedNavigationBarItem(
+              child: Icon(
+                Icons.calendar_month_rounded,
+                color: Colors.white,
+              ),
+              label: 'Booking',
+              labelStyle: TextStyle(color: Colors.white),
             ),
-            label: 'Booking',
-            labelStyle: TextStyle(color: Colors.white),
-          ),
-          CurvedNavigationBarItem(
-            child: Icon(
-              Icons.history,
-              color: Colors.white,
+            CurvedNavigationBarItem(
+              child: Icon(
+                Icons.history,
+                color: Colors.white,
+              ),
+              label: 'History',
+              labelStyle: TextStyle(color: Colors.white),
             ),
-            label: 'History',
-            labelStyle: TextStyle(color: Colors.white),
-          ),
-          CurvedNavigationBarItem(
-            child: Icon(
-              Icons.portrait_outlined,
-              color: Colors.white,
+            CurvedNavigationBarItem(
+              child: Icon(
+                Icons.portrait_outlined,
+                color: Colors.white,
+              ),
+              label: 'Profile',
+              labelStyle: TextStyle(color: Colors.white),
             ),
-            label: 'Profile',
-            labelStyle: TextStyle(color: Colors.white),
-          ),
-        ],
-        color: MyColors.appPrimaryColor,
-        buttonBackgroundColor: MyColors.appPrimaryColor,
-        backgroundColor: Colors.white,
-        animationCurve: Curves.linear,
-        animationDuration: const Duration(milliseconds: 600),
-        onTap: (index) {
-          HapticFeedback.lightImpact();
-          setState(() {
-            _page = index;
-            _pageController.animateToPage(
-              index,
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.linear,
-            );
-          });
-        },
-        letIndexChange: (index) => true,
-      ),
-      body: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (isTablet)
-            Expanded(
-              flex: 1,
-              child: Container(
-                color: MyColors.appPrimaryColor,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    for (int i = 0; i < 5; i++)
-                      GestureDetector(
-                        onTap: () {
-                          HapticFeedback.lightImpact();
-                          setState(() {
-                            _page = i;
-                            _pageController.animateToPage(
-                              i,
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.linear,
-                            );
-                          });
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child: Column(
-                            children: [
-                              Icon(
-                                _getIcon(i),
-                                color: Colors.white,
-                              ),
-                              SizedBox(height: 4),
-                              Text(
-                                _getTitle(i),
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ],
+          ],
+          color: MyColors.appPrimaryColor,
+          buttonBackgroundColor: MyColors.appPrimaryColor,
+          backgroundColor: Colors.white,
+          animationCurve: Curves.linear,
+          animationDuration: const Duration(milliseconds: 600),
+          onTap: (index) {
+            HapticFeedback.lightImpact();
+            setState(() {
+              _page = index;
+              _pageController.animateToPage(
+                index,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.linear,
+              );
+            });
+          },
+          letIndexChange: (index) => true,
+        ),
+        body: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (isTablet)
+              Expanded(
+                flex: 1,
+                child: Container(
+                  color: MyColors.appPrimaryColor,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      for (int i = 0; i < 5; i++)
+                        GestureDetector(
+                          onTap: () {
+                            HapticFeedback.lightImpact();
+                            setState(() {
+                              _page = i;
+                              _pageController.animateToPage(
+                                i,
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.linear,
+                              );
+                            });
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Column(
+                              children: [
+                                Icon(
+                                  _getIcon(i),
+                                  color: Colors.white,
+                                ),
+                                SizedBox(height: 4),
+                                Text(
+                                  _getTitle(i),
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
+            Expanded(
+              flex: 4,
+              child: PageView(
+                controller: _pageController,
+                onPageChanged: (index) {
+                  setState(() {
+                    _page = index;
+                  });
+                },
+                children: <Widget>[
+                  HomePage(),
+                  StackOver(),
+                  BokingView(),
+                  HistoryView2(clearCachedBooking: clearCachedBoking),
+                  ProfileView(),
+                ],
+              ),
             ),
-          Expanded(
-            flex: 4,
-            child: PageView(
-              controller: _pageController,
-              onPageChanged: (index) {
-                setState(() {
-                  _page = index;
-                });
-              },
-              children: <Widget>[
-                HomePage(),
-                StackOver(),
-                BokingView(),
-                HistoryView2(clearCachedBooking: clearCachedBoking),
-                ProfileView(),
-              ],
-            ),
-          ),
-        ],
-      ),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        toolbarHeight: 0,
-        systemOverlayStyle:  SystemUiOverlayStyle(
-          statusBarColor: Colors.transparent,
-          statusBarIconBrightness: Brightness.dark,
-          statusBarBrightness: Brightness.light,
-          systemNavigationBarColor: MyColors.appPrimaryColor,
+          ],
         ),
-      ),
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          toolbarHeight: 0,
+          systemOverlayStyle:  SystemUiOverlayStyle(
+            statusBarColor: Colors.transparent,
+            statusBarIconBrightness: Brightness.dark,
+            statusBarBrightness: Brightness.light,
+            systemNavigationBarColor: MyColors.appPrimaryColor,
+          ),
+        ),
       ),
     );
   }

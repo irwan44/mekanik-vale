@@ -48,7 +48,7 @@ import 'localstorage.dart';
 import 'package:http/http.dart' as http;
 
 class API {
-  static const _url = 'https://api-vale.techthinkhub.com';
+  static const _url = 'https://api.realauto.co.id';
   static const _urlbe = 'https://be.techthinkhub.id';
   static const _baseUrl = '$_url/api';
   static const _getProfile = '$_baseUrl/mekanik/profile-karyawan';
@@ -118,7 +118,7 @@ class API {
           final obj = Token.fromJson(responseData);
           if (obj.token != null) {
             LocalStorages.setToken(obj.token!);
-            Get.snackbar('Selamat Datang', 'Mekanik Vale Indonesia',
+            Get.snackbar('Selamat Datang', 'Mekanik Real Auto Workshop',
                 backgroundColor: Colors.green,
                 colorText: Colors.white
             );

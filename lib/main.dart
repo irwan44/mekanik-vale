@@ -1,22 +1,27 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:pusher_channels_flutter/pusher_channels_flutter.dart'; // Import Pusher
 import 'app/componen/color.dart';
 import 'app/data/endpoint.dart';
 import 'app/data/publik.dart';
 import 'app/routes/app_pages.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:pusher_channels_flutter/pusher_channels_flutter.dart'; // Import Pusher
 
-FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-FlutterLocalNotificationsPlugin(); // Declare globally
-
+FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  print('Handling a background message: ${message.messageId}');
+}
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  await Firebase.initializeApp();
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   HttpOverrides.global = MyHttpOverrides();
   startPollingNotifications();
   await GetStorage.init('token-mekanik');
@@ -31,7 +36,8 @@ void main() async {
     DeviceOrientation.landscapeRight
   ]);
 
-  final AndroidInitializationSettings initializationSettingsAndroid =
+  // Inisialisasi notifikasi lokal
+  const AndroidInitializationSettings initializationSettingsAndroid =
   AndroidInitializationSettings('@mipmap/ic_launcher');
   final InitializationSettings initializationSettings =
   InitializationSettings(android: initializationSettingsAndroid);
@@ -44,38 +50,16 @@ void startPollingNotifications() {
   const pollingInterval = Duration(minutes: 1);
 
   Timer.periodic(pollingInterval, (timer) async {
-    showPeriodicNotificationLocalNotification('Vale Indonesia Mekanik', 'Ada Booking Masuk'); // Call showPeriodicNotification
+
+    print("Polling notification...");
   });
-}
-
-void showPeriodicNotificationLocalNotification(String title, String body, {String? sound}) async {
-  var androidPlatformChannelSpecifics = AndroidNotificationDetails(
-    'high_importance_channel',
-    'High Importance Notifications',
-    channelDescription: 'This channel is used for important notifications.',
-    importance: Importance.max,
-    priority: Priority.high,
-    sound: sound != null ? RawResourceAndroidNotificationSound(sound) : null,
-    playSound: true,
-    showWhen: false,
-  );
-  var platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
-
-  await flutterLocalNotificationsPlugin.show(
-    0,
-    title,
-    body,
-    platformChannelSpecifics,
-    payload: 'item x',
-  );
 }
 
 class MyHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
     return super.createHttpClient(context)
-      ..badCertificateCallback =
-          (X509Certificate cert, String host, int port) => true;
+      ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
   }
 }
 
@@ -87,6 +71,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  String? _token;
   late PusherChannelsFlutter pusher;
   final String appId = "1827229";
   final String key = "5c463cc9a2fdf08932b5";
@@ -97,6 +82,15 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     initPusher();
+    _getToken();
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print('Got a message whilst in the foreground!');
+      print('Message data: ${message.data}');
+
+      if (message.notification != null) {
+        print('Message also contained a notification: ${message.notification}');
+      }
+    });
   }
 
   Future<void> initPusher() async {
@@ -110,8 +104,7 @@ class _MyAppState extends State<MyApp> {
           showLocalNotification(event.eventName, event.data);
         },
         onConnectionStateChange: (currentState, previousState) {
-          print(
-              "Connection state changed from $previousState to $currentState");
+          print("Connection state changed from $previousState to $currentState");
         },
         onError: (message, code, exception) {
           print("Connection error: $message");
@@ -120,56 +113,48 @@ class _MyAppState extends State<MyApp> {
       await pusher.connect();
       await pusher.subscribe(
         channelName: 'my-channel',
-        onEvent: (event) {
-          print("Event received: ${event.eventName}");
-          print("Event data: ${event.data}");
-          showLocalNotification(event.eventName, event.data);
-        },
       );
     } catch (e) {
       print("Pusher connection error: $e");
     }
   }
+  void _getToken() async {
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
 
+    NotificationSettings settings = await messaging.requestPermission(
+      alert: true,
+      announcement: false,
+      badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
+      sound: true,
+    );
+
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      String? token = await messaging.getToken();
+      setState(() {
+        _token = token;
+      });
+      print("FCM Token: $_token");
+    } else {
+      print("User declined or has not accepted permission");
+    }
+  }
   void showLocalNotification(String title, String body) async {
-    const AndroidNotificationDetails androidPlatformChannelSpecifics =
-    AndroidNotificationDetails(
+    const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
       'high_importance_channel', // channel_id
       'High Importance Notifications', // channel_name
-      channelDescription:
-      'This channel is used for important notifications.', // channel_description
+      channelDescription: 'This channel is used for important notifications.', // channel_description
       importance: Importance.max,
       priority: Priority.high,
       showWhen: false,
     );
-    const NotificationDetails platformChannelSpecifics =
-    NotificationDetails(android: androidPlatformChannelSpecifics);
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
     await flutterLocalNotificationsPlugin.show(
       0,
       'Vale Indonesia Mekanik',
       'Ada Booking Masuk',
-      platformChannelSpecifics,
-      payload: 'item x',
-    );
-  }
-
-  void showPeriodicNotification() async {
-    const AndroidNotificationDetails androidPlatformChannelSpecifics =
-    AndroidNotificationDetails(
-      'repeat_channel_id', // channel_id
-      'Repeat Notifications', // channel_name
-      channelDescription: 'This channel is used for repeating notifications.', // channel_description
-      importance: Importance.max,
-      priority: Priority.high,
-      showWhen: false,
-    );
-    const NotificationDetails platformChannelSpecifics =
-    NotificationDetails(android: androidPlatformChannelSpecifics);
-    await flutterLocalNotificationsPlugin.periodicallyShow(
-      1,
-      'Periodic Notification',
-      'This notification repeats every 1 minute',
-      RepeatInterval.everyMinute,
       platformChannelSpecifics,
       payload: 'item x',
     );
@@ -180,9 +165,8 @@ class _MyAppState extends State<MyApp> {
     final token = Publics.controller.getToken.value;
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      title: "Mekanik Vale Indonesia",
-      initialRoute:
-      token.isEmpty ? AppPages.INITIAL : Routes.SPLASHCREEN,
+      title: "Mekanik Real Auto Workshop",
+      initialRoute: token.isEmpty ? AppPages.INITIAL : Routes.SPLASHCREEN,
       getPages: AppPages.routes,
       theme: ThemeData(
         appBarTheme: const AppBarTheme(
