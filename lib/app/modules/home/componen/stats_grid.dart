@@ -23,13 +23,13 @@ class StatsGrid extends StatelessWidget {
               children: <Widget>[
                 _buildFutureStatCard<MasukBooking>(
                   future: API.BookingMasukID(),
-                  color: Colors.black,
+                  color: Colors.orange,
                   onTapRoute: Routes.BOOKINGMASUK,
                   dataLabel: "Booking Masuk",
                 ),
                 _buildFutureStatCard<ServiceSelesaiHome>(
                   future: API.ServiceSelesaiID(),
-                  color:   MyColors.appPrimaryRED,
+                  color: Colors.blue,
                   onTapRoute: null??'',
                   dataLabel: "Service Selesai",
                 ),
@@ -41,11 +41,11 @@ class StatsGrid extends StatelessWidget {
               children: <Widget>[
                 _buildFutureStatCard2<ServiceDikerjakan>(
                   future: API.DikerjakanID(),
-                  color:  MyColors.appPrimarykuning,
+                  color: Colors.green,
                   onTapRoute: Routes.SELESAIDIKERJAKAN,
                   dataLabel: "Service Dikerjakan",
                 ),
-                _buildStatCard('Invoice', '-', Colors.blueGrey),
+                _buildStatCard('Invoice', '-', Colors.purple),
               ],
             ),
           ),
@@ -176,7 +176,7 @@ class StatsGrid extends StatelessWidget {
                     Text(
                       label,
                       style: const TextStyle(
-                        color: Colors.black,
+                        color: Colors.white,
                         fontSize: 15.0,
                         fontWeight: FontWeight.w600,
                       ),
@@ -184,14 +184,14 @@ class StatsGrid extends StatelessWidget {
                     Text(
                       'Hari ini',
                       style: const TextStyle(
-                        color: Colors.black,
+                        color: Colors.white,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     Text(
                       count,
                       style: const TextStyle(
-                        color: Colors.black,
+                        color: Colors.white,
                         fontSize: 20.0,
                         fontWeight: FontWeight.bold,
                       ),

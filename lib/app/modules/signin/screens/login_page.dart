@@ -53,11 +53,11 @@ class _LoginPageState extends State<LoginPage> {
         surfaceTintColor: Colors.transparent,
         automaticallyImplyLeading: false,
         toolbarHeight: 0,
-        systemOverlayStyle: SystemUiOverlayStyle(
-          statusBarColor: MyColors.appPrimaryDarkmod,
-          statusBarIconBrightness: Brightness.light,
-          statusBarBrightness: Brightness.dark,
-          systemNavigationBarColor: MyColors.appPrimaryDarkmod,
+        systemOverlayStyle: const SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.dark,
+          statusBarBrightness: Brightness.light,
+          systemNavigationBarColor: Colors.white,
         ),
       ),
       body: WillPopScope(
@@ -81,33 +81,39 @@ class _LoginPageState extends State<LoginPage> {
                   begin: Alignment.bottomCenter,
                   end: Alignment.topCenter,
                   colors: [
-                    MyColors.appPrimaryDarkmod
-                        .withOpacity(0.0),
-                    MyColors.appPrimaryDarkmod
-                        .withOpacity(0.9),
-                    MyColors.appPrimaryDarkmod,
+                    Colors.white
+                        .withOpacity(0.0), // Warna transparan di bagian atas
+                    Colors.white
+                        .withOpacity(0.9), // Warna pudar di bagian bawah
+                    Colors.white, // Warna pudar di bagian bawah
                   ],
                 ),
               ),
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(12.0),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           FadeInAnimation(
                             delay: 1.3,
-                            child: Image.asset(
-                              'assets/logo_autobenz.png',
-                              width: 200.0,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
+                            child: Text(
+                        "Selamat Datang",
+                        style: Common().mediumTheme,
+                      ),
+              ),
+              FadeInAnimation(
+                delay: 1.6,
+                child: Text(
+                  "VALE Indonesia",
+                  style: Common().titelTheme,
+
+                ),)
                         ],
                       ),
                     ),
@@ -118,19 +124,11 @@ class _LoginPageState extends State<LoginPage> {
                           children: [
                             FadeInAnimation(
                               delay: 1.9,
-                              child: TextFormField(
-                                style: TextStyle(color: Colors.white),
-                                controller: _emailController,
-                                obscureText:false,
-                                decoration: InputDecoration(
-                                    border: OutlineInputBorder(
-                                      borderSide:
-                                      const BorderSide(color: Colors.black),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    contentPadding: EdgeInsets.all(18),
-                                    hintStyle: Common().hinttext,
-                                    hintText: 'Masukkan email Anda'),
+                              child: CustomTextFormField(
+                              hinttext: 'Masukkan email Anda',
+                              obsecuretext: false,
+                              controller:
+                              _emailController,
                               ),
                             ),
                             const SizedBox(
@@ -139,7 +137,6 @@ class _LoginPageState extends State<LoginPage> {
                             FadeInAnimation(
                               delay: 2.2,
                               child: TextFormField(
-                                style: TextStyle(color: Colors.white),
                                 controller: _passwordController,
                                 obscureText: obscureText,
                                 decoration: InputDecoration(
@@ -234,7 +231,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     const SizedBox(
-                      height: 205,
+                      height: 305,
                     ),
                   ],
                 ),

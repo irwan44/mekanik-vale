@@ -25,6 +25,7 @@ abstract class Routes {
   static const MyStepperPage = _Paths.MyStepperPage;
   static const DetailPKBView = _Paths.DetailPKBView;
   static const CardDetailPKBSperepart = _Paths.CardDetailPKBSperepart;
+  static const DetailBooking = _Paths.DetailBooking;
 }
 
 abstract class _Paths {
@@ -51,4 +52,5 @@ abstract class _Paths {
   static const MyStepperPage = '/MyStepperPage';
   static const DetailPKBView = '/DetailPKBView';
   static const CardDetailPKBSperepart = '/CardDetailPKBSperepart';
+  static const DetailBooking = '/DetailBooking';
 }

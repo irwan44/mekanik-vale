@@ -29,6 +29,7 @@ import '../modules/promek/start_stop/start_stop_view.dart';
 import '../modules/promek/views/pkb.dart';
 import '../modules/repair_maintenen/bindings/repair_maintenen_binding.dart';
 import '../modules/repair_maintenen/views/repair_maintenen_view.dart';
+import '../modules/repair_maintenen/views/repair_maintenen_view_detail.dart';
 import '../modules/selesaidikerjakan/bindings/selesaidikerjakan_binding.dart';
 import '../modules/selesaidikerjakan/views/selesaidikerjakan_view.dart';
 import '../modules/selesaiservice/bindings/selesaiservice_binding.dart';
@@ -170,6 +171,12 @@ class AppPages {
       name: _Paths.DetailPKBView,
       page: () =>  const DetailPKBView(),
       binding: HomeBinding(),
+    ),
+    GetPage(
+      transition: Transition.downToUp,
+      name: _Paths.DetailBooking,
+      page: () =>  const DetailBooking(),
+      binding: RepairMaintenenBinding(),
     ),
   ];
 }

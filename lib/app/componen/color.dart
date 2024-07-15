@@ -27,8 +27,9 @@ class AppColors {
 }
 
 class MyColors{
-  static Color appPrimaryColor = HexColor("000000");
-  static Color appPrimaryBengkelly = HexColor("000000");
+  static Color appPrimaryColor = HexColor("007e7a");
+  static Color appPrimaryColorbottom = HexColor("E48B1B");
+  static Color appPrimaryBengkelly = HexColor("007e7a");
   static Color appPrimarykuning = HexColor("FCD54B");
   static Color appPrimaryRED = HexColor("EC2124");
   static Color appPrimaryDarkmod = HexColor("1E1E1E");

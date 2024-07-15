@@ -130,11 +130,6 @@ class _PKBlistState extends State<PKBlist>
           'vin_number': e.vinNumber ?? '',
           'nama_tipe': e.namaTipe ?? '',
           'status': e.status ?? '',
-          'jasa': e.jasa?.map((j) => {
-            'nama_jasa': j.namaJasa ?? '',
-            'kode_jasa': j.kodeJasa ?? '',
-            'harga': j.hargaJasa ?? 0,
-          }).toList() ?? [],
           'parts': e.parts ?? [],
         },
       );
@@ -229,11 +224,6 @@ class _PKBlistState extends State<PKBlist>
           'vin_number': e.vinNumber ?? '',
           'nama_tipe': e.namaTipe ?? '',
           'status': e.status ?? '',
-          'jasa': e.jasa?.map((j) => {
-            'nama_jasa': j.namaJasa ?? '',
-            'kode_jasa': j.kodeJasa ?? '',
-            'harga': j.hargaJasa ?? 0,
-          }).toList() ?? [],
           'parts': e.parts ?? [],
         },
       );
@@ -254,8 +244,28 @@ class _PKBlistState extends State<PKBlist>
           future: API.PKBID(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: loadsearchpkb(),
+              return Container(
+                width: double.infinity,
+                margin: EdgeInsets.only(top: 10, bottom: 10),
+                padding: EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.15),
+                      spreadRadius: 5,
+                      blurRadius: 10,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Row(children: [
+                  SizedBox(width: 10,),
+                  Icon(Icons.search_rounded, color: MyColors.appPrimaryColor,),
+                  SizedBox(width: 10,),
+                  Text('Pencarian PKB Service',  style: TextStyle(fontSize: 14, color: MyColors.appPrimaryColor),)
+                ],),
               );
             } else if (snapshot.hasData && snapshot.data != null) {
               final data = snapshot.data!.dataPKB;
@@ -321,16 +331,53 @@ class _PKBlistState extends State<PKBlist>
                   ),
                 );
               } else {
-                return Center(
-                  child: Text(
-                    'Pencarian',
-                    style: GoogleFonts.nunito(fontSize: 16),
+                return Container(
+                  width: double.infinity,
+                  margin: EdgeInsets.only(top: 10, bottom: 10),
+                  padding: EdgeInsets.symmetric(vertical: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.15),
+                        spreadRadius: 5,
+                        blurRadius: 10,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
                   ),
+                  child: Row(children: [
+                    SizedBox(width: 10,),
+                    Icon(Icons.search_rounded, color: MyColors.appPrimaryColor,),
+                    SizedBox(width: 10,),
+                    Text('Pencarian PKB Service',  style: TextStyle(fontSize: 14, color: MyColors.appPrimaryColor),)
+                  ],),
                 );
               }
             } else {
-              return Center(
-                child: loadsearch(),
+              return Container(
+                width: double.infinity,
+                margin: EdgeInsets.only(top: 10, bottom: 10),
+                padding: EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.15),
+                      spreadRadius: 5,
+                      blurRadius: 10,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Row(children: [
+                  SizedBox(width: 10,),
+                  Icon(Icons.search_rounded, color: MyColors.appPrimaryColor,),
+                  SizedBox(width: 10,),
+                  Text('Pencarian PKB Service',  style: TextStyle(fontSize: 14, color: MyColors.appPrimaryColor),)
+                ],),
               );
             }
           },
@@ -357,11 +404,17 @@ class _PKBlistState extends State<PKBlist>
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
+                          Image.asset(
+                            'assets/icons/booking.png',
+                            width: 100.0,
+                            height: 100.0,
+                            fit: BoxFit.cover,
+                          ),
                           const SizedBox(
                             height: 10,
                           ),
                           Text(
-                            'Terjadi Kesalahan API',
+                            'Belum ada data PKB',
                             style: TextStyle(
                                 color: MyColors.appPrimaryColor,
                                 fontWeight: FontWeight.bold),

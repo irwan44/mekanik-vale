@@ -558,8 +558,8 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              const Text('Vin Number :'),
-                              Text('${dataSvc?.vinNumber??'belum ada Vin Number'}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                              const Text('Nomor Lambung :'),
+                              Text('${dataSvc?.vinNumber??'belum ada Nomor Lambung'}', style: const TextStyle(fontWeight: FontWeight.bold)),
                             ],
                           ),
                         ],

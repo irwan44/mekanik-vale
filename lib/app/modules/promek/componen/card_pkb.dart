@@ -62,8 +62,8 @@ class pkblist extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                         Text(items.namaCabang?? '', style: const TextStyle(fontWeight: FontWeight.bold),),
-                        Text('Vin Number :'),
-                        Text(items.vinNumber?? 'belum ada nomor Vin Number', style: const TextStyle(fontWeight: FontWeight.bold),),
+                        Text('Nomor Lambung :'),
+                        Text(items.vinNumber?? 'belum ada nomor Nomor Lambung', style: const TextStyle(fontWeight: FontWeight.bold),),
                       ],),
                       Container(
                         padding: const EdgeInsets.all(10),

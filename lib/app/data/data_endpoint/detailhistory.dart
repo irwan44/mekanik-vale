@@ -2,11 +2,11 @@ class DetailHistory {
   bool? status;
   String? message;
   DataSvc? dataSvc;
-  List<DataSvcPaket>? dataSvcPaket;
+  List<Null>? dataSvcPaket;
   List<DataSvcDtlPart>? dataSvcDtlPart;
   List<DataSvcDtlJasa>? dataSvcDtlJasa;
-  List<Paket>? paket;
-  String? deskripsiMembership;
+  List<Null>? paket;
+  Null? deskripsiMembership;
 
   DetailHistory(
       {this.status,
@@ -21,54 +21,59 @@ class DetailHistory {
   DetailHistory.fromJson(Map<String, dynamic> json) {
     status = json['status'];
     message = json['message'];
-    dataSvc = json['data_svc'] != null ? DataSvc.fromJson(json['data_svc']) : null;
+    dataSvc = json['data_svc'] != null
+        ? new DataSvc.fromJson(json['data_svc'])
+        : null;
     if (json['data_svc_paket'] != null) {
-      dataSvcPaket = <DataSvcPaket>[];
+      dataSvcPaket = <Null>[];
       json['data_svc_paket'].forEach((v) {
-        dataSvcPaket!.add(DataSvcPaket.fromJson(v));
+        dataSvcPaket!.add((v));
       });
     }
     if (json['data_svc_dtl_part'] != null) {
       dataSvcDtlPart = <DataSvcDtlPart>[];
       json['data_svc_dtl_part'].forEach((v) {
-        dataSvcDtlPart!.add(DataSvcDtlPart.fromJson(v));
+        dataSvcDtlPart!.add(new DataSvcDtlPart.fromJson(v));
       });
     }
     if (json['data_svc_dtl_jasa'] != null) {
       dataSvcDtlJasa = <DataSvcDtlJasa>[];
       json['data_svc_dtl_jasa'].forEach((v) {
-        dataSvcDtlJasa!.add(DataSvcDtlJasa.fromJson(v));
+        dataSvcDtlJasa!.add(new DataSvcDtlJasa.fromJson(v));
       });
     }
     if (json['paket'] != null) {
-      paket = <Paket>[];
+      paket = <Null>[];
       json['paket'].forEach((v) {
-        paket!.add(Paket.fromJson(v));
+        paket!.add((v));
       });
     }
     deskripsiMembership = json['deskripsi_membership'];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['status'] = status;
-    data['message'] = message;
-    if (dataSvc != null) {
-      data['data_svc'] = dataSvc!.toJson();
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['status'] = this.status;
+    data['message'] = this.message;
+    if (this.dataSvc != null) {
+      data['data_svc'] = this.dataSvc!.toJson();
     }
-    if (dataSvcPaket != null) {
-      data['data_svc_paket'] = dataSvcPaket!.map((v) => v.toJson()).toList();
+    if (this.dataSvcPaket != null) {
+      data['data_svc_paket'] =
+          this.dataSvcPaket!.map((v) => ()).toList();
     }
-    if (dataSvcDtlPart != null) {
-      data['data_svc_dtl_part'] = dataSvcDtlPart!.map((v) => v.toJson()).toList();
+    if (this.dataSvcDtlPart != null) {
+      data['data_svc_dtl_part'] =
+          this.dataSvcDtlPart!.map((v) => v.toJson()).toList();
     }
-    if (dataSvcDtlJasa != null) {
-      data['data_svc_dtl_jasa'] = dataSvcDtlJasa!.map((v) => v.toJson()).toList();
+    if (this.dataSvcDtlJasa != null) {
+      data['data_svc_dtl_jasa'] =
+          this.dataSvcDtlJasa!.map((v) => v.toJson()).toList();
     }
-    if (paket != null) {
-      data['paket'] = paket!.map((v) => v.toJson()).toList();
+    if (this.paket != null) {
+      data['paket'] = this.paket!.map((v) => ()).toList();
     }
-    data['deskripsi_membership'] = deskripsiMembership;
+    data['deskripsi_membership'] = this.deskripsiMembership;
     return data;
   }
 }
@@ -108,11 +113,13 @@ class DataSvc {
   String? tglTutup;
   String? jamEstimasiSelesai;
   String? jamSelesai;
+  String? datetimeSelesai;
   int? pkb;
   int? tutup;
   int? faktur;
   int? deleted;
   int? notab;
+  String? statusApproval;
   String? createdBy;
   String? createdByPkb;
   String? createdAt;
@@ -132,8 +139,12 @@ class DataSvc {
   String? power;
   String? kategoriKendaraan;
   String? jenisKontrak;
-  String? picIdPelanggan;
+  String? jenisUnit;
+  int? idPicPerusahaan;
+  int? picIdPelanggan;
   int? idCustomer;
+  String? vinNumber;
+  String? expiredStnk;
   String? nama;
   String? alamat;
   String? telp;
@@ -153,6 +164,7 @@ class DataSvc {
   String? otp;
   String? otpExpiry;
   String? gambar;
+  String? fcmToken;
   String? namaMerk;
   String? namaTipe;
   String? namaCabang;
@@ -192,11 +204,13 @@ class DataSvc {
         this.tglTutup,
         this.jamEstimasiSelesai,
         this.jamSelesai,
+        this.datetimeSelesai,
         this.pkb,
         this.tutup,
         this.faktur,
         this.deleted,
         this.notab,
+        this.statusApproval,
         this.createdBy,
         this.createdByPkb,
         this.createdAt,
@@ -216,8 +230,12 @@ class DataSvc {
         this.power,
         this.kategoriKendaraan,
         this.jenisKontrak,
+        this.jenisUnit,
+        this.idPicPerusahaan,
         this.picIdPelanggan,
         this.idCustomer,
+        this.vinNumber,
+        this.expiredStnk,
         this.nama,
         this.alamat,
         this.telp,
@@ -237,6 +255,7 @@ class DataSvc {
         this.otp,
         this.otpExpiry,
         this.gambar,
+        this.fcmToken,
         this.namaMerk,
         this.namaTipe,
         this.namaCabang});
@@ -276,11 +295,13 @@ class DataSvc {
     tglTutup = json['tgl_tutup'];
     jamEstimasiSelesai = json['jam_estimasi_selesai'];
     jamSelesai = json['jam_selesai'];
+    datetimeSelesai = json['datetime_selesai'];
     pkb = json['pkb'];
     tutup = json['tutup'];
     faktur = json['faktur'];
     deleted = json['deleted'];
     notab = json['notab'];
+    statusApproval = json['status_approval'];
     createdBy = json['created_by'];
     createdByPkb = json['created_by_pkb'];
     createdAt = json['created_at'];
@@ -300,8 +321,12 @@ class DataSvc {
     power = json['power'];
     kategoriKendaraan = json['kategori_kendaraan'];
     jenisKontrak = json['jenis_kontrak'];
+    jenisUnit = json['jenis_unit'];
+    idPicPerusahaan = json['id_pic_perusahaan'];
     picIdPelanggan = json['pic_id_pelanggan'];
     idCustomer = json['id_customer'];
+    vinNumber = json['vin_number'];
+    expiredStnk = json['expired_stnk'];
     nama = json['nama'];
     alamat = json['alamat'];
     telp = json['telp'];
@@ -321,152 +346,103 @@ class DataSvc {
     otp = json['otp'];
     otpExpiry = json['otp_expiry'];
     gambar = json['gambar'];
+    fcmToken = json['fcm_token'];
     namaMerk = json['nama_merk'];
     namaTipe = json['nama_tipe'];
     namaCabang = json['nama_cabang'];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
-    data['kode_booking'] = kodeBooking;
-    data['cabang_id'] = cabangId;
-    data['kode_svc'] = kodeSvc;
-    data['kode_estimasi'] = kodeEstimasi;
-    data['kode_pkb'] = kodePkb;
-    data['kode_pelanggan'] = kodePelanggan;
-    data['kode_kendaraan'] = kodeKendaraan;
-    data['odometer'] = odometer;
-    data['pic'] = pic;
-    data['hp_pic'] = hpPic;
-    data['kode_membership'] = kodeMembership;
-    data['kode_paketmember'] = kodePaketmember;
-    data['tipe_svc'] = tipeSvc;
-    data['tipe_pelanggan'] = tipePelanggan;
-    data['referensi'] = referensi;
-    data['referensi_teman'] = referensiTeman;
-    data['po_number'] = poNumber;
-    data['paket_svc'] = paketSvc;
-    data['tgl_keluar'] = tglKeluar;
-    data['tgl_kembali'] = tglKembali;
-    data['km_keluar'] = kmKeluar;
-    data['km_kembali'] = kmKembali;
-    data['keluhan'] = keluhan;
-    data['perintah_kerja'] = perintahKerja;
-    data['pergantian_part'] = pergantianPart;
-    data['saran'] = saran;
-    data['ppn'] = ppn;
-    data['penanggung_jawab'] = penanggungJawab;
-    data['tgl_estimasi'] = tglEstimasi;
-    data['tgl_pkb'] = tglPkb;
-    data['tgl_tutup'] = tglTutup;
-    data['jam_estimasi_selesai'] = jamEstimasiSelesai;
-    data['jam_selesai'] = jamSelesai;
-    data['pkb'] = pkb;
-    data['tutup'] = tutup;
-    data['faktur'] = faktur;
-    data['deleted'] = deleted;
-    data['notab'] = notab;
-    data['created_by'] = createdBy;
-    data['created_by_pkb'] = createdByPkb;
-    data['created_at'] = createdAt;
-    data['updated_by'] = updatedBy;
-    data['updated_at'] = updatedAt;
-    data['kode'] = kode;
-    data['no_polisi'] = noPolisi;
-    data['id_merk'] = idMerk;
-    data['id_tipe'] = idTipe;
-    data['tahun'] = tahun;
-    data['warna'] = warna;
-    data['transmisi'] = transmisi;
-    data['no_rangka'] = noRangka;
-    data['no_mesin'] = noMesin;
-    data['model_karoseri'] = modelKaroseri;
-    data['driving_mode'] = drivingMode;
-    data['power'] = power;
-    data['kategori_kendaraan'] = kategoriKendaraan;
-    data['jenis_kontrak'] = jenisKontrak;
-    data['pic_id_pelanggan'] = picIdPelanggan;
-    data['id_customer'] = idCustomer;
-    data['nama'] = nama;
-    data['alamat'] = alamat;
-    data['telp'] = telp;
-    data['hp'] = hp;
-    data['email'] = email;
-    data['kontak'] = kontak;
-    data['due'] = due;
-    data['jenis_kontrak_x'] = jenisKontrakX;
-    data['nama_tagihan'] = namaTagihan;
-    data['alamat_tagihan'] = alamatTagihan;
-    data['telp_tagihan'] = telpTagihan;
-    data['npwp_tagihan'] = npwpTagihan;
-    data['pic_tagihan'] = picTagihan;
-    data['password'] = password;
-    data['remember_token'] = rememberToken;
-    data['email_verified_at'] = emailVerifiedAt;
-    data['otp'] = otp;
-    data['otp_expiry'] = otpExpiry;
-    data['gambar'] = gambar;
-    data['nama_merk'] = namaMerk;
-    data['nama_tipe'] = namaTipe;
-    data['nama_cabang'] = namaCabang;
-    return data;
-  }
-}
-
-class DataSvcPaket {
-  int? id;
-  String? kodeSvc;
-  String? kode;
-  String? nama;
-  int? qty;
-  int? harga;
-  String? jenis;
-  String? kodePaket;
-  String? namaPaket;
-  String? createdAt;
-  String? updatedAt;
-
-  DataSvcPaket(
-      {this.id,
-        this.kodeSvc,
-        this.kode,
-        this.nama,
-        this.qty,
-        this.harga,
-        this.jenis,
-        this.kodePaket,
-        this.namaPaket,
-        this.createdAt,
-        this.updatedAt});
-
-  DataSvcPaket.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    kodeSvc = json['kode_svc'];
-    kode = json['kode'];
-    nama = json['nama'];
-    qty = json['qty'];
-    harga = json['harga'];
-    jenis = json['jenis'];
-    kodePaket = json['kode_paket'];
-    namaPaket = json['nama_paket'];
-    createdAt = json['created_at'];
-    updatedAt = json['updated_at'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
-    data['kode_svc'] = kodeSvc;
-    data['kode'] = kode;
-    data['nama'] = nama;
-    data['qty'] = qty;
-    data['harga'] = harga;
-    data['jenis'] = jenis;
-    data['kode_paket'] = kodePaket;
-    data['nama_paket'] = namaPaket;
-    data['created_at'] = createdAt;
-    data['updated_at'] = updatedAt;
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['kode_booking'] = this.kodeBooking;
+    data['cabang_id'] = this.cabangId;
+    data['kode_svc'] = this.kodeSvc;
+    data['kode_estimasi'] = this.kodeEstimasi;
+    data['kode_pkb'] = this.kodePkb;
+    data['kode_pelanggan'] = this.kodePelanggan;
+    data['kode_kendaraan'] = this.kodeKendaraan;
+    data['odometer'] = this.odometer;
+    data['pic'] = this.pic;
+    data['hp_pic'] = this.hpPic;
+    data['kode_membership'] = this.kodeMembership;
+    data['kode_paketmember'] = this.kodePaketmember;
+    data['tipe_svc'] = this.tipeSvc;
+    data['tipe_pelanggan'] = this.tipePelanggan;
+    data['referensi'] = this.referensi;
+    data['referensi_teman'] = this.referensiTeman;
+    data['po_number'] = this.poNumber;
+    data['paket_svc'] = this.paketSvc;
+    data['tgl_keluar'] = this.tglKeluar;
+    data['tgl_kembali'] = this.tglKembali;
+    data['km_keluar'] = this.kmKeluar;
+    data['km_kembali'] = this.kmKembali;
+    data['keluhan'] = this.keluhan;
+    data['perintah_kerja'] = this.perintahKerja;
+    data['pergantian_part'] = this.pergantianPart;
+    data['saran'] = this.saran;
+    data['ppn'] = this.ppn;
+    data['penanggung_jawab'] = this.penanggungJawab;
+    data['tgl_estimasi'] = this.tglEstimasi;
+    data['tgl_pkb'] = this.tglPkb;
+    data['tgl_tutup'] = this.tglTutup;
+    data['jam_estimasi_selesai'] = this.jamEstimasiSelesai;
+    data['jam_selesai'] = this.jamSelesai;
+    data['datetime_selesai'] = this.datetimeSelesai;
+    data['pkb'] = this.pkb;
+    data['tutup'] = this.tutup;
+    data['faktur'] = this.faktur;
+    data['deleted'] = this.deleted;
+    data['notab'] = this.notab;
+    data['status_approval'] = this.statusApproval;
+    data['created_by'] = this.createdBy;
+    data['created_by_pkb'] = this.createdByPkb;
+    data['created_at'] = this.createdAt;
+    data['updated_by'] = this.updatedBy;
+    data['updated_at'] = this.updatedAt;
+    data['kode'] = this.kode;
+    data['no_polisi'] = this.noPolisi;
+    data['id_merk'] = this.idMerk;
+    data['id_tipe'] = this.idTipe;
+    data['tahun'] = this.tahun;
+    data['warna'] = this.warna;
+    data['transmisi'] = this.transmisi;
+    data['no_rangka'] = this.noRangka;
+    data['no_mesin'] = this.noMesin;
+    data['model_karoseri'] = this.modelKaroseri;
+    data['driving_mode'] = this.drivingMode;
+    data['power'] = this.power;
+    data['kategori_kendaraan'] = this.kategoriKendaraan;
+    data['jenis_kontrak'] = this.jenisKontrak;
+    data['jenis_unit'] = this.jenisUnit;
+    data['id_pic_perusahaan'] = this.idPicPerusahaan;
+    data['pic_id_pelanggan'] = this.picIdPelanggan;
+    data['id_customer'] = this.idCustomer;
+    data['vin_number'] = this.vinNumber;
+    data['expired_stnk'] = this.expiredStnk;
+    data['nama'] = this.nama;
+    data['alamat'] = this.alamat;
+    data['telp'] = this.telp;
+    data['hp'] = this.hp;
+    data['email'] = this.email;
+    data['kontak'] = this.kontak;
+    data['due'] = this.due;
+    data['jenis_kontrak_x'] = this.jenisKontrakX;
+    data['nama_tagihan'] = this.namaTagihan;
+    data['alamat_tagihan'] = this.alamatTagihan;
+    data['telp_tagihan'] = this.telpTagihan;
+    data['npwp_tagihan'] = this.npwpTagihan;
+    data['pic_tagihan'] = this.picTagihan;
+    data['password'] = this.password;
+    data['remember_token'] = this.rememberToken;
+    data['email_verified_at'] = this.emailVerifiedAt;
+    data['otp'] = this.otp;
+    data['otp_expiry'] = this.otpExpiry;
+    data['gambar'] = this.gambar;
+    data['fcm_token'] = this.fcmToken;
+    data['nama_merk'] = this.namaMerk;
+    data['nama_tipe'] = this.namaTipe;
+    data['nama_cabang'] = this.namaCabang;
     return data;
   }
 }
@@ -481,11 +457,12 @@ class DataSvcDtlPart {
   int? diskonSparepart;
   String? hidSparepart;
   int? nota;
+  int? pengajuan;
   String? createdAt;
   String? updatedAt;
   String? kodeMaster;
   String? kode;
-  String? kode2;
+  int? kode2;
   String? nama;
   String? divisi;
   String? brand;
@@ -521,6 +498,7 @@ class DataSvcDtlPart {
         this.diskonSparepart,
         this.hidSparepart,
         this.nota,
+        this.pengajuan,
         this.createdAt,
         this.updatedAt,
         this.kodeMaster,
@@ -561,6 +539,7 @@ class DataSvcDtlPart {
     diskonSparepart = json['diskon_sparepart'];
     hidSparepart = json['hid_sparepart'];
     nota = json['nota'];
+    pengajuan = json['pengajuan'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
     kodeMaster = json['kode_master'];
@@ -593,45 +572,46 @@ class DataSvcDtlPart {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
-    data['kode_svc'] = kodeSvc;
-    data['kode_sparepart'] = kodeSparepart;
-    data['nama_sparepart'] = namaSparepart;
-    data['qty_sparepart'] = qtySparepart;
-    data['harga_sparepart'] = hargaSparepart;
-    data['diskon_sparepart'] = diskonSparepart;
-    data['hid_sparepart'] = hidSparepart;
-    data['nota'] = nota;
-    data['created_at'] = createdAt;
-    data['updated_at'] = updatedAt;
-    data['kode_master'] = kodeMaster;
-    data['kode'] = kode;
-    data['kode_2'] = kode2;
-    data['nama'] = nama;
-    data['divisi'] = divisi;
-    data['brand'] = brand;
-    data['qty'] = qty;
-    data['harga_beli'] = hargaBeli;
-    data['harga_jual'] = hargaJual;
-    data['barcode'] = barcode;
-    data['satuan'] = satuan;
-    data['no_stock'] = noStock;
-    data['lokasi'] = lokasi;
-    data['note'] = note;
-    data['tipe'] = tipe;
-    data['kode_supplier'] = kodeSupplier;
-    data['qty_min'] = qtyMin;
-    data['qty_max'] = qtyMax;
-    data['ukuran'] = ukuran;
-    data['kualitas'] = kualitas;
-    data['demand_bulanan'] = demandBulanan;
-    data['emergency'] = emergency;
-    data['jenis'] = jenis;
-    data['deleted'] = deleted;
-    data['created_by'] = createdBy;
-    data['gudang'] = gudang;
-    data['cabang_id'] = cabangId;
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['kode_svc'] = this.kodeSvc;
+    data['kode_sparepart'] = this.kodeSparepart;
+    data['nama_sparepart'] = this.namaSparepart;
+    data['qty_sparepart'] = this.qtySparepart;
+    data['harga_sparepart'] = this.hargaSparepart;
+    data['diskon_sparepart'] = this.diskonSparepart;
+    data['hid_sparepart'] = this.hidSparepart;
+    data['nota'] = this.nota;
+    data['pengajuan'] = this.pengajuan;
+    data['created_at'] = this.createdAt;
+    data['updated_at'] = this.updatedAt;
+    data['kode_master'] = this.kodeMaster;
+    data['kode'] = this.kode;
+    data['kode_2'] = this.kode2;
+    data['nama'] = this.nama;
+    data['divisi'] = this.divisi;
+    data['brand'] = this.brand;
+    data['qty'] = this.qty;
+    data['harga_beli'] = this.hargaBeli;
+    data['harga_jual'] = this.hargaJual;
+    data['barcode'] = this.barcode;
+    data['satuan'] = this.satuan;
+    data['no_stock'] = this.noStock;
+    data['lokasi'] = this.lokasi;
+    data['note'] = this.note;
+    data['tipe'] = this.tipe;
+    data['kode_supplier'] = this.kodeSupplier;
+    data['qty_min'] = this.qtyMin;
+    data['qty_max'] = this.qtyMax;
+    data['ukuran'] = this.ukuran;
+    data['kualitas'] = this.kualitas;
+    data['demand_bulanan'] = this.demandBulanan;
+    data['emergency'] = this.emergency;
+    data['jenis'] = this.jenis;
+    data['deleted'] = this.deleted;
+    data['created_by'] = this.createdBy;
+    data['gudang'] = this.gudang;
+    data['cabang_id'] = this.cabangId;
     return data;
   }
 }
@@ -689,83 +669,22 @@ class DataSvcDtlJasa {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
-    data['kode_svc'] = kodeSvc;
-    data['kode_jasa'] = kodeJasa;
-    data['nama_jasa'] = namaJasa;
-    data['qty_jasa'] = qtyJasa;
-    data['harga_jasa'] = hargaJasa;
-    data['diskon_jasa'] = diskonJasa;
-    data['hid_jasa'] = hidJasa;
-    data['created_at'] = createdAt;
-    data['updated_at'] = updatedAt;
-    data['biaya'] = biaya;
-    data['jam'] = jam;
-    data['divisi_jasa'] = divisiJasa;
-    data['deleted'] = deleted;
-    data['created_by'] = createdBy;
-    return data;
-  }
-}
-
-class Paket {
-  int? id;
-  String? kodeSvc;
-  String? kode;
-  String? nama;
-  int? qty;
-  int? harga;
-  String? jenis;
-  String? kodePaket;
-  String? namaPaket;
-  String? createdAt;
-  String? updatedAt;
-  int? total;
-
-  Paket(
-      {this.id,
-        this.kodeSvc,
-        this.kode,
-        this.nama,
-        this.qty,
-        this.harga,
-        this.jenis,
-        this.kodePaket,
-        this.namaPaket,
-        this.createdAt,
-        this.updatedAt,
-        this.total});
-
-  Paket.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    kodeSvc = json['kode_svc'];
-    kode = json['kode'];
-    nama = json['nama'];
-    qty = json['qty'];
-    harga = json['harga'];
-    jenis = json['jenis'];
-    kodePaket = json['kode_paket'];
-    namaPaket = json['nama_paket'];
-    createdAt = json['created_at'];
-    updatedAt = json['updated_at'];
-    total = json['total'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
-    data['kode_svc'] = kodeSvc;
-    data['kode'] = kode;
-    data['nama'] = nama;
-    data['qty'] = qty;
-    data['harga'] = harga;
-    data['jenis'] = jenis;
-    data['kode_paket'] = kodePaket;
-    data['nama_paket'] = namaPaket;
-    data['created_at'] = createdAt;
-    data['updated_at'] = updatedAt;
-    data['total'] = total;
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['kode_svc'] = this.kodeSvc;
+    data['kode_jasa'] = this.kodeJasa;
+    data['nama_jasa'] = this.namaJasa;
+    data['qty_jasa'] = this.qtyJasa;
+    data['harga_jasa'] = this.hargaJasa;
+    data['diskon_jasa'] = this.diskonJasa;
+    data['hid_jasa'] = this.hidJasa;
+    data['created_at'] = this.createdAt;
+    data['updated_at'] = this.updatedAt;
+    data['biaya'] = this.biaya;
+    data['jam'] = this.jam;
+    data['divisi_jasa'] = this.divisiJasa;
+    data['deleted'] = this.deleted;
+    data['created_by'] = this.createdBy;
     return data;
   }
 }

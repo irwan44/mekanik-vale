@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.bengkelly.realautobenz.co">
+    package="com.bengkelly.mekanik.co.id">
 
     <!-- Izin aplikasi -->
 
@@ -40,7 +40,7 @@
 
 
     <application
-        android:label="Mekanik Real Auto Workshop"
+        android:label="Mekanik Vale Indonesia"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <meta-data

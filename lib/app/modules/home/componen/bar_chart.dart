@@ -5,8 +5,8 @@ import 'package:mekanik/app/componen/color.dart';
 
 class BarChartSample2 extends StatefulWidget {
   BarChartSample2({super.key});
-  final Color leftBarColor = MyColors.appPrimarykuning;
-  final Color rightBarColor = MyColors.appPrimaryRED;
+  final Color leftBarColor = MyColors.appPrimaryColor;
+  final Color rightBarColor = Colors.green;
   final Color avgColor = Colors.blue;
   @override
   State<StatefulWidget> createState() => BarChartSample2State();
@@ -64,7 +64,7 @@ class BarChartSample2State extends State<BarChartSample2> {
                 ),
                 Text(
                   'Static',
-                  style: TextStyle(color: MyColors.appPrimarykuning, fontSize: 22),
+                  style: TextStyle(color: MyColors.appPrimaryColor, fontSize: 22),
                 ),
                 const SizedBox(
                   width: 4,
@@ -242,7 +242,7 @@ class BarChartSample2State extends State<BarChartSample2> {
         Container(
           width: width,
           height: 10,
-          color: MyColors.appPrimarykuning,
+          color: MyColors.appPrimaryColor,
         ),
         const SizedBox(
           width: space,
@@ -250,7 +250,7 @@ class BarChartSample2State extends State<BarChartSample2> {
         Container(
           width: width,
           height: 28,
-          color: MyColors.appPrimaryRED,
+          color: MyColors.appPrimaryColor,
         ),
         const SizedBox(
           width: space,
@@ -258,7 +258,7 @@ class BarChartSample2State extends State<BarChartSample2> {
         Container(
           width: width,
           height: 42,
-          color: MyColors.appPrimarykuning,
+          color: MyColors.appPrimaryColor,
         ),
         const SizedBox(
           width: space,
@@ -266,7 +266,7 @@ class BarChartSample2State extends State<BarChartSample2> {
         Container(
           width: width,
           height: 28,
-          color: MyColors.appPrimaryRED,
+          color: MyColors.appPrimaryColor,
         ),
         const SizedBox(
           width: space,
@@ -274,7 +274,7 @@ class BarChartSample2State extends State<BarChartSample2> {
         Container(
           width: width,
           height: 10,
-          color: MyColors.appPrimarykuning,
+          color: MyColors.appPrimaryColor,
         ),
       ],
     );

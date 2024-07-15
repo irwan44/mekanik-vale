@@ -248,90 +248,119 @@ class _DetailHistoryViewState extends State<DetailHistoryView> {
                             const SizedBox(height: 10,),
                             Text('Paket', style: TextStyle(fontWeight: FontWeight.bold,color: MyColors.appPrimaryColor),),
                       FutureBuilder<DetailHistory>(
-                          future: API.DetailhistoryID(kodesvc: kodeSvc),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting) {
-                              return const Center(child: CircularProgressIndicator());
-                            } else if (snapshot.hasError) {
-                              return Center(child: Text('Error: ${snapshot.error}'));
-                            } else if (snapshot.hasData) {
-                              final dataSvcDtlJasa = snapshot.data!.dataSvcDtlJasa;
-                              return SizedBox(
-                                height: 760,
-                                child: ListView.builder(
-                                  physics: NeverScrollableScrollPhysics(),
-                                  itemCount: dataSvcDtlJasa?.length ?? 0,
-                                  itemBuilder: (context, index) {
-                                    return Column(
-                                      children: [
-                                        Row(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Flexible(
-                                              child:
-                                    Column(
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                        future: API.DetailhistoryID(kodesvc: kodeSvc),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const Center(child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Center(child: Text('Error: ${snapshot.error}'));
+                          } else if (snapshot.hasData) {
+                            final dataSvcDtlJasa = snapshot.data!.dataSvcDtlJasa;
+                            return Column(
+                              children: [
+                                for (var jasa in dataSvcDtlJasa ?? [])
+                                  Column(
                                     children: [
-                                      const Text('Nama Jasa :'),
-                                      Text('${dataSvcDtlJasa?[index].namaJasa}', style: const TextStyle(fontWeight: FontWeight.bold,),),
-                                    ]),),
+                                      Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Flexible(
+                                            child: Column(
+                                              mainAxisAlignment: MainAxisAlignment.start,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                const Text('Nama Jasa :'),
+                                                Text(
+                                                  '${jasa.namaJasa}',
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
                                           Column(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      const Text('Harga :'),
-                                      Text('Rp. ${dataSvcDtlJasa?[index].hargaJasa}', style: const TextStyle(fontWeight: FontWeight.bold,),),
-                                    ]),
-                                        ],),
-                                        Row(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Column(
-                                                mainAxisAlignment: MainAxisAlignment.start,
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                ]),
-                                            Column(
-                                                mainAxisAlignment: MainAxisAlignment.end,
-                                                crossAxisAlignment: CrossAxisAlignment.end,
-                                                children: [
-                                                  const Text('Diskon :'),
-                                                  Text('Rp. ${dataSvcDtlJasa?[index].diskonJasa}', style: const TextStyle(fontWeight: FontWeight.bold,),),
-                                                ]),
-                                          ],),
-                                        const Divider(color: Colors.grey,),
-                                        const SizedBox(height: 10,),
-                                        Row(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            const Column(
-                                                mainAxisAlignment: MainAxisAlignment.start,
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                ]),
-                                            Column(
-                                                mainAxisAlignment: MainAxisAlignment.end,
-                                                crossAxisAlignment: CrossAxisAlignment.end,
-                                                children: [
-                                                   Text('TOTAL', style: TextStyle(color: MyColors.appPrimaryColor,fontWeight: FontWeight.bold),),
-                                                  Text('Rp. ${dataSvcDtlJasa?[index].biaya}', style: const TextStyle(fontWeight: FontWeight.bold,),),
-                                                ]),
-                                          ],),
-                                        const Divider(color: Colors.transparent,),
-                                        const SizedBox(height: 10,),
-                                      ],
-                                    );
-                                  },
-                                ),
-                              );
-                            } else {
-                              return const Center(child: Text('No data available'));
-                            }
+                                            mainAxisAlignment: MainAxisAlignment.end,
+                                            crossAxisAlignment: CrossAxisAlignment.end,
+                                            children: [
+                                              const Text('Harga :'),
+                                              Text(
+                                                'Rp. ${jasa.hargaJasa}',
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Column(
+                                            mainAxisAlignment: MainAxisAlignment.start,
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [],
+                                          ),
+                                          Column(
+                                            mainAxisAlignment: MainAxisAlignment.end,
+                                            crossAxisAlignment: CrossAxisAlignment.end,
+                                            children: [
+                                              const Text('Diskon :'),
+                                              Text(
+                                                'Rp. ${jasa.diskonJasa}',
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                      const Divider(color: Colors.grey),
+                                      const SizedBox(height: 10),
+                                      Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          const Column(
+                                            mainAxisAlignment: MainAxisAlignment.start,
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [],
+                                          ),
+                                          Column(
+                                            mainAxisAlignment: MainAxisAlignment.end,
+                                            crossAxisAlignment: CrossAxisAlignment.end,
+                                            children: [
+                                              Text(
+                                                'TOTAL',
+                                                style: TextStyle(
+                                                  color: MyColors.appPrimaryColor,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              Text(
+                                                'Rp. ${jasa.biaya}',
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                      const Divider(color: Colors.transparent),
+                                      const SizedBox(height: 10),
+                                    ],
+                                  ),
+                              ],
+                            );
+                          } else {
+                            return const Center(child: Text('No data available'));
                           }
+                        },
                       ),
                       ]));
               } else {

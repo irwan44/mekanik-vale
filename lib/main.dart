@@ -7,9 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:pusher_channels_flutter/pusher_channels_flutter.dart'; // Import Pusher
 import 'app/componen/color.dart';
-import 'app/data/endpoint.dart';
 import 'app/data/publik.dart';
 import 'app/routes/app_pages.dart';
 
@@ -18,13 +16,13 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
   print('Handling a background message: ${message.messageId}');
 }
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  HttpOverrides.global = MyHttpOverrides();
-  startPollingNotifications();
   await GetStorage.init('token-mekanik');
+  await GetStorage.init('role-mekanik');
 
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
@@ -36,7 +34,6 @@ void main() async {
     DeviceOrientation.landscapeRight
   ]);
 
-  // Inisialisasi notifikasi lokal
   const AndroidInitializationSettings initializationSettingsAndroid =
   AndroidInitializationSettings('@mipmap/ic_launcher');
   final InitializationSettings initializationSettings =
@@ -50,7 +47,6 @@ void startPollingNotifications() {
   const pollingInterval = Duration(minutes: 1);
 
   Timer.periodic(pollingInterval, (timer) async {
-
     print("Polling notification...");
   });
 }
@@ -72,16 +68,10 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   String? _token;
-  late PusherChannelsFlutter pusher;
-  final String appId = "1827229";
-  final String key = "5c463cc9a2fdf08932b5";
-  final String secret = "521202e4d68dc816c054";
-  final String cluster = "ap1";
 
   @override
   void initState() {
     super.initState();
-    initPusher();
     _getToken();
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       print('Got a message whilst in the foreground!');
@@ -93,31 +83,6 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  Future<void> initPusher() async {
-    pusher = PusherChannelsFlutter.getInstance();
-    try {
-      await pusher.init(
-        apiKey: key,
-        cluster: cluster,
-        onEvent: (event) {
-          print("Event received: $event");
-          showLocalNotification(event.eventName, event.data);
-        },
-        onConnectionStateChange: (currentState, previousState) {
-          print("Connection state changed from $previousState to $currentState");
-        },
-        onError: (message, code, exception) {
-          print("Connection error: $message");
-        },
-      );
-      await pusher.connect();
-      await pusher.subscribe(
-        channelName: 'my-channel',
-      );
-    } catch (e) {
-      print("Pusher connection error: $e");
-    }
-  }
   void _getToken() async {
     FirebaseMessaging messaging = FirebaseMessaging.instance;
 
@@ -137,24 +102,36 @@ class _MyAppState extends State<MyApp> {
         _token = token;
       });
       print("FCM Token: $_token");
+
+      // Subscribe to topic
+      messaging.subscribeToTopic('MutiaraCar').then((_) {
+        print('Subscribed to allUsers topic');
+      }).catchError((error) {
+        print('Failed to subscribe to allUsers topic: $error');
+      });
     } else {
       print("User declined or has not accepted permission");
     }
   }
+
   void showLocalNotification(String title, String body) async {
-    const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
-      'high_importance_channel', // channel_id
-      'High Importance Notifications', // channel_name
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+    AndroidNotificationDetails(
+      'high_importance_channel',
+      'High Importance Notifications',
       channelDescription: 'This channel is used for important notifications.', // channel_description
       importance: Importance.max,
       priority: Priority.high,
+      ticker: 'ticker',
       showWhen: false,
+      sound: RawResourceAndroidNotificationSound('sounds'),
     );
-    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
+    const NotificationDetails platformChannelSpecifics =
+    NotificationDetails(android: androidPlatformChannelSpecifics);
     await flutterLocalNotificationsPlugin.show(
       0,
-      'Vale Indonesia Mekanik',
-      'Ada Booking Masuk',
+      title,
+      body,
       platformChannelSpecifics,
       payload: 'item x',
     );
@@ -165,7 +142,7 @@ class _MyAppState extends State<MyApp> {
     final token = Publics.controller.getToken.value;
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      title: "Mekanik Real Auto Workshop",
+      title: "Mekanik Vale Indonesia",
       initialRoute: token.isEmpty ? AppPages.INITIAL : Routes.SPLASHCREEN,
       getPages: AppPages.routes,
       theme: ThemeData(

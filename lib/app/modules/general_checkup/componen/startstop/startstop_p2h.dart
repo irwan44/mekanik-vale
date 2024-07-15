@@ -128,7 +128,7 @@ class _StartStopViewG2HState extends State<StartStopViewG2H> with AutomaticKeepA
           systemNavigationBarColor: Colors.white,
         ),
         title: Text(
-          'Mekanik P2H',
+          nama_jenissvc!,
           style: TextStyle(color: MyColors.appPrimaryColor, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,

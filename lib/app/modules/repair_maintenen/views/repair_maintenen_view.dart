@@ -61,98 +61,97 @@ class RepairMaintenenView extends GetView<RepairMaintenenController> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  if (tipeSvc == 'Repair & Maintenance') {
-                    QuickAlert.show(
-                      context: context,
-                      type: QuickAlertType.warning,
-                      headerBackgroundColor: Colors.yellow,
-                      text: 'Pastikan Kembali data Booking sudah sesuai, untuk Lanjut ke Estimasi ',
-                      confirmBtnText: 'Konfirmasi',
-                      cancelBtnText: 'Kembali',
-                      confirmBtnColor: Colors.blue,
-                      onConfirmBtnTap: () async {
-                        Navigator.pop(Get.context!);
-                        try {
-                          // Tampilkan indikator loading
-                          QuickAlert.show(
-                            barrierDismissible: false,
-                            context: Get.context!,
-                            type: QuickAlertType.loading,
-                            headerBackgroundColor: Colors.yellow,
-                            text: 'Buat Estimasi......',
-                          );
+                  QuickAlert.show(
+                    context: context,
+                    type: QuickAlertType.warning,
+                    headerBackgroundColor: Colors.yellow,
+                    text: 'Pastikan Kembali data Booking sudah sesuai, untuk Lanjut ke Estimasi',
+                    confirmBtnText: 'Konfirmasi',
+                    cancelBtnText: 'Kembali',
+                    confirmBtnColor: Colors.blue,
+                    onConfirmBtnTap: () async {
+                      Navigator.pop(Get.context!);
+                      try {
+                        // Tampilkan indikator loading
+                        QuickAlert.show(
+                          barrierDismissible: false,
+                          context: Get.context!,
+                          type: QuickAlertType.loading,
+                          headerBackgroundColor: Colors.yellow,
+                          text: 'Buat Estimasi......',
+                        );
 
-                          // Panggil API untuk menyetujui booking
-                          final response = await API.estimasiId(
-                            idkaryawan: '',
-                            kodeBooking: kodeBooking,
-                            kodepelanggan: kodepelanggan,
-                            kodekendaraan: kodekendaraan,
-                            kategorikendaraan: kategorikendaraan,
-                            tglBooking: controller.tanggal.text,
-                            jamBooking: controller.jam.text,
-                            odometer: controller.odometer.text,
-                            pic: controller.pic.text,
-                            hpPic: controller.hppic.text,
-                            kodeMembership: kodeMembership,
-                            kodePaketmember: kodePaketmember,
-                            tipeSvc: tipeSvc,
-                            tipePelanggan: tipePelanggan,
-                            referensi: referensi,
-                            referensiTmn: referensiTmn,
-                            paketSvc: paketSvc,
-                            keluhan: controller.keluhan.text,
-                            perintahKerja: controller.perintah.text,
-                            ppn: 10,
-                          );
-                          if (response.message == 200) {
-                            Navigator.pop(Get.context!);
-                            QuickAlert.show(
-                              barrierDismissible: false,
-                              context: Get.context!,
-                              type: QuickAlertType.success,
-                              headerBackgroundColor: Colors.yellow,
-                              text: 'Estimasi Telah diBuat',
-                              confirmBtnText: 'Kembali',
-                              confirmBtnColor: Colors.green,
-                              onConfirmBtnTap: () {
-                                Navigator.of(context).popUntil((route) => route.isFirst);
-                              },
-                            );
-                          } else {
-                            Navigator.pop(Get.context!);
-                            Get.toNamed(Routes.BOKING2);
-                            QuickAlert.show(
-                              barrierDismissible: false,
-                              context: Get.context!,
-                              type: QuickAlertType.success,
-                              headerBackgroundColor: Colors.yellow,
-                              text: 'Estimasi Telah diBuat',
-                              confirmBtnText: 'Kembali',
-                              confirmBtnColor: Colors.green,
-                              onConfirmBtnTap: () {
-                                Navigator.pop(Get.context!);
-                              },
-                            );
-                          }
-                        } catch (e) {
-                          Navigator.pop(Get.context!);
+                        // Panggil API untuk menyetujui booking
+                        final response = await API.estimasiId(
+                          idkaryawan: '',
+                          kodeBooking: kodeBooking,
+                          kodepelanggan: kodepelanggan,
+                          kodekendaraan: kodekendaraan,
+                          kategorikendaraan: kategorikendaraan,
+                          tglBooking: controller.tanggal.text,
+                          jamBooking: controller.jam.text,
+                          odometer: controller.odometer.text,
+                          pic: controller.pic.text,
+                          hpPic: controller.hppic.text,
+                          kodeMembership: kodeMembership,
+                          kodePaketmember: kodePaketmember,
+                          tipeSvc: tipeSvc,
+                          tipePelanggan: tipePelanggan,
+                          referensi: referensi,
+                          referensiTmn: referensiTmn,
+                          paketSvc: paketSvc,
+                          keluhan: controller.keluhan.text,
+                          perintahKerja: controller.perintah.text,
+                          ppn: 10,
+                        );
+
+                        Navigator.pop(Get.context!);
+
+                        if (response.message == 200) {
                           QuickAlert.show(
                             barrierDismissible: false,
                             context: Get.context!,
-                            type: QuickAlertType.error,
+                            type: QuickAlertType.success,
                             headerBackgroundColor: Colors.yellow,
-                            text: 'Terjadi kesalahan saat membuat estimasi',
+                            text: 'Estimasi Telah diBuat',
                             confirmBtnText: 'Kembali',
-                            confirmBtnColor: Colors.red,
+                            confirmBtnColor: Colors.green,
                             onConfirmBtnTap: () {
-                              Navigator.of(context).pop();
+                              Navigator.of(context).popUntil((route) => route.isFirst);
+                            },
+                          );
+                        } else {
+                          Get.toNamed(Routes.BOKING2);
+                          QuickAlert.show(
+                            barrierDismissible: false,
+                            context: Get.context!,
+                            type: QuickAlertType.success,
+                            headerBackgroundColor: Colors.yellow,
+                            text: 'Estimasi Telah diBuat',
+                            confirmBtnText: 'Kembali',
+                            confirmBtnColor: Colors.green,
+                            onConfirmBtnTap: () {
+                              Navigator.pop(Get.context!);
                             },
                           );
                         }
-                      },
-                    );
-                  }
+                      } catch (e) {
+                        Navigator.pop(Get.context!);
+                        QuickAlert.show(
+                          barrierDismissible: false,
+                          context: Get.context!,
+                          type: QuickAlertType.error,
+                          headerBackgroundColor: Colors.yellow,
+                          text: 'Terjadi kesalahan saat membuat estimasi',
+                          confirmBtnText: 'Kembali',
+                          confirmBtnColor: Colors.red,
+                          onConfirmBtnTap: () {
+                            Navigator.of(context).pop();
+                          },
+                        );
+                      }
+                    },
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
@@ -175,7 +174,7 @@ class RepairMaintenenView extends GetView<RepairMaintenenController> {
       ),
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
-        title: const Text('Repair Maintenance'),
+        title: Text(tipeSvc??''),
         centerTitle: true,
         systemOverlayStyle: SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
