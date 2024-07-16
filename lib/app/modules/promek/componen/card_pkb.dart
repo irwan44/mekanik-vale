@@ -5,15 +5,15 @@ import 'package:mekanik/app/componen/color.dart';
 import '../../../data/data_endpoint/boking.dart';
 import '../../../data/data_endpoint/pkb.dart';
 
-class pkblist extends StatelessWidget {
+class PkbList extends StatelessWidget {
   final DataPKB items;
   final VoidCallback onTap;
 
-  const pkblist({Key? key, required this.items, required this.onTap});
+  const PkbList({Key? key, required this.items, required this.onTap}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    Color statusColor = StatusColor.getColor(items.status??'');
+    Color statusColor = StatusColor.getColor(items.status ?? '');
     return InkWell(
       onTap: onTap,
       child: Container(
@@ -50,7 +50,7 @@ class pkblist extends StatelessWidget {
                   ),
                 ],
               ),
-              child:  Column(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
@@ -61,10 +61,17 @@ class pkblist extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                        Text(items.namaCabang?? '', style: const TextStyle(fontWeight: FontWeight.bold),),
-                        Text('Nomor Lambung :'),
-                        Text(items.vinNumber?? 'belum ada nomor Nomor Lambung', style: const TextStyle(fontWeight: FontWeight.bold),),
-                      ],),
+                          Text(
+                            items.namaCabang ?? '',
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          const Text('Nomor Lambung :'),
+                          Text(
+                            items.vinNumber ?? 'belum ada nomor Nomor Lambung',
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
@@ -74,7 +81,7 @@ class pkblist extends StatelessWidget {
                         child: Column(
                           children: [
                             Text(
-                              items.status??'',
+                              items.status ?? '',
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
@@ -83,9 +90,10 @@ class pkblist extends StatelessWidget {
                           ],
                         ),
                       ),
-                    ],),
-                  SizedBox(height: 10,),
-                  Divider(color: Colors.grey,),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  const Divider(color: Colors.grey),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -94,10 +102,13 @@ class pkblist extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Tanggal Estimasi' ,style: const TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.normal,
-                          ),),
+                          const Text(
+                            'Tanggal Estimasi',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
                           Text(
                             items.tglEstimasi?.split(" ")[0] ?? "",
                             style: const TextStyle(
@@ -105,16 +116,19 @@ class pkblist extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-
-                        ],),
+                        ],
+                      ),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          const Text('Jam Estimasi' ,style: const TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.normal,
-                          ),),
+                          const Text(
+                            'Jam Estimasi',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
                           Text(
                             items.tglEstimasi?.split(" ")[1] ?? "",
                             style: const TextStyle(
@@ -122,60 +136,71 @@ class pkblist extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-
-                        ],),
+                        ],
+                      ),
                     ],
                   ),
-                  Divider(color: Colors.grey,),
+                  const Divider(color: Colors.grey),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Column(children: [
-                        const Text('Tanggal PKB' ,style: const TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.normal,
-                        ),),
-                        Text(
-                          items.tglPkb?.split(" ")[0] ?? "",
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-
-                      ],),
                       Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          const Text('Kode PKB' ,style: const TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.normal,
-                          ),),
+                          const Text(
+                            'Tanggal PKB',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
                           Text(
-                            items.kodePkb??'',
+                            items.tglPkb?.split(" ")[0] ?? "",
                             style: const TextStyle(
                               color: Colors.black,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-
-                        ],),
+                        ],
+                      ),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          const Text(
+                            'Kode PKB',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
+                          Text(
+                            items.kodePkb ?? '',
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
-                  Divider(color: Colors.grey,),
+                  const Divider(color: Colors.grey),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text('Pelanggan'),
-                            Text(items.nama??'', style: const TextStyle(fontWeight: FontWeight.bold),),
-                          ]),
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('Pelanggan'),
+                          Text(
+                            items.nama ?? '',
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
                       Column(
                         mainAxisAlignment: MainAxisAlignment.end,
                         crossAxisAlignment: CrossAxisAlignment.end,
@@ -190,12 +215,16 @@ class pkblist extends StatelessWidget {
                           ),
                         ],
                       ),
-                    ],),
+                    ],
+                  ),
                 ],
               ),
             ),
             const SizedBox(height: 10),
-            Text('Detail Kendaraaan Pelanggan',style: TextStyle(fontWeight: FontWeight.bold),),
+            const Text(
+              'Detail Kendaraaan Pelanggan',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -206,20 +235,36 @@ class pkblist extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text('Merek :'),
-                    Text(items.namaMerk??'', style: const TextStyle(fontWeight: FontWeight.bold),),
+                    Text(
+                      items.namaMerk ?? '',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
                     const Text('Warna :'),
-                    Text(items.warna??'', style: const TextStyle(fontWeight: FontWeight.bold),),
+                    Text(
+                      items.warna ?? '',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   ],
                 ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Type :'),
-                    Text(items.namaTipe??'', style: const TextStyle(fontWeight: FontWeight.bold),),
-                    const Text('NoPol :'),
-                    Text(items.noPolisi??'', style: const TextStyle(fontWeight: FontWeight.bold),),
-                  ],
+                Flexible(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('Type :'),
+                      Text(
+                        items.namaTipe ?? '',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const Text('NoPol :'),
+                      Text(
+                        items.noPolisi ?? '',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),

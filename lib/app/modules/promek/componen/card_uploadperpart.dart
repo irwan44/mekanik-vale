@@ -51,7 +51,7 @@ class pkblistSperpart extends StatelessWidget {
                   ),
                 ],
               ),
-              child:  Column(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
@@ -62,31 +62,15 @@ class pkblistSperpart extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                        Text(items.namaCabang?? '', style: const TextStyle(fontWeight: FontWeight.bold),),
-                        Text('Nomor Lambung :'),
-                        Text(items.vinNumber?? 'belum ada Nomor Lambung', style: const TextStyle(fontWeight: FontWeight.bold),),
-                      ],),
-                      // Container(
-                      //   padding: const EdgeInsets.all(10),
-                      //   decoration: BoxDecoration(
-                      //     color: statusColor,
-                      //     borderRadius: BorderRadius.circular(10),
-                      //   ),
-                      //   child: Column(
-                      //     children: [
-                      //       Text(
-                      //         items.status.toString(),
-                      //         style: const TextStyle(
-                      //           color: Colors.white,
-                      //           fontWeight: FontWeight.bold,
-                      //         ),
-                      //       ),
-                      //     ],
-                      //   ),
-                      // ),
-                    ],),
-                  SizedBox(height: 10,),
-                  Divider(color: Colors.grey,),
+                          Text(items.namaCabang ?? '', style: const TextStyle(fontWeight: FontWeight.bold)),
+                          const Text('Nomor Lambung :'),
+                          Text(items.vinNumber ?? 'belum ada Nomor Lambung', style: const TextStyle(fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  const Divider(color: Colors.grey),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -95,88 +79,66 @@ class pkblistSperpart extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Tanggal Estimasi' ,style: const TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.normal,
-                          ),),
+                          const Text('Tanggal Estimasi', style: TextStyle(color: Colors.black, fontWeight: FontWeight.normal)),
                           Text(
                             items.tglEstimasi?.split(" ")[0] ?? "",
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
                           ),
-
-                        ],),
+                        ],
+                      ),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          const Text('Jam Estimasi' ,style: const TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.normal,
-                          ),),
+                          const Text('Jam Estimasi', style: TextStyle(color: Colors.black, fontWeight: FontWeight.normal)),
                           Text(
                             items.tglEstimasi?.split(" ")[1] ?? "",
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
                           ),
-
-                        ],),
+                        ],
+                      ),
                     ],
                   ),
-                  Divider(color: Colors.grey,),
+                  const Divider(color: Colors.grey),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Column(children: [
-                        const Text('Tanggal PKB' ,style: const TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.normal,
-                        ),),
-                        Text(
-                          items.tglPkb?.split(" ")[0] ?? "",
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
+                      Column(
+                        children: [
+                          const Text('Tanggal PKB', style: TextStyle(color: Colors.black, fontWeight: FontWeight.normal)),
+                          Text(
+                            items.tglPkb?.split(" ")[0] ?? "",
+                            style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
                           ),
-                        ),
-
-                      ],),
+                        ],
+                      ),
                       Column(
                         mainAxisAlignment: MainAxisAlignment.end,
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          const Text('Kode PKB' ,style: const TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.normal,
-                          ),),
+                          const Text('Kode PKB', style: TextStyle(color: Colors.black, fontWeight: FontWeight.normal)),
                           Text(
-                            items.kodePkb??'',
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            items.kodePkb ?? '',
+                            style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
                           ),
-
-                        ],),
+                        ],
+                      ),
                     ],
                   ),
-                  Divider(color: Colors.grey,),
+                  const Divider(color: Colors.grey),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text('Pelanggan'),
-                            Text(items.nama??'', style: const TextStyle(fontWeight: FontWeight.bold),),
-                          ]),
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('Pelanggan'),
+                          Text(items.nama ?? '', style: const TextStyle(fontWeight: FontWeight.bold)),
+                        ],
+                      ),
                       Column(
                         mainAxisAlignment: MainAxisAlignment.end,
                         crossAxisAlignment: CrossAxisAlignment.end,
@@ -184,19 +146,17 @@ class pkblistSperpart extends StatelessWidget {
                           const Text('Kode Pelanggan'),
                           Text(
                             items.kodePelanggan.toString(),
-                            style: const TextStyle(
-                              color: Colors.green,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
-                    ],),
+                    ],
+                  ),
                 ],
               ),
             ),
             const SizedBox(height: 10),
-            Text('Detail Kendaraaan Pelanggan',style: TextStyle(fontWeight: FontWeight.bold),),
+            const Text('Detail Kendaraaan Pelanggan', style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -207,20 +167,30 @@ class pkblistSperpart extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text('Merek :'),
-                    Text(items.namaMerk??'', style: const TextStyle(fontWeight: FontWeight.bold),),
+                    Text(items.namaMerk ?? '', style: const TextStyle(fontWeight: FontWeight.bold)),
                     const Text('Warna :'),
-                    Text(items.warna??'', style: const TextStyle(fontWeight: FontWeight.bold),),
+                    Text(items.warna ?? '', style: const TextStyle(fontWeight: FontWeight.bold)),
                   ],
                 ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Type :'),
-                    Text(items.namaTipe??'', style: const TextStyle(fontWeight: FontWeight.bold),),
-                    const Text('NoPol :'),
-                    Text(items.noPolisi??'', style: const TextStyle(fontWeight: FontWeight.bold),),
-                  ],
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('Type :'),
+                      Text(
+                        items.namaTipe ?? '',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const Text('NoPol :'),
+                      Text(
+                        items.noPolisi ?? '',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -242,8 +212,6 @@ class StatusColor {
         return Colors.orange;
       case 'estimasi':
         return Colors.lime;
-      case 'estimasi':
-        return Colors.orange;
       case 'selesai dikerjakan':
         return Colors.blue;
       case 'pkb':
@@ -258,8 +226,6 @@ class StatusColor {
         return Colors.red;
       case 'ditolak':
         return Colors.red;
-      case 'selesai dikerjakan':
-        return Colors.green;
       default:
         return Colors.transparent;
     }

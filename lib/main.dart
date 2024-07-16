@@ -12,6 +12,7 @@ import 'app/data/publik.dart';
 import 'app/routes/app_pages.dart';
 
 FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
   print('Handling a background message: ${message.messageId}');
@@ -79,7 +80,22 @@ class _MyAppState extends State<MyApp> {
 
       if (message.notification != null) {
         print('Message also contained a notification: ${message.notification}');
+
+        // Show snackbar using Get.context
+        Get.snackbar(
+          message.notification!.title ?? 'Notification',
+          message.notification!.body ?? 'You have a new message',
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: Colors.black,
+          colorText: Colors.white,
+        );
       }
+
+      // Optionally show local notification as well
+      showLocalNotification(
+        message.notification!.title ?? 'Notification',
+        message.notification!.body ?? 'You have a new message',
+      );
     });
   }
 
@@ -104,7 +120,7 @@ class _MyAppState extends State<MyApp> {
       print("FCM Token: $_token");
 
       // Subscribe to topic
-      messaging.subscribeToTopic('MutiaraCar').then((_) {
+      messaging.subscribeToTopic('allUsers').then((_) {
         print('Subscribed to allUsers topic');
       }).catchError((error) {
         print('Failed to subscribe to allUsers topic: $error');
@@ -119,7 +135,7 @@ class _MyAppState extends State<MyApp> {
     AndroidNotificationDetails(
       'high_importance_channel',
       'High Importance Notifications',
-      channelDescription: 'This channel is used for important notifications.', // channel_description
+      channelDescription: 'This channel is used for important notifications.',
       importance: Importance.max,
       priority: Priority.high,
       ticker: 'ticker',

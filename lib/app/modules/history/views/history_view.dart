@@ -299,6 +299,7 @@ class _HistoryView2State extends State<HistoryView2> with SingleTickerProviderSt
                         } else if (snapshot.hasData) {
                           final data = snapshot.data!.dataHistory ?? [];
                           List<DataHistory> filteredData = [];
+
                           if (selectedStatus == 'Semua') {
                             filteredData = data
                                 .where((item) => item.tipeSvc == tabService)
@@ -310,38 +311,53 @@ class _HistoryView2State extends State<HistoryView2> with SingleTickerProviderSt
                                 item.tipeSvc == tabService)
                                 .toList();
                           }
+
                           return filteredData.isEmpty
-                              ? const Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // No queues
-                            ],
+                              ? Container(
+                            height: 500,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Image.asset(
+                                  'assets/icons/booking.png',
+                                  width: 100.0,
+                                  height: 100.0,
+                                  fit: BoxFit.cover,
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Text(
+                                  'Belum ada data History',
+                                  style: TextStyle(
+                                      color: MyColors.appPrimaryColor,
+                                      fontWeight: FontWeight.bold),
+                                )
+                              ],
+                            ),
                           )
                               : Column(
-                            children: filteredData
-                                .map(
-                                  (e) => HistoryList(
-                                items: e,
-                                onTap: () {
-                                  Get.toNamed(
-                                    Routes.DETAIL_HISTORY,
-                                    arguments: {
-                                      'kode_svc': e.kodeSvc ?? '',
-                                    },
-                                  );
-                                },
-                              ),
-                            )
-                                .toList(),
+                            children: filteredData.map((e) => HistoryList(
+                              items: e,
+                              onTap: () {
+                                Get.toNamed(
+                                  Routes.DETAIL_HISTORY,
+                                  arguments: {
+                                    'kode_svc': e.kodeSvc ?? '',
+                                  },
+                                );
+                              },
+                            )).toList(),
                           );
                         } else {
-                          return const Column(
-                            children: [],
+                          return const Center(
+                            child: Text('History tidak ada'),
                           );
                         }
                       },
                     ),
+
                   ],
                 ),
               ),

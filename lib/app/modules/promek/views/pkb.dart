@@ -281,7 +281,7 @@ class _PKBlistState extends State<PKBlist>
                       showItemsOnEmpty: true,
                       failure: Center(
                         child: Text(
-                          'History Tidak Dtemukan :(',
+                          'Cari PKB Service Tidak Dtemukan :(',
                           style: GoogleFonts.nunito(),
                         ),
                       ),
@@ -298,7 +298,7 @@ class _PKBlistState extends State<PKBlist>
                         booking.status,
                         booking.kodePelanggan,
                       ],
-                      builder: (items) => pkblist(
+                      builder: (items) => PkbList(
                         items: items,
                         onTap: () {
                           handleBookingTapPKB(items);
@@ -473,7 +473,7 @@ class _PKBlistState extends State<PKBlist>
                           ),
                         ),
                         children: sortedDataPKB.map((e) {
-                          return pkblist(
+                          return PkbList(
                             items: e,
                             onTap: () {
                               handleBookingTapPKB(e);

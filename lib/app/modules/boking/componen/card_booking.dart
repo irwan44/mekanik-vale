@@ -58,7 +58,7 @@ class BokingList extends StatelessWidget {
                     children: [
                       Column(
                         children: [
-                          Text('Jenis Service'),
+                          const Text('Jenis Service'),
                           Text(
                             items.namaService ?? '',
                             style: const TextStyle(fontWeight: FontWeight.bold),
@@ -69,36 +69,16 @@ class BokingList extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                        Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: statusColor,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Column(
-                            children: [
-                              Text(
-                                items.bookingStatus.toString(),
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 10,),
-                        if (items.typeOrder != null && items.typeOrder == 'Emergency Service')
                           Container(
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: Colors.red, // Warna merah untuk Emergency Service
+                              color: statusColor,
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: Column(
                               children: [
                                 Text(
-                                  items.typeOrder.toString(),
+                                  items.bookingStatus.toString(),
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
@@ -107,12 +87,32 @@ class BokingList extends StatelessWidget {
                               ],
                             ),
                           ),
-                      ],)
-
+                          const SizedBox(height: 10),
+                          if (items.typeOrder == 'Emergency Service')
+                            Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Column(
+                                children: [
+                                  Text(
+                                    items.typeOrder.toString(),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                        ],
+                      ),
                     ],
                   ),
-                  SizedBox(height: 10),
-                  Divider(color: Colors.grey),
+                  const SizedBox(height: 10),
+                  const Divider(color: Colors.grey),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -121,7 +121,7 @@ class BokingList extends StatelessWidget {
                         children: [
                           const Text(
                             'Tanggal Booking',
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: Colors.black,
                               fontWeight: FontWeight.normal,
                             ),
@@ -139,7 +139,7 @@ class BokingList extends StatelessWidget {
                         children: [
                           const Text(
                             'Jam Booking',
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: Colors.black,
                               fontWeight: FontWeight.normal,
                             ),
@@ -155,7 +155,7 @@ class BokingList extends StatelessWidget {
                       ),
                     ],
                   ),
-                  Divider(color: Colors.grey),
+                  const Divider(color: Colors.grey),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -191,7 +191,7 @@ class BokingList extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 10),
-            Text(
+            const Text(
               'Detail Kendaraaan',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
@@ -216,21 +216,25 @@ class BokingList extends StatelessWidget {
                     ),
                   ],
                 ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Type :'),
-                    Text(
-                      items.namaTipe ?? '',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    const Text('NoPol :'),
-                    Text(
-                      items.noPolisi ?? '',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('Type :'),
+                      Text(
+                        items.namaTipe ?? '',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const Text('NoPol :'),
+                      Text(
+                        items.noPolisi ?? '',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),

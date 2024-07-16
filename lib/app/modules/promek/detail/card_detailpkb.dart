@@ -115,8 +115,8 @@ class _CardDetailPKBState extends State<CardDetailPKB> {
               } else if (snapshot.hasError) {
                 return Center(child: Text('Error: ${snapshot.error}'));
               } else {
-                final jasaList = snapshot.data?.dataPhotosparepart?.detailSparepart ?? [];
-                if (jasaList.isEmpty) {
+                final SpertList = snapshot.data?.dataPhotosparepart?.detailSparepart ?? [];
+                if (SpertList.isEmpty) {
                   return Container(
                     height: 200,
                     alignment: Alignment.center,
@@ -132,9 +132,9 @@ class _CardDetailPKBState extends State<CardDetailPKB> {
                 return ListView.builder(
                   shrinkWrap: true,
                   physics: NeverScrollableScrollPhysics(),
-                  itemCount: jasaList.length,
+                  itemCount: SpertList.length,
                   itemBuilder: (context, index) {
-                    final jasa = jasaList[index];
+                    final jasa = SpertList[index];
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -142,11 +142,11 @@ class _CardDetailPKBState extends State<CardDetailPKB> {
                           jasa.namaSparepart ?? '',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                            fontSize: 14,
                           ),
                         ),
                         SizedBox(height: 5),
-                        Text('Harga Jasa:  ${formatCurrency(jasa.hargaSparepart)}',
+                        Text('Harga Jasa:  ${formatCurrency(jasa.hargaSparepart).toString()}',
                             style: TextStyle(
                               fontSize: 14,
                             )),
@@ -257,22 +257,30 @@ class _CardDetailPKBState extends State<CardDetailPKB> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          title,
-          style: TextStyle(
-            fontWeight: FontWeight.normal,
+        Flexible(
+          child: Text(
+            title,
+            style: const TextStyle(
+              fontWeight: FontWeight.normal,
+            ),
+            overflow: TextOverflow.ellipsis, // Ensures the text does not overflow
           ),
         ),
-        Text(
-          value,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: color ?? Colors.black,
+        Flexible(
+          child: Text(
+            value,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: color ?? Colors.black,
+              overflow: TextOverflow.ellipsis, // Ensures the text does not overflow
+            ),
+            textAlign: TextAlign.right, // Aligns the text to the right
           ),
         ),
       ],
     );
   }
+
 
   Widget _buildDetailText(String title, String value) {
     return Column(

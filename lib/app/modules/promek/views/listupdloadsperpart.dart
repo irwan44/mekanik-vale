@@ -186,12 +186,12 @@ class _PKBUploadlistState extends State<PKBUploadlist>
                         context: context,
                         delegate: SearchPage<DataPhotosparepart>(
                           items: data,
-                          searchLabel: 'Cari PKB Service',
+                          searchLabel: 'Pencarian List Sperepart',
                           searchStyle: GoogleFonts.nunito(color: Colors.black),
                           showItemsOnEmpty: true,
                           failure: Center(
                             child: Text(
-                              'History Tidak Dtemukan :(',
+                              'Pencarian List Sperepart Tidak Dtemukan :(',
                               style: GoogleFonts.nunito(),
                             ),
                           ),

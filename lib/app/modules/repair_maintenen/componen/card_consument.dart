@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:intl/intl.dart';
 import '../../../data/data_endpoint/profile.dart';
 import '../../../data/endpoint.dart';
@@ -22,8 +21,6 @@ class _CardmaintenentState extends State<Cardmaintenent> {
   @override
   void initState() {
     super.initState();
-
-    // Set the initial values from arguments
     final Map args = Get.arguments;
     controller.setInitialValues(args);
   }
@@ -60,6 +57,8 @@ class _CardmaintenentState extends State<Cardmaintenent> {
   @override
   Widget build(BuildContext context) {
     final Map args = Get.arguments;
+    final double screenWidth = MediaQuery.of(context).size.width;
+
     return Column(children: [
       Container(
         padding: const EdgeInsets.all(10),
@@ -78,7 +77,6 @@ class _CardmaintenentState extends State<Cardmaintenent> {
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             FutureBuilder<Profile>(
               future: API.profileiD(),
@@ -88,106 +86,75 @@ class _CardmaintenentState extends State<Cardmaintenent> {
                 } else if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
                 } else {
-                  if (snapshot.data != null) {
-                    final cabang = snapshot.data!.data?.cabang ?? "";
-                    return Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          cabang,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    );
-                  } else {
-                    return const Text('Tidak ada data');
-                  }
+                  final cabang = snapshot.data?.data?.cabang ?? "";
+                  return Text(cabang, style: const TextStyle(fontWeight: FontWeight.bold));
                 }
               },
             ),
-            // Kode Booking
             Row(
               children: [
-                Text('Kode Booking : ', style: TextStyle(fontWeight: FontWeight.normal)),
+                Text('Kode Booking: ', style: TextStyle(fontWeight: FontWeight.normal)),
                 Text(args['kode_booking'] ?? '', style: TextStyle(fontWeight: FontWeight.bold)),
               ],
             ),
             SizedBox(height: 10),
-            // Jenis Service
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Text('Jenis Service'),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  padding: const EdgeInsets.only(left: 25, right: 20),
-                  child: TextField(
-                    enabled: false,
-                    decoration: InputDecoration(
-                      label: Text(args['nama_jenissvc'] ?? '', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-                      hintStyle: TextStyle(color: Colors.black),
-                      border: InputBorder.none,
-                    ),
-                  ),
+            Text('Jenis Service'),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.circular(10),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: TextField(
+                enabled: false,
+                decoration: InputDecoration(
+                  label: Text(args['nama_jenissvc'] ?? '', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                  border: InputBorder.none,
                 ),
-              ],
+              ),
             ),
             SizedBox(height: 10),
-            // Tanggal dan Jam Booking
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Flexible(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Text('Tanggal Booking (edit)'),
                       TextField(
                         controller: controller.tanggal,
                         readOnly: true,
-                        onTap: () {
-                          _selectDate(context);
-                        },
+                        onTap: () => _selectDate(context),
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: Colors.white,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          contentPadding: const EdgeInsets.only(left: 25, right: 20),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 25),
                         ),
                       ),
                     ],
                   ),
                 ),
-                SizedBox(width: 10),
+                SizedBox(width: screenWidth < 600 ? 10 : 20),
                 Flexible(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Text('Jam Booking (edit)'),
                       TextField(
-                        controller: controller.jam, // Gunakan controller dari GetX
+                        controller: controller.jam,
                         readOnly: true,
-                        onTap: () {
-                          _selectTime(context);
-                        },
+                        onTap: () => _selectTime(context),
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: Colors.white,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          contentPadding: const EdgeInsets.only(left: 25, right: 20),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 25),
                         ),
                       ),
                     ],
@@ -195,19 +162,15 @@ class _CardmaintenentState extends State<Cardmaintenent> {
                 ),
               ],
             ),
-            // Detail Kendaraan
             const Divider(color: Colors.grey),
             const Text('Detail Kendaraan', style: TextStyle(fontWeight: FontWeight.bold)),
             SizedBox(height: 10),
-            // No Polisi dan Merk
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Flexible(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Text('No Polisi'),
                       Container(
@@ -215,12 +178,11 @@ class _CardmaintenentState extends State<Cardmaintenent> {
                           color: Colors.grey[200],
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        padding: const EdgeInsets.only(left: 25, right: 20),
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: TextField(
                           enabled: false,
                           decoration: InputDecoration(
                             label: Text(args['no_polisi'] ?? '-', style: TextStyle(color: Colors.black)),
-                            hintStyle: TextStyle(color: Colors.black),
                             border: InputBorder.none,
                           ),
                         ),
@@ -232,7 +194,6 @@ class _CardmaintenentState extends State<Cardmaintenent> {
                 Flexible(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Text('Merk'),
                       Container(
@@ -240,13 +201,12 @@ class _CardmaintenentState extends State<Cardmaintenent> {
                           color: Colors.grey[200],
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        padding: const EdgeInsets.only(left: 25, right: 20),
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: TextField(
                           enabled: false,
                           decoration: InputDecoration(
                             label: Text(args['nama_merk'] ?? '-', style: TextStyle(color: Colors.black)),
                             border: InputBorder.none,
-                            hintStyle: TextStyle(color: Colors.black),
                           ),
                         ),
                       ),
@@ -256,15 +216,12 @@ class _CardmaintenentState extends State<Cardmaintenent> {
               ],
             ),
             SizedBox(height: 10),
-            // Tipe dan Tahun
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Flexible(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Text('Tipe'),
                       Container(
@@ -272,13 +229,12 @@ class _CardmaintenentState extends State<Cardmaintenent> {
                           color: Colors.grey[200],
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        padding: const EdgeInsets.only(left: 25, right: 20),
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: TextField(
                           enabled: false,
                           decoration: InputDecoration(
                             label: Text(args['nama_tipe'] ?? '-', style: TextStyle(color: Colors.black)),
                             border: InputBorder.none,
-                            hintStyle: TextStyle(color: Colors.black),
                           ),
                         ),
                       ),
@@ -289,7 +245,6 @@ class _CardmaintenentState extends State<Cardmaintenent> {
                 Flexible(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Text('Tahun'),
                       Container(
@@ -297,13 +252,12 @@ class _CardmaintenentState extends State<Cardmaintenent> {
                           color: Colors.grey[200],
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        padding: const EdgeInsets.only(left: 25, right: 20),
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: TextField(
                           enabled: false,
                           decoration: InputDecoration(
                             label: Text(args['tahun'] ?? '-', style: TextStyle(color: Colors.black)),
                             border: InputBorder.none,
-                            hintStyle: TextStyle(color: Colors.black),
                           ),
                         ),
                       ),
@@ -312,16 +266,13 @@ class _CardmaintenentState extends State<Cardmaintenent> {
                 ),
               ],
             ),
-            // Warna dan Transmisi
             SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Flexible(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Text('Warna'),
                       Container(
@@ -329,13 +280,12 @@ class _CardmaintenentState extends State<Cardmaintenent> {
                           color: Colors.grey[200],
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        padding: const EdgeInsets.only(left: 25, right: 20),
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: TextField(
                           enabled: false,
                           decoration: InputDecoration(
                             label: Text(args['warna'] ?? '-', style: TextStyle(color: Colors.black)),
                             border: InputBorder.none,
-                            hintStyle: TextStyle(color: Colors.black),
                           ),
                         ),
                       ),
@@ -346,21 +296,19 @@ class _CardmaintenentState extends State<Cardmaintenent> {
                 Flexible(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Text('Transmisi'),
+                      Text('KM'),
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.grey[200],
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        padding: const EdgeInsets.only(left: 25, right: 20),
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: TextField(
                           enabled: false,
                           decoration: InputDecoration(
-                            label: Text(args['transmisi'] ?? '-', style: TextStyle(color: Colors.black)),
+                            label: Text(args['km'] ?? '-', style: TextStyle(color: Colors.black)),
                             border: InputBorder.none,
-                            hintStyle: TextStyle(color: Colors.black),
                           ),
                         ),
                       ),
@@ -369,113 +317,6 @@ class _CardmaintenentState extends State<Cardmaintenent> {
                 ),
               ],
             ),
-            // No Rangka dan No Mesin
-            SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Flexible(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text('No Rangka'),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.grey[200],
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        padding: const EdgeInsets.only(left: 25, right: 20),
-                        child: TextField(
-                          enabled: false,
-                          keyboardType: TextInputType.number,
-                          controller: controller.rangka,
-                          decoration: InputDecoration(
-                            hintText: args['no_rangka'] ?? "-",
-                            border: InputBorder.none,
-                            hintStyle: TextStyle(color: Colors.black),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(width: 10),
-                Flexible(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text('No Mesin'),
-                      Container(
-                        height: 45,
-                        decoration: BoxDecoration(
-                          color: Colors.grey[200],
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        padding: const EdgeInsets.only(left: 25, right: 20),
-                        child: TextField(
-                          enabled: false,
-                          keyboardType: TextInputType.number,
-                          controller: controller.mesin,
-                          decoration: InputDecoration(
-                            label: Text(args['no_mesin'] ?? "-"),
-                            border: InputBorder.none,
-                            hintStyle: TextStyle(color: Colors.black),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            // Odometer
-            SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Flexible(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Odometer'),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: TextField(
-                          keyboardType: TextInputType.number,
-                          controller: controller.odometer,
-                          decoration: InputDecoration(
-                            label: Text(args['odometer'] ?? ''),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            hintStyle: TextStyle(color: Colors.black),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(width: 10),
-                Flexible(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(''),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            // Detail Pelanggan
             const Divider(color: Colors.grey),
             const Text('Detail Pelangan', style: TextStyle(fontWeight: FontWeight.bold)),
             SizedBox(height: 10),
@@ -520,14 +361,7 @@ class _CardmaintenentState extends State<Cardmaintenent> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                         padding: const EdgeInsets.only(left: 25, right: 20),
-                        child: TextField(
-                          enabled: false,
-                          decoration: InputDecoration(
-                            label: Text(args['alamat'] ?? '-', style: TextStyle(color: Colors.black)),
-                            border: InputBorder.none,
-                            hintStyle: TextStyle(color: Colors.black),
-                          ),
-                        ),
+                        child: Text(args['alamat'] ?? '-', style: TextStyle(color: Colors.black)),
                       ),
                     ],
                   ),
@@ -676,8 +510,6 @@ class _CardmaintenentState extends State<Cardmaintenent> {
           ],
         ),
       ),
-      SizedBox(height: 20),
-      // Kontainer tambahan atau elemen lain jika ada
     ]);
   }
 }

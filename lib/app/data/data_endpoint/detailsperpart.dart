@@ -422,88 +422,87 @@ class DataSvc {
     return data;
   }
 }
-
 class DetailSparepart {
-  int? id;
-  String? kodeSvc;
-  String? kodeSparepart;
-  String? namaSparepart;
-  int? qtySparepart;
-  int? hargaSparepart;
-  int? diskonSparepart;
-  String? hidSparepart;
-  int? nota;
-  int? pengajuan;
-  String? createdAt;
-  String? updatedAt;
-  String? kodeMaster;
-  String? kode;
-  String? kode2;
-  String? nama;
-  String? divisi;
-  String? brand;
-  int? qty;
-  int? hargaBeli;
-  int? hargaJual;
-  String? barcode;
-  String? satuan;
-  String? noStock;
-  String? lokasi;
-  String? note;
-  String? tipe;
-  String? kodeSupplier;
-  int? qtyMin;
-  int? qtyMax;
-  String? ukuran;
-  String? kualitas;
-  int? demandBulanan;
-  String? emergency;
-  String? jenis;
-  int? deleted;
-  String? createdBy;
-  String? gudang;
-  int? cabangId;
+int? id;
+String? kodeSvc;
+String? kodeSparepart;
+String? namaSparepart;
+int? qtySparepart;
+int? hargaSparepart;
+int? diskonSparepart;
+String? hidSparepart;
+int? nota;
+int? pengajuan;
+String? createdAt;
+String? updatedAt;
+String? kodeMaster;
+String? kode;
+int? kode2;
+String? nama;
+String? divisi;
+String? brand;
+int? qty;
+int? hargaBeli;
+int? hargaJual;
+String? barcode;
+String? satuan;
+String? noStock;
+String? lokasi;
+String? note;
+String? tipe;
+String? kodeSupplier;
+int? qtyMin;
+int? qtyMax;
+String? ukuran;
+String? kualitas;
+int? demandBulanan;
+String? emergency;
+String? jenis;
+int? deleted;
+String? createdBy;
+String? gudang;
+int? cabangId;
 
-  DetailSparepart(
-      {this.id,
-        this.kodeSvc,
-        this.kodeSparepart,
-        this.namaSparepart,
-        this.qtySparepart,
-        this.hargaSparepart,
-        this.diskonSparepart,
-        this.hidSparepart,
-        this.nota,
-        this.pengajuan,
-        this.createdAt,
-        this.updatedAt,
-        this.kodeMaster,
-        this.kode,
-        this.kode2,
-        this.nama,
-        this.divisi,
-        this.brand,
-        this.qty,
-        this.hargaBeli,
-        this.hargaJual,
-        this.barcode,
-        this.satuan,
-        this.noStock,
-        this.lokasi,
-        this.note,
-        this.tipe,
-        this.kodeSupplier,
-        this.qtyMin,
-        this.qtyMax,
-        this.ukuran,
-        this.kualitas,
-        this.demandBulanan,
-        this.emergency,
-        this.jenis,
-        this.deleted,
-        this.createdBy,
-        this.gudang,
-        this.cabangId});
+DetailSparepart(
+    {this.id,
+      this.kodeSvc,
+      this.kodeSparepart,
+      this.namaSparepart,
+      this.qtySparepart,
+      this.hargaSparepart,
+      this.diskonSparepart,
+      this.hidSparepart,
+      this.nota,
+      this.pengajuan,
+      this.createdAt,
+      this.updatedAt,
+      this.kodeMaster,
+      this.kode,
+      this.kode2,
+      this.nama,
+      this.divisi,
+      this.brand,
+      this.qty,
+      this.hargaBeli,
+      this.hargaJual,
+      this.barcode,
+      this.satuan,
+      this.noStock,
+      this.lokasi,
+      this.note,
+      this.tipe,
+      this.kodeSupplier,
+      this.qtyMin,
+      this.qtyMax,
+      this.ukuran,
+      this.kualitas,
+      this.demandBulanan,
+      this.emergency,
+      this.jenis,
+      this.deleted,
+      this.createdBy,
+      this.gudang,
+      this.cabangId});
 
   DetailSparepart.fromJson(Map<String, dynamic> json) {
     id = json['id'];

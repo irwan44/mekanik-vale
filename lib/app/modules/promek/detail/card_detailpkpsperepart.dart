@@ -508,14 +508,23 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
                               Text('${dataSvc?.namaMerk??'-'}', style: const TextStyle(fontWeight: FontWeight.bold)),
                             ],
                           ),
-                          Column(
+
+                          Flexible(
+                            child: Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               const Text('Tipe :'),
-                              Text('${dataSvc?.namaTipe??'-'}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                             Text(
+                                  dataSvc?.namaTipe??'-',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  textAlign: TextAlign.right,
+                                ),
                             ],
                           ),
-                        ],
+                          )],
                       ),
                       const SizedBox(height: 5),
                       Row(
