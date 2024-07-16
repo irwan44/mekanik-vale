@@ -36,12 +36,15 @@ class _EmergencyViewState extends State<EmergencyView> {
   PolylinePoints polylinePoints = PolylinePoints();
   bool isMenujuLokasi = true; // Initial state for isMenujuLokasi
   bool isLoading = false; // Initial state for isLoading
-
+  bool isTibaDiLokasi = false;
+  bool isMenujuLokasiLoading = false;
+  bool isTibaDiLokasiLoading = false;
   @override
   void initState() {
     super.initState();
     _checkPermissions();
     _loadCustomIcon();
+    _loadButtonState();
   }
 
   Future<void> _loadCustomIcon() async {
@@ -120,7 +123,7 @@ class _EmergencyViewState extends State<EmergencyView> {
       setState(() {
         _polylines = [
           Polyline(
-            polylineId: PolylineId('polyline_id'),
+            polylineId: const PolylineId('polyline_id'),
             color: Colors.blue,
             points: polylineCoordinates,
             width: 5,
@@ -196,6 +199,29 @@ class _EmergencyViewState extends State<EmergencyView> {
       ),
     );
   }
+
+  void _saveButtonState() {
+    final Map<String, dynamic>? arguments = Get.arguments as Map<String, dynamic>?;
+    final String kodeBooking = arguments?['kode_booking'] ?? '';
+    GetStorage().write(kodeBooking, {
+      'isTibaDiLokasi': isTibaDiLokasi,
+      'isMenujuLokasi': isMenujuLokasi,
+    });
+  }
+
+  void _loadButtonState() {
+    final Map<String, dynamic>? arguments = Get.arguments as Map<String, dynamic>?;
+    final String kodeBooking = arguments?['kode_booking'] ?? '';
+    final savedState = GetStorage().read<Map<String, dynamic>>(kodeBooking);
+
+    if (savedState != null) {
+      setState(() {
+        isTibaDiLokasi = savedState['isTibaDiLokasi'] ?? false;
+        isMenujuLokasi = savedState['isMenujuLokasi'] ?? true;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final Map<String, dynamic>? arguments = Get.arguments as Map<String, dynamic>?;
@@ -212,7 +238,7 @@ class _EmergencyViewState extends State<EmergencyView> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
-        iconTheme: IconThemeData(color: Colors.black),
+        iconTheme: const IconThemeData(color: Colors.black),
         systemOverlayStyle: const SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
           statusBarIconBrightness: Brightness.dark,
@@ -239,7 +265,7 @@ class _EmergencyViewState extends State<EmergencyView> {
         ),
       ),
       body: _currentPosition == null
-          ? Center(
+          ? const Center(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
@@ -247,8 +273,8 @@ class _EmergencyViewState extends State<EmergencyView> {
             CircularProgressIndicator(
               color: Colors.blue,
             ),
-            const SizedBox(height: 10,),
-            const Text('Sedang memuat lokasi...')
+            SizedBox(height: 10,),
+            Text('Sedang memuat lokasi...')
           ],
         ),
       )
@@ -308,74 +334,98 @@ class _EmergencyViewState extends State<EmergencyView> {
               child: Container(
                 width: double.infinity,
                 color: Colors.white,
-                child: ElevatedButton(
-                  onPressed: () async {
-                    setState(() {
-                      isLoading = true;
-                    });
-                    String idKaryawan = GetStorage().read('idKaryawan') ?? '';
-                    try {
-                      if (isMenujuLokasi) {
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      onPressed: isMenujuLokasi && !isMenujuLokasiLoading
+                          ? () async {
+                        setState(() {
+                          isMenujuLokasiLoading = true;
+                        });
+                        final Map<String, dynamic>? arguments = Get.arguments as Map<String, dynamic>?;
+                        String idKaryawan = GetStorage().read('idKaryawan') ?? '';
                         var response = await API.MenujudiLokasiID(
                           idkaryawan: idKaryawan,
-                          kodebooking: args['kode_booking'] ?? '',
-                          kodepelanggan: args['tipe_svc'] ?? '',
-                          kodekendaraan: args['kode_kendaraan'] ?? '',
+                          kodebooking: arguments?['kode_booking'] ?? '',
+                          kodepelanggan: arguments?['tipe_svc'] ?? '',
+                          kodekendaraan: arguments?['kode_kendaraan'] ?? '',
                         );
                         if (response.success == true) {
                           setState(() {
                             isMenujuLokasi = false;
+                            isTibaDiLokasi = true;
                           });
+                          _saveButtonState();
                         }
-                      } else {
-                        var response = await API.TibadiLokasiID(
-                          idkaryawan: idKaryawan,
-                          kodebooking: args['kode_booking'] ?? '',
-                          kodepelanggan: args['tipe_svc'] ?? '',
-                          kodekendaraan: args['kode_kendaraan'] ?? '',
-                        );
+                        setState(() {
+                          isMenujuLokasiLoading = false;
+                        });
                       }
-                    } catch (e) {
-                      print('Error: $e');
-                    } finally {
-                      setState(() {
-                        isLoading = false;
-                      });
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: isMenujuLokasi ? Colors.blue : Colors.green,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  child: isLoading
-                      ? Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      CircularProgressIndicator(
-                        color: Colors.white,
-                      ),
-                      SizedBox(width: 10),
-                      Text(
-                        'Loading...',
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          : null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: isMenujuLokasi ? Colors.blue : Colors.grey,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                    ],
-                  )
-                      : Text(
-                    isMenujuLokasi ? 'Menuju lokasi' : 'Tiba dilokasi',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      child: isMenujuLokasiLoading
+                          ? const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CircularProgressIndicator(color: Colors.white),
+                          SizedBox(width: 10),
+                          Text('Loading...', style: TextStyle(color: Colors.white)),
+                        ],
+                      )
+                          : const Text('Menuju lokasi', style: TextStyle(color: Colors.white)),
                     ),
-                  ),
-                ),
+                    SizedBox(width: 10,),
+                    ElevatedButton(
+                      onPressed: isTibaDiLokasi && !isTibaDiLokasiLoading
+                          ? () async {
+                        setState(() {
+                          isTibaDiLokasiLoading = true;
+                        });
+                        final Map<String, dynamic>? arguments = Get.arguments as Map<String, dynamic>?;
+                        String idKaryawan = GetStorage().read('idKaryawan') ?? '';
+                        var response = await API.TibadiLokasiID(
+                          idkaryawan: idKaryawan,
+                          kodebooking: arguments?['kode_booking'] ?? '',
+                          kodepelanggan: arguments?['tipe_svc'] ?? '',
+                          kodekendaraan: arguments?['kode_kendaraan'] ?? '',
+                        );
+                        if (response.success == true) {
+                          setState(() {
+                            isTibaDiLokasi = false;
+                          });
+                          _saveButtonState();
+                        }
+                        setState(() {
+                          isTibaDiLokasiLoading = false;
+                        });
+                      }
+                          : null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: isTibaDiLokasi ? Colors.green : Colors.grey,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: isTibaDiLokasiLoading
+                          ? const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CircularProgressIndicator(color: Colors.white),
+                          SizedBox(width: 10),
+                          Text('Loading...', style: TextStyle(color: Colors.white)),
+                        ],
+                      )
+                          : const Text('Tiba Di Lokasi', style: TextStyle(color: Colors.white)),
+                    ),
+                  ],
+                )
               ),
             ),
           ),
@@ -421,9 +471,9 @@ class _EmergencyViewState extends State<EmergencyView> {
               children: [
                 Text(
                   _estimatedTime,
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
-                SizedBox(height: 10,),
+                const SizedBox(height: 10,),
                 InkWell(
                   onTap: () async {
                     final String googleMapsUrl = "https://www.google.com/maps/dir/?api=1&destination=$location&travelmode=driving";
@@ -434,7 +484,7 @@ class _EmergencyViewState extends State<EmergencyView> {
                     }
                   },
                   child: Container(
-                    margin: EdgeInsets.only(right: 100, left: 100),
+                    margin: const EdgeInsets.only(right: 100, left: 100),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
                       color: Colors.white,
@@ -443,7 +493,7 @@ class _EmergencyViewState extends State<EmergencyView> {
                           color: Colors.grey.withOpacity(0.1),
                           spreadRadius: 5,
                           blurRadius: 10,
-                          offset: Offset(0, 3),
+                          offset: const Offset(0, 3),
                         ),
                       ],
                     ),
@@ -453,7 +503,7 @@ class _EmergencyViewState extends State<EmergencyView> {
                       children: [
                         Text(' Directions', style: GoogleFonts.nunito(fontWeight: FontWeight.bold)),
                         IconButton(
-                          icon: Icon(Icons.directions),
+                          icon: const Icon(Icons.directions),
                           onPressed: () async {
                             final String googleMapsUrl = "https://www.google.com/maps/dir/?api=1&destination=$location&travelmode=driving";
                             if (await canLaunch(googleMapsUrl)) {
@@ -467,7 +517,7 @@ class _EmergencyViewState extends State<EmergencyView> {
                     ),
                   ),
                 ),
-                SizedBox(height: 10,),
+                const SizedBox(height: 10,),
                 const CardEmergencyPKB(),
                 // Add more CardEmergencyPKB() widgets here if needed
               ],

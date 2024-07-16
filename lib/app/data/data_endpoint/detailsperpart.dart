@@ -433,11 +433,12 @@ class DetailSparepart {
   int? diskonSparepart;
   String? hidSparepart;
   int? nota;
+  int? pengajuan;
   String? createdAt;
   String? updatedAt;
   String? kodeMaster;
   String? kode;
-  int? kode2;
+  String? kode2;
   String? nama;
   String? divisi;
   String? brand;
@@ -446,13 +447,13 @@ class DetailSparepart {
   int? hargaJual;
   String? barcode;
   String? satuan;
-  int? noStock;
+  String? noStock;
   String? lokasi;
   String? note;
   String? tipe;
   String? kodeSupplier;
-  String? qtyMin;
-  String? qtyMax;
+  int? qtyMin;
+  int? qtyMax;
   String? ukuran;
   String? kualitas;
   int? demandBulanan;
@@ -473,6 +474,7 @@ class DetailSparepart {
         this.diskonSparepart,
         this.hidSparepart,
         this.nota,
+        this.pengajuan,
         this.createdAt,
         this.updatedAt,
         this.kodeMaster,
@@ -513,6 +515,7 @@ class DetailSparepart {
     diskonSparepart = json['diskon_sparepart'];
     hidSparepart = json['hid_sparepart'];
     nota = json['nota'];
+    pengajuan = json['pengajuan'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
     kodeMaster = json['kode_master'];
@@ -555,6 +558,7 @@ class DetailSparepart {
     data['diskon_sparepart'] = this.diskonSparepart;
     data['hid_sparepart'] = this.hidSparepart;
     data['nota'] = this.nota;
+    data['pengajuan'] = this.pengajuan;
     data['created_at'] = this.createdAt;
     data['updated_at'] = this.updatedAt;
     data['kode_master'] = this.kodeMaster;

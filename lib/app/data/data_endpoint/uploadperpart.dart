@@ -69,6 +69,7 @@ class DataPhotosparepart {
   int? faktur;
   int? deleted;
   int? notab;
+  int? planning;
   String? statusApproval;
   String? createdBy;
   String? createdByPkb;
@@ -90,10 +91,11 @@ class DataPhotosparepart {
   String? kategoriKendaraan;
   String? jenisKontrak;
   String? jenisUnit;
-  String? idPicPerusahaan;
-  String? picIdPelanggan;
+  int? idPicPerusahaan;
+  int? picIdPelanggan;
   int? idCustomer;
   String? vinNumber;
+  String? expiredStnk;
   String? namaMerk;
   String? namaTipe;
   String? nama;
@@ -115,6 +117,7 @@ class DataPhotosparepart {
   String? otp;
   String? otpExpiry;
   String? gambar;
+  String? fcmToken;
   String? namaCabang;
 
   DataPhotosparepart(
@@ -158,6 +161,7 @@ class DataPhotosparepart {
         this.faktur,
         this.deleted,
         this.notab,
+        this.planning,
         this.statusApproval,
         this.createdBy,
         this.createdByPkb,
@@ -183,6 +187,7 @@ class DataPhotosparepart {
         this.picIdPelanggan,
         this.idCustomer,
         this.vinNumber,
+        this.expiredStnk,
         this.namaMerk,
         this.namaTipe,
         this.nama,
@@ -204,6 +209,7 @@ class DataPhotosparepart {
         this.otp,
         this.otpExpiry,
         this.gambar,
+        this.fcmToken,
         this.namaCabang});
 
   DataPhotosparepart.fromJson(Map<String, dynamic> json) {
@@ -247,6 +253,7 @@ class DataPhotosparepart {
     faktur = json['faktur'];
     deleted = json['deleted'];
     notab = json['notab'];
+    planning = json['planning'];
     statusApproval = json['status_approval'];
     createdBy = json['created_by'];
     createdByPkb = json['created_by_pkb'];
@@ -272,6 +279,7 @@ class DataPhotosparepart {
     picIdPelanggan = json['pic_id_pelanggan'];
     idCustomer = json['id_customer'];
     vinNumber = json['vin_number'];
+    expiredStnk = json['expired_stnk'];
     namaMerk = json['nama_merk'];
     namaTipe = json['nama_tipe'];
     nama = json['nama'];
@@ -293,6 +301,7 @@ class DataPhotosparepart {
     otp = json['otp'];
     otpExpiry = json['otp_expiry'];
     gambar = json['gambar'];
+    fcmToken = json['fcm_token'];
     namaCabang = json['nama_cabang'];
   }
 
@@ -338,6 +347,7 @@ class DataPhotosparepart {
     data['faktur'] = this.faktur;
     data['deleted'] = this.deleted;
     data['notab'] = this.notab;
+    data['planning'] = this.planning;
     data['status_approval'] = this.statusApproval;
     data['created_by'] = this.createdBy;
     data['created_by_pkb'] = this.createdByPkb;
@@ -363,6 +373,7 @@ class DataPhotosparepart {
     data['pic_id_pelanggan'] = this.picIdPelanggan;
     data['id_customer'] = this.idCustomer;
     data['vin_number'] = this.vinNumber;
+    data['expired_stnk'] = this.expiredStnk;
     data['nama_merk'] = this.namaMerk;
     data['nama_tipe'] = this.namaTipe;
     data['nama'] = this.nama;
@@ -384,6 +395,7 @@ class DataPhotosparepart {
     data['otp'] = this.otp;
     data['otp_expiry'] = this.otpExpiry;
     data['gambar'] = this.gambar;
+    data['fcm_token'] = this.fcmToken;
     data['nama_cabang'] = this.namaCabang;
     return data;
   }

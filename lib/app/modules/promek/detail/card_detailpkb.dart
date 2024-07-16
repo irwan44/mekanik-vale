@@ -151,12 +151,12 @@ class _CardDetailPKBState extends State<CardDetailPKB> {
                               fontSize: 14,
                             )),
                         SizedBox(height: 5),
-                        Text('Kode Sparepart:  ${jasa.kodeSparepart??''}',
+                        Text('Kode Sparepart:  ${jasa.kodeSparepart.toString()}',
                             style: TextStyle(
                               fontSize: 14,
                             )),
                         SizedBox(height: 5),
-                        Text('QTY:  ${jasa.qtySparepart??''}',
+                        Text('QTY:  ${jasa.qtySparepart.toString()}',
                             style: TextStyle(
                               fontSize: 14,
                             )),
