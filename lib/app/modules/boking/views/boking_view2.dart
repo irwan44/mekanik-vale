@@ -16,7 +16,6 @@ import '../../../data/data_endpoint/boking.dart';
 import '../../../data/data_endpoint/profile.dart';
 import '../../../data/endpoint.dart';
 import '../../../routes/app_pages.dart';
-import '../../../tester/tester_kategori.dart';
 import '../componen/card_booking.dart';
 import '../controllers/boking_controller.dart';
 
