@@ -85,7 +85,7 @@ class _ProfileViewState extends State<ProfileView> {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const CircularProgressIndicator();
                   } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
+                    return Text('Mohon periksa Internet anda');
                   } else {
                     if (snapshot.data != null) {
                       final nama = snapshot.data!.data?.namaKaryawan ?? "";

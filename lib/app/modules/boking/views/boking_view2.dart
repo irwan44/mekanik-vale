@@ -42,7 +42,7 @@ class _BokingView3State extends State<BokingView3> {
 
 class BokingView2 extends StatefulWidget {
   final VoidCallback
-  clearCachedBoking; // Menggunakan VoidCallback untuk tipe fungsi tanpa parameter
+  clearCachedBoking;
 
   const BokingView2({super.key, required this.clearCachedBoking});
 
@@ -61,90 +61,74 @@ class _BokingView2State extends State<BokingView2> {
   Future<void> handleBookingTap(DataBooking e) async {
     HapticFeedback.lightImpact();
     if (kDebugMode) {
-      print('Nilai e.namaJenissvc: ${e.namaService ?? ''}');
+      print('Nilai e.namaService: ${e.namaService ?? ''}');
     }
     if (e.bookingStatus != null && e.namaService != null) {
-      if (e.bookingStatus!.toLowerCase() == 'booking' &&
-          e.namaService!.toLowerCase() != 'repair & maintenance') {
-        Get.toNamed(
-          Routes.APPROVE,
-          arguments: {
-            'tgl_booking': e.tglBooking ?? '',
-            'jam_booking': e.jamBooking ?? '',
-            'nama': e.nama ?? '',
-            'kode_kendaraan': e.kodeKendaraan ?? '',
-            'kode_pelanggan': e.kodePelanggan ?? '',
-            'kode_booking': e.kodeBooking ?? '',
-            'nama_jenissvc': e.namaService ?? '',
-            'no_polisi': e.noPolisi ?? '',
-            'nama_merk': e.namaMerk ?? '',
-            'keluhan': e.keluhan ?? '',
-            'tahun': e.tahun ?? '',
-            'warna': e.warna ?? '',
-            'booking_id': e.tglBooking ?? '',
-            'nama_tipe': e.namaTipe ?? '',
-            'alamat': e.alamat ?? '',
-            'hp': e.hp ?? '',
-            'hp_pic': e.hpPic ?? '',
-            'kode_pelanggan': e.kodePelanggan ?? '',
-            'kategori_kendaraan': e.kategoriKendaraan ?? '',
-          },
+      String kategoriKendaraanId = '';
+      final generalData = await API.kategoriID();
+      if (generalData != null) {
+        final matchingKategori = generalData.dataKategoriKendaraan?.firstWhere(
+              (kategori) => kategori.kategoriKendaraan == e.kategoriKendaraan,
+          orElse: () => DataKategoriKendaraan(kategoriKendaraanId: '', kategoriKendaraan: ''),
         );
-      } else if (e.bookingStatus!.toLowerCase() == 'booking' &&
-          e.namaService!.toLowerCase() != 'general check up/p2h') {
-        Get.toNamed(
-          Routes.APPROVE,
-          arguments: {
-            'tgl_booking': e.tglBooking ?? '',
-            'booking_id': e.tglBooking ?? '',
-            'jam_booking': e.jamBooking ?? '',
-            'nama': e.nama ?? '',
-            'keluhan': e.keluhan ?? '',
-            'kode_kendaraan': e.kodeKendaraan ?? '',
-            'kode_pelanggan': e.kodePelanggan ?? '',
-            'nama_jenissvc': e.namaService ?? '',
-            'no_polisi': e.noPolisi ?? '',
-            'kode_booking': e.kodeBooking ?? '',
-            'tahun': e.tahun ?? '',
-            'warna': e.warna ?? '',
-            'ho': e.hp ?? '',
-            'kode_booking': e.kodeBooking ?? '',
-            'nama_merk': e.namaMerk ?? '',
-            'transmisi': e.transmisi ?? '',
-            'nama_tipe': e.namaTipe ?? '',
-            'alamat': e.alamat ?? '',
-            'status': e.bookingStatus ?? '',
-          },
-        );
-      }
-    } else {
-      print('Status atau namaJenissvc bernilai null');
-    }
 
-    if (e.bookingStatus != null && e.namaService != null) {
-      if (e.bookingStatus!.toLowerCase() == 'approve' &&
-          e.namaService!.toLowerCase() != 'repair & maintenance') {
-        final generalData = await API.kategoriID();
-        String kategoriKendaraanId = '';
-        if (generalData != null) {
-          final matchingKategori = generalData
-              .dataKategoriKendaraan
-              ?.where((kategori) =>
-          kategori.kategoriKendaraan == e.kategoriKendaraan)
-              .firstOrNull;
-          if (matchingKategori != null &&
-              matchingKategori is DataKategoriKendaraan) {
-            kategoriKendaraanId =
-                matchingKategori.kategoriKendaraanId ?? '';
+        if (matchingKategori != null && matchingKategori is DataKategoriKendaraan) {
+          kategoriKendaraanId = matchingKategori.kategoriKendaraanId ?? '';
+        }
+      }
+
+      final arguments = {
+        'tgl_booking': e.tglBooking ?? '',
+        'jam_booking': e.jamBooking ?? '',
+        'nama': e.nama ?? '',
+        'kode_kendaraan': e.kodeKendaraan ?? '',
+        'kode_pelanggan': e.kodePelanggan ?? '',
+        'kode_booking': e.kodeBooking ?? '',
+        'nama_jenissvc': e.namaService ?? '',
+        'no_polisi': e.noPolisi ?? '',
+        'tahun': e.tahun ?? '',
+        'keluhan': e.keluhan ?? '',
+        'type_order': e.typeOrder ?? '',
+        'kategori_kendaraan': e.kategoriKendaraan ?? '',
+        'kategori_kendaraan_id': kategoriKendaraanId,
+        'warna': e.warna ?? '',
+        'hp': e.hp ?? '',
+        'nama_merk': e.namaMerk ?? '',
+        'transmisi': e.transmisi ?? '',
+        'nama_tipe': e.namaTipe ?? '',
+        'alamat': e.alamat ?? '',
+        'booking_id': e.bookingId ?? '',
+        'status': e.bookingStatus ?? '',
+      };
+
+      if (e.bookingStatus!.toLowerCase() == 'booking') {
+        Get.toNamed(Routes.APPROVE, arguments: arguments);
+      } else if (e.bookingStatus!.toLowerCase() == 'approve') {
+        if (e.typeOrder != null && e.typeOrder!.toLowerCase() == 'emergency service') {
+          arguments['location'] = e.location ?? '';
+          Get.toNamed(Routes.EmergencyView, arguments: arguments);
+        } else {
+          if (e.namaService!.toLowerCase() == 'repair & maintenance') {
+            Get.toNamed(Routes.REPAIR_MAINTENEN, arguments: arguments);
+          } else if (e.namaService!.toLowerCase() == 'periodical maintenance') {
+            Get.toNamed(Routes.REPAIR_MAINTENEN, arguments: arguments);
+          } else if (e.namaService!.toLowerCase() == 'Warranty') {
+            Get.toNamed(Routes.REPAIR_MAINTENEN, arguments: arguments);
+          } else if (e.namaService!.toLowerCase() == 'general check up/p2h') {
+            Get.toNamed(Routes.GENERAL_CHECKUP, arguments: arguments);
           }
         }
+      } else if (e.bookingStatus!.toLowerCase() == 'diproses') {
+        Get.toNamed(Routes.GENERAL_CHECKUP, arguments: arguments);
+      } else {
         Get.toNamed(
-          Routes.GENERAL_CHECKUP,
+          Routes.DetailBooking,
           arguments: {
             'tgl_booking': e.tglBooking ?? '',
             'booking_id': e.bookingId.toString(),
             'jam_booking': e.jamBooking ?? '',
             'nama': e.nama ?? '',
+            'location': e.location ?? '',
             'kode_booking': e.kodeBooking ?? '',
             'kode_kendaraan': e.kodeKendaraan ?? '',
             'kode_pelanggan': e.kodePelanggan ?? '',
@@ -152,60 +136,22 @@ class _BokingView2State extends State<BokingView2> {
             'no_polisi': e.noPolisi ?? '',
             'tahun': e.tahun ?? '',
             'keluhan': e.keluhan ?? '',
+            'type_order': e.typeOrder ?? '',
             'kategori_kendaraan': e.kategoriKendaraan ?? '',
-            'kategori_kendaraan_id': kategoriKendaraanId,
+            'kategori_kendaraan_id': '',
             'warna': e.warna ?? '',
-            'ho': e.hp ?? '',
-            'kode_booking': e.kodeBooking ?? '',
+            'hp': e.hp ?? '',
             'nama_merk': e.namaMerk ?? '',
             'transmisi': e.transmisi ?? '',
             'nama_tipe': e.namaTipe ?? '',
             'alamat': e.alamat ?? '',
-            'status': e.bookingStatus ?? '',
-          },
-        );
-      } else if (e.bookingStatus!.toLowerCase() == 'approve' &&
-          e.namaService!.toLowerCase() != 'general check up/p2h') {
-        final generalData = await API.kategoriID();
-        String kategoriKendaraanId = '';
-        if (generalData != null) {
-          final matchingKategori = generalData.dataKategoriKendaraan?.firstWhere(
-                (kategori) => kategori.kategoriKendaraan == e.kategoriKendaraan,
-            orElse: () => DataKategoriKendaraan(kategoriKendaraanId: '', kategoriKendaraan: ''),
-          );
-          if (matchingKategori != null && matchingKategori is DataKategoriKendaraan) {
-            kategoriKendaraanId = matchingKategori.kategoriKendaraanId ?? '';
-          }
-        }
-        Get.toNamed(
-          Routes.REPAIR_MAINTENEN,
-          arguments: {
-            'tgl_booking': e.tglBooking ?? '',
-            'booking_id': e.bookingId.toString(),
-            'jam_booking': e.jamBooking ?? '',
-            'nama': e.nama ?? '',
-            'kategori_kendaraan_id': kategoriKendaraanId,
-            'kategori_kendaraan': e.kategoriKendaraan ?? '',
-            'kode_booking': e.kodeBooking ?? '',
-            'nama_jenissvc': e.namaService ?? '',
-            'no_polisi': e.noPolisi ?? '',
-            'tahun': e.tahun ?? '',
-            'warna': e.warna ?? '',
-            'keluhan': e.keluhan ?? '',
-            'kode_kendaraan': e.kodeKendaraan ?? '',
-            'kode_pelanggan': e.kodePelanggan ?? '',
-            'ho': e.nama ?? '',
-            'kode_booking': e.kodeBooking ?? '',
-            'nama_merk': e.namaMerk ?? '',
-            'transmisi': e.transmisi ?? '',
-            'nama_tipe': e.namaTipe ?? '',
-            'alamat': e.alamat ?? '',
+            'booking_id': e.bookingId ?? '',
             'status': e.bookingStatus ?? '',
           },
         );
       }
     } else {
-      print('Status atau namaJenissvc bernilai null');
+      print('Booking status atau namaService bernilai null');
     }
   }
 
@@ -414,29 +360,8 @@ class _BokingView2State extends State<BokingView2> {
                     child: Loadingshammer(),
                   );
                 } else if (snapshot.hasError) {
-                  return Container(
-                    height: 500,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          'assets/icons/booking.png',
-                          width: 100.0,
-                          height: 100.0,
-                          fit: BoxFit.cover,
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Text(
-                          'Belum ada data Booking',
-                          style: TextStyle(
-                              color: MyColors.appPrimaryColor,
-                              fontWeight: FontWeight.bold),
-                        )
-                      ],
-                    ),
+                  return SingleChildScrollView(
+                    child: Loadingshammer(),
                   );
                 } else if (snapshot.hasData) {
                   Boking getDataAcc = snapshot.data!;
@@ -596,6 +521,8 @@ class _BokingView2State extends State<BokingView2> {
                                   if (e.namaService!.toLowerCase() == 'repair & maintenance') {
                                     Get.toNamed(Routes.REPAIR_MAINTENEN, arguments: arguments);
                                   } else if (e.namaService!.toLowerCase() == 'periodical maintenance') {
+                                    Get.toNamed(Routes.REPAIR_MAINTENEN, arguments: arguments);
+                                  } else if (e.namaService!.toLowerCase() == 'Warranty') {
                                     Get.toNamed(Routes.REPAIR_MAINTENEN, arguments: arguments);
                                   } else if (e.namaService!.toLowerCase() == 'general check up/p2h') {
                                     Get.toNamed(Routes.GENERAL_CHECKUP, arguments: arguments);

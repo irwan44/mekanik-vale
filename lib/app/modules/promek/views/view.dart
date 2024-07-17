@@ -49,7 +49,14 @@ class _StackOverState extends State<StackOver>
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const loadcabang();
                   } else if (snapshot.hasError) {
-                    return const loadcabang();
+                    return const Text(
+                      'tidak ada koneksi',
+                      style: const TextStyle(
+                        color: Colors.grey,
+                        fontSize: 15.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    );
                   } else {
                     if (snapshot.data != null) {
                       final cabang = snapshot.data!.data?.cabang ?? "";

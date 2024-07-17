@@ -98,7 +98,14 @@ class _HistoryView2State extends State<HistoryView2> with SingleTickerProviderSt
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const loadcabang();
                   } else if (snapshot.hasError) {
-                    return const Text('Error');
+                    return const Text(
+                      'tidak ada koneksi',
+                      style: const TextStyle(
+                        color: Colors.grey,
+                        fontSize: 15.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    );
                   } else {
                     if (snapshot.data != null) {
                       final cabang = snapshot.data!.data?.cabang ?? "";
@@ -202,7 +209,7 @@ class _HistoryView2State extends State<HistoryView2> with SingleTickerProviderSt
                   }
                 } else {
                   return Center(
-                    child: CircularProgressIndicator(),
+                    child: loadsearch(),
                   );
                 }
               },
@@ -293,9 +300,7 @@ class _HistoryView2State extends State<HistoryView2> with SingleTickerProviderSt
                         if (snapshot.connectionState == ConnectionState.waiting) {
                           return const LoadingshammerHistory();
                         } else if (snapshot.hasError) {
-                          return Center(
-                            child: Text('Error: ${snapshot.error}'),
-                          );
+                          return LoadingshammerHistory();
                         } else if (snapshot.hasData) {
                           final data = snapshot.data!.dataHistory ?? [];
                           List<DataHistory> filteredData = [];

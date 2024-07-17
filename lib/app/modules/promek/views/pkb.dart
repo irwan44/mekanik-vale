@@ -398,30 +398,7 @@ class _PKBlistState extends State<PKBlist>
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Center(child: Loadingshammer());
                   } else if (snapshot.hasError) {
-                    return Container(
-                      height: 500,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            'assets/icons/booking.png',
-                            width: 100.0,
-                            height: 100.0,
-                            fit: BoxFit.cover,
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          Text(
-                            'Belum ada data PKB',
-                            style: TextStyle(
-                                color: MyColors.appPrimaryColor,
-                                fontWeight: FontWeight.bold),
-                          )
-                        ],
-                      ),
-                    );
+                    return Center(child: Loadingshammer());
                   } else if (!snapshot.hasData ||
                       (snapshot.data as PKB).dataPKB == null ||
                       (snapshot.data as PKB).dataPKB!.isEmpty) {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:shimmer_animation/shimmer_animation.dart';
 
 import '../../../componen/color.dart';
 import '../../../data/data_endpoint/bookingmasuk.dart';
@@ -67,7 +68,46 @@ class StatsGrid extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return _buildLoadingCard(color);
           } else if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}');
+            return Shimmer(
+                child:
+              Container(
+              margin: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(10.0),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    'Tidak ada Internet',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 15.0,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  Text(
+                    'Hari ini',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    '0',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              ),
+            );
           } else {
             var data = snapshot.data;
             var count = '0';
@@ -142,7 +182,46 @@ class StatsGrid extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return _buildLoadingCard(color);
           } else if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}');
+            return Shimmer(
+              child:
+              Container(
+                margin: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(10.0),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      'Tidak ada Internet',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 15.0,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      'Hari ini',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      '0',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
           } else {
             var data = snapshot.data;
             var count = '0';
