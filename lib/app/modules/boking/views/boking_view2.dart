@@ -159,7 +159,12 @@ class _BokingView2State extends State<BokingView2> {
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 12,
-      child: Scaffold(
+      child: WillPopScope(
+        onWillPop: () async {
+    Get.toNamed(Routes.HOME);
+      return true;
+    },
+    child: Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
           surfaceTintColor: Colors.transparent,
@@ -336,6 +341,7 @@ class _BokingView2State extends State<BokingView2> {
             _buildTabContent('cancel booking'),
           ],
         ),
+      ),
       ),
     );
   }

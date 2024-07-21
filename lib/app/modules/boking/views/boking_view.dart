@@ -160,7 +160,7 @@ class _BokingView2State extends State<BokingView2> {
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 12,
-      child: Scaffold(
+      child:  Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
           surfaceTintColor: Colors.transparent,

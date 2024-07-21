@@ -72,12 +72,12 @@ android {
     defaultConfig {
         applicationId "com.bengkelly.mekanik.co.id"
         minSdkVersion 21
-        targetSdkVersion 33
+        targetSdkVersion 34
         versionCode versionCodeGlobal
         versionName flutterVersionName
         multiDexEnabled true
         ndk {
-            abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
+            abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64", "armeabi"
         }
     }
 

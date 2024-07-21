@@ -99,6 +99,7 @@ class DataSvc {
   int? faktur;
   int? deleted;
   int? notab;
+  int? planning;
   String? statusApproval;
   String? createdBy;
   String? createdByPkb;
@@ -120,10 +121,11 @@ class DataSvc {
   String? kategoriKendaraan;
   String? jenisKontrak;
   String? jenisUnit;
-  String? idPicPerusahaan;
-  String? picIdPelanggan;
+  int? idPicPerusahaan;
+  int? picIdPelanggan;
   int? idCustomer;
   String? vinNumber;
+  String? expiredStnk;
   String? nama;
   String? alamat;
   String? telp;
@@ -143,6 +145,7 @@ class DataSvc {
   String? otp;
   String? otpExpiry;
   String? gambar;
+  String? fcmToken;
   String? namaMerk;
   String? namaTipe;
   String? namaCabang;
@@ -189,6 +192,7 @@ class DataSvc {
         this.faktur,
         this.deleted,
         this.notab,
+        this.planning,
         this.statusApproval,
         this.createdBy,
         this.createdByPkb,
@@ -214,6 +218,7 @@ class DataSvc {
         this.picIdPelanggan,
         this.idCustomer,
         this.vinNumber,
+        this.expiredStnk,
         this.nama,
         this.alamat,
         this.telp,
@@ -233,6 +238,7 @@ class DataSvc {
         this.otp,
         this.otpExpiry,
         this.gambar,
+        this.fcmToken,
         this.namaMerk,
         this.namaTipe,
         this.namaCabang,
@@ -279,6 +285,7 @@ class DataSvc {
     faktur = json['faktur'];
     deleted = json['deleted'];
     notab = json['notab'];
+    planning = json['planning'];
     statusApproval = json['status_approval'];
     createdBy = json['created_by'];
     createdByPkb = json['created_by_pkb'];
@@ -304,6 +311,7 @@ class DataSvc {
     picIdPelanggan = json['pic_id_pelanggan'];
     idCustomer = json['id_customer'];
     vinNumber = json['vin_number'];
+    expiredStnk = json['expired_stnk'];
     nama = json['nama'];
     alamat = json['alamat'];
     telp = json['telp'];
@@ -323,6 +331,7 @@ class DataSvc {
     otp = json['otp'];
     otpExpiry = json['otp_expiry'];
     gambar = json['gambar'];
+    fcmToken = json['fcm_token'];
     namaMerk = json['nama_merk'];
     namaTipe = json['nama_tipe'];
     namaCabang = json['nama_cabang'];
@@ -371,6 +380,7 @@ class DataSvc {
     data['faktur'] = this.faktur;
     data['deleted'] = this.deleted;
     data['notab'] = this.notab;
+    data['planning'] = this.planning;
     data['status_approval'] = this.statusApproval;
     data['created_by'] = this.createdBy;
     data['created_by_pkb'] = this.createdByPkb;
@@ -396,6 +406,7 @@ class DataSvc {
     data['pic_id_pelanggan'] = this.picIdPelanggan;
     data['id_customer'] = this.idCustomer;
     data['vin_number'] = this.vinNumber;
+    data['expired_stnk'] = this.expiredStnk;
     data['nama'] = this.nama;
     data['alamat'] = this.alamat;
     data['telp'] = this.telp;
@@ -415,6 +426,7 @@ class DataSvc {
     data['otp'] = this.otp;
     data['otp_expiry'] = this.otpExpiry;
     data['gambar'] = this.gambar;
+    data['fcm_token'] = this.fcmToken;
     data['nama_merk'] = this.namaMerk;
     data['nama_tipe'] = this.namaTipe;
     data['nama_cabang'] = this.namaCabang;
@@ -422,87 +434,88 @@ class DataSvc {
     return data;
   }
 }
-class DetailSparepart {
-int? id;
-String? kodeSvc;
-String? kodeSparepart;
-String? namaSparepart;
-int? qtySparepart;
-int? hargaSparepart;
-int? diskonSparepart;
-String? hidSparepart;
-int? nota;
-int? pengajuan;
-String? createdAt;
-String? updatedAt;
-String? kodeMaster;
-String? kode;
-int? kode2;
-String? nama;
-String? divisi;
-String? brand;
-int? qty;
-int? hargaBeli;
-int? hargaJual;
-String? barcode;
-String? satuan;
-String? noStock;
-String? lokasi;
-String? note;
-String? tipe;
-String? kodeSupplier;
-int? qtyMin;
-int? qtyMax;
-String? ukuran;
-String? kualitas;
-int? demandBulanan;
-String? emergency;
-String? jenis;
-int? deleted;
-String? createdBy;
-String? gudang;
-int? cabangId;
 
-DetailSparepart(
-    {this.id,
-      this.kodeSvc,
-      this.kodeSparepart,
-      this.namaSparepart,
-      this.qtySparepart,
-      this.hargaSparepart,
-      this.diskonSparepart,
-      this.hidSparepart,
-      this.nota,
-      this.pengajuan,
-      this.createdAt,
-      this.updatedAt,
-      this.kodeMaster,
-      this.kode,
-      this.kode2,
-      this.nama,
-      this.divisi,
-      this.brand,
-      this.qty,
-      this.hargaBeli,
-      this.hargaJual,
-      this.barcode,
-      this.satuan,
-      this.noStock,
-      this.lokasi,
-      this.note,
-      this.tipe,
-      this.kodeSupplier,
-      this.qtyMin,
-      this.qtyMax,
-      this.ukuran,
-      this.kualitas,
-      this.demandBulanan,
-      this.emergency,
-      this.jenis,
-      this.deleted,
-      this.createdBy,
-      this.gudang,
-      this.cabangId});
+class DetailSparepart {
+  int? id;
+  String? kodeSvc;
+  String? kodeSparepart;
+  String? namaSparepart;
+  int? qtySparepart;
+  int? hargaSparepart;
+  int? diskonSparepart;
+  String? hidSparepart;
+  int? nota;
+  int? pengajuan;
+  String? createdAt;
+  String? updatedAt;
+  String? kodeMaster;
+  String? kode;
+  String? kode2;
+  String? nama;
+  String? divisi;
+  String? brand;
+  int? qty;
+  int? hargaBeli;
+  int? hargaJual;
+  String? barcode;
+  String? satuan;
+  String? noStock;
+  String? lokasi;
+  String? note;
+  String? tipe;
+  String? kodeSupplier;
+  String? qtyMin;
+  String? qtyMax;
+  String? ukuran;
+  String? kualitas;
+  int? demandBulanan;
+  String? emergency;
+  String? jenis;
+  int? deleted;
+  String? createdBy;
+  String? gudang;
+  int? cabangId;
+
+  DetailSparepart(
+      {this.id,
+        this.kodeSvc,
+        this.kodeSparepart,
+        this.namaSparepart,
+        this.qtySparepart,
+        this.hargaSparepart,
+        this.diskonSparepart,
+        this.hidSparepart,
+        this.nota,
+        this.pengajuan,
+        this.createdAt,
+        this.updatedAt,
+        this.kodeMaster,
+        this.kode,
+        this.kode2,
+        this.nama,
+        this.divisi,
+        this.brand,
+        this.qty,
+        this.hargaBeli,
+        this.hargaJual,
+        this.barcode,
+        this.satuan,
+        this.noStock,
+        this.lokasi,
+        this.note,
+        this.tipe,
+        this.kodeSupplier,
+        this.qtyMin,
+        this.qtyMax,
+        this.ukuran,
+        this.kualitas,
+        this.demandBulanan,
+        this.emergency,
+        this.jenis,
+        this.deleted,
+        this.createdBy,
+        this.gudang,
+        this.cabangId});
 
   DetailSparepart.fromJson(Map<String, dynamic> json) {
     id = json['id'];
