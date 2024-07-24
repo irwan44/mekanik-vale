@@ -474,9 +474,13 @@ class API {
   //Beda
   static Future<AbsenMasuk> AbsenMasukID({
     required String idkaryawan,
+    required String latitude,
+    required String longitude,
   }) async {
     final data = {
       "id_karyawan": idkaryawan,
+      "latitude": latitude,
+      "longitude": longitude,
     };
     try {
       final token = Publics.controller.getToken.value ?? '';

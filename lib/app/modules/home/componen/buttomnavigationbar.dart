@@ -9,10 +9,8 @@ import 'package:mekanik/app/modules/history/views/history_view.dart';
 import 'package:mekanik/app/modules/profile/views/profile_view.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
-
 import '../../../data/data_endpoint/boking.dart';
 import '../../boking/views/boking_view.dart';
-import '../../promek/views/pkb.dart';
 import '../../promek/views/view.dart';
 import '../views/home_view.dart';
 
@@ -56,14 +54,13 @@ class _HomeViewState extends State<HomeView> {
         );
         return true;
       },
-      child:
-      Scaffold(
+      child: Scaffold(
         bottomNavigationBar: isTablet
             ? null
             : CurvedNavigationBar(
           key: _bottomNavigationKey,
           index: _page,
-          items:  [
+          items: [
             CurvedNavigationBarItem(
               child: Icon(
                 Icons.home_outlined,
@@ -127,49 +124,56 @@ class _HomeViewState extends State<HomeView> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (isTablet)
-              Expanded(
-                flex: 1,
-                child: Container(
-                  color: MyColors.appPrimaryColor,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      for (int i = 0; i < 5; i++)
-                        GestureDetector(
-                          onTap: () {
-                            HapticFeedback.lightImpact();
-                            setState(() {
-                              _page = i;
-                              _pageController.animateToPage(
-                                i,
-                                duration: const Duration(milliseconds: 300),
-                                curve: Curves.linear,
-                              );
-                            });
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: Column(
-                              children: [
-                                Icon(
-                                  _getIcon(i),
-                                  color: Colors.white,
-                                ),
-                                SizedBox(height: 4),
-                                Text(
-                                  _getTitle(i),
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                              ],
-                            ),
-                          ),
+              Container(
+                width: 80,
+                color: MyColors.appPrimaryColor,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(5, (index) {
+                    bool isSelected = _page == index;
+                    return GestureDetector(
+                      onTap: () {
+                        HapticFeedback.lightImpact();
+                        setState(() {
+                          _page = index;
+                          _pageController.animateToPage(
+                            index,
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.linear,
+                          );
+                        });
+                      },
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                        decoration: BoxDecoration(
+                          color: isSelected ? Colors.white : MyColors.appPrimaryColor, // Background color
+                          borderRadius: BorderRadius.circular(12), // Radius rounded
                         ),
-                    ],
-                  ),
+                        padding: const EdgeInsets.all(12.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              _getIcon(index),
+                              color: isSelected ? MyColors.appPrimaryColor : Colors.white, // Icon color
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              _getTitle(index),
+                              style: TextStyle(
+                                color: isSelected ? MyColors.appPrimaryColor : Colors.white, // Text color
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }),
                 ),
               ),
             Expanded(
-              flex: 4,
+              flex: 1,
               child: PageView(
                 controller: _pageController,
                 onPageChanged: (index) {
@@ -191,7 +195,7 @@ class _HomeViewState extends State<HomeView> {
         appBar: AppBar(
           backgroundColor: Colors.white,
           toolbarHeight: 0,
-          systemOverlayStyle:  SystemUiOverlayStyle(
+          systemOverlayStyle: SystemUiOverlayStyle(
             statusBarColor: Colors.transparent,
             statusBarIconBrightness: Brightness.dark,
             statusBarBrightness: Brightness.light,

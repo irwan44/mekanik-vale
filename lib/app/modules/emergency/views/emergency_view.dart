@@ -291,7 +291,6 @@ class _EmergencyViewState extends State<EmergencyView> {
             polylines: Set<Polyline>.of(_polylines),
             onMapCreated: (controller) {
               _controller = controller;
-
               setState(() {
                 _markers.add(
                   Marker(
@@ -519,6 +518,7 @@ class _EmergencyViewState extends State<EmergencyView> {
                 ),
                 const SizedBox(height: 10,),
                 const CardEmergencyPKB(),
+                const SizedBox(height: 40,),
                 // Add more CardEmergencyPKB() widgets here if needed
               ],
             ),

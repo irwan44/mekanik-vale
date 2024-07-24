@@ -324,9 +324,9 @@ class _PKBlistState extends State<PKBlist>
                     ),
                     child: Row(children: [
                       SizedBox(width: 10,),
-                        Icon(Icons.search_rounded, color: MyColors.appPrimaryColor,),
+                      Icon(Icons.search_rounded, color: MyColors.appPrimaryColor,),
                       SizedBox(width: 10,),
-                      Text('Pencarian PKB Service',  style: TextStyle(fontSize: 14, color: MyColors.appPrimaryColor),)
+                      Text('Pencarian PKB Service',  style: TextStyle(fontSize: 14, color: Colors.black54),)
                     ],),
                   ),
                 );
@@ -376,7 +376,7 @@ class _PKBlistState extends State<PKBlist>
                   SizedBox(width: 10,),
                   Icon(Icons.search_rounded, color: MyColors.appPrimaryColor,),
                   SizedBox(width: 10,),
-                  Text('Pencarian PKB Service',  style: TextStyle(fontSize: 14, color: MyColors.appPrimaryColor),)
+                  Text('Pencarian PKB Service',  style: TextStyle(fontSize: 14, color: Colors.black54),)
                 ],),
               );
             }
@@ -462,6 +462,7 @@ class _PKBlistState extends State<PKBlist>
                   }
                 },
               ),
+              SizedBox(height: 170,)
             ],
           ),
         ),

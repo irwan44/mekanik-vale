@@ -1,24 +1,25 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:mekanik/app/componen/color.dart';
-import 'package:mekanik/app/data/data_endpoint/abseninfo.dart';
 import 'package:mekanik/app/data/data_endpoint/absenhistory.dart';
 import 'package:mekanik/app/data/data_endpoint/profile.dart';
 import 'package:mekanik/app/data/endpoint.dart';
 import 'package:mekanik/app/modules/home/controllers/home_controller.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
 
-import '../../../routes/app_pages.dart';
 import 'listhistory/absensekarang.dart';
-import 'listhistory/indikator.dart';
 import 'listhistory/listhistoryabsen.dart';
 import 'listhistory/tombolabsen.dart';
 import 'listhistory/tombolabsenpulang.dart';
@@ -39,6 +40,85 @@ class _AbsenViewState extends State<AbsenView> {
   String idkaryawan = '';
   final controller = Get.put(HomeController());
   final _refreshController = RefreshController();
+  String _currentAddress = 'Mengambil lokasi...';
+  TextEditingController locationController = TextEditingController();
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+  FlutterLocalNotificationsPlugin();
+  Position? _currentPosition;
+  Future<void> _getCurrentLocation() async {
+    try {
+      _currentPosition = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      print('Current position: Latitude: ${_currentPosition!.latitude}, Longitude: ${_currentPosition!.longitude}');
+
+      // Lakukan pemeriksaan fake GPS dengan lebih teliti
+      bool isFake = await _checkFakeGPS(_currentPosition!);
+
+      if (isFake) {
+        // Menampilkan pesan hanya setelah pemeriksaan mendalam
+        Get.snackbar('Warning', 'Fake GPS detected', snackPosition: SnackPosition.TOP, backgroundColor: Colors.red, colorText: Colors.white);
+        return;
+      }
+
+      _getAddressFromLatLng();
+      locationController.text = '${_currentPosition!.latitude},${_currentPosition!.longitude}';
+    } catch (e) {
+      print('Error getting current location: $e');
+      Get.snackbar('Error', 'Error getting current location', snackPosition: SnackPosition.BOTTOM);
+    }
+  }
+
+  Future<bool> _checkFakeGPS(Position position) async {
+    // Memeriksa kecepatan yang mendekati nol
+    if (position.speed <= 0) {
+      // Periksa konsistensi lokasi dalam interval waktu tertentu
+      if (await _isLocationConsistent(position)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  Future<bool> _isLocationConsistent(Position position) async {
+    // Misalnya, kita bisa menyimpan lokasi sebelumnya dan memeriksa jarak perubahannya
+    // Implementasikan logika untuk menyimpan dan memeriksa lokasi sebelumnya
+    // Jika jaraknya tidak realistis dalam waktu singkat, maka kemungkinan menggunakan fake GPS
+
+    // Placeholder untuk logika pemeriksaan konsistensi lokasi
+    // Implementasikan logika sesuai dengan kebutuhan Anda
+    return true; // Misalnya selalu menganggap konsisten; ganti dengan logika sebenarnya
+  }
+
+  Future<void> _getAddressFromLatLng() async {
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(_currentPosition!.latitude, _currentPosition!.longitude);
+      Placemark place = placemarks[0];
+      setState(() {
+        _currentAddress = "${place.locality}, ${place.subAdministrativeArea}";
+      });
+    } catch (e) {
+      print('Error getting address: $e');
+      Get.snackbar('Error', 'Error getting address', snackPosition: SnackPosition.BOTTOM);
+    }
+  }
+
+  Future<void> _checkPermissions() async {
+    var status = await Permission.location.status;
+    print('Permission status: $status');
+    if (status.isGranted) {
+      print('Permission already granted');
+      await _getCurrentLocation();
+    } else {
+      var requestedStatus = await Permission.location.request();
+      print('Requested permission status: $requestedStatus');
+      if (requestedStatus.isGranted) {
+        print('Permission granted');
+        await _getCurrentLocation();
+      } else {
+        print('Permission denied');
+        Get.snackbar('Error', 'Permission denied', snackPosition: SnackPosition.BOTTOM);
+      }
+    }
+  }
 
   @override
   void initState() {
@@ -46,8 +126,29 @@ class _AbsenViewState extends State<AbsenView> {
     _updateTime();
     _fetchAbsenInfo();
     _fetchidkaryawan();
+    _checkPermissions();
+    _checkPermissionsfile();
+    _requestNotificationPermission();
+    _initializeNotifications();
+  }
+  Future<void> _requestNotificationPermission() async {
+    PermissionStatus status = await Permission.notification.status;
+    if (!status.isGranted) {
+      await Permission.notification.request();
+    }
   }
 
+  Future<void> _initializeNotifications() async {
+    const AndroidInitializationSettings initializationSettingsAndroid =
+    AndroidInitializationSettings('@mipmap/ic_launcher');
+
+
+
+    const InitializationSettings initializationSettings = InitializationSettings(
+        android: initializationSettingsAndroid);
+
+    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  }
   @override
   void dispose() {
     super.dispose();
@@ -125,9 +226,6 @@ class _AbsenViewState extends State<AbsenView> {
     }
   }
 
-
-
-
   void _fetchAbsenInfo() async {
     try {
       final absen = await API.AbsenHistoryID(idkaryawan: idkaryawan);
@@ -167,6 +265,16 @@ class _AbsenViewState extends State<AbsenView> {
       _currentDate = DateFormat('EEEE, d MMMM y').format(now);
     });
   }
+  Future<void> _checkPermissionsfile() async {
+    var status = await Permission.storage.status;
+    if (status.isGranted) {
+    } else {
+      var requestedStatus = await Permission.storage.request();
+      if (requestedStatus.isGranted) {
+      } else {
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -186,7 +294,7 @@ class _AbsenViewState extends State<AbsenView> {
         ),
         body: Container(
           padding: const EdgeInsets.all(20),
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             image: DecorationImage(
               image: AssetImage("assets/bgabsen.png"),
               fit: BoxFit.cover,
@@ -212,68 +320,100 @@ class _AbsenViewState extends State<AbsenView> {
                   const SizedBox(height: 20,),
                   Row(
                     children: [
-                      Stack(
-                        alignment: const Alignment(0.9, 0.9),
-                        children: <Widget>[
-                          const CircleAvatar(
-                            backgroundImage: AssetImage("assets/avatar.png"),
-                            radius: 20.0,
+                      Row(
+                        children: [
+                          Stack(
+                            alignment: const Alignment(0.9, 0.9),
+                            children: <Widget>[
+                              const CircleAvatar(
+                                backgroundImage: AssetImage("assets/avatar.png"),
+                                radius: 20.0,
+                              ),
+                              Container(
+                                height: 10,
+                                width: 10,
+                                alignment: Alignment.bottomRight,
+                                child: Image.asset("assets/success_logo.png"),
+                              ),
+                            ],
                           ),
-                          Container(
-                            height: 10,
-                            width: 10,
-                            alignment: Alignment.bottomRight,
-                            child: Image.asset("assets/success_logo.png"),
+                          const SizedBox(width: 10,),
+                          FutureBuilder<Profile>(
+                            future: API.profileiD(),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                return const CircularProgressIndicator();
+                              } else if (snapshot.hasError) {
+                                return Text('Error: ${snapshot.error}');
+                              } else {
+                                if (snapshot.data != null) {
+                                  final nama = snapshot.data!.data?.namaKaryawan ?? "";
+                                  final hp = snapshot.data!.data?.hp ?? "";
+                                  return Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        nama,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Text(
+                                        hp,
+                                        style: const TextStyle(
+                                          fontSize: 15.0,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.normal,
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                } else {
+                                  return const Text('Tidak ada data');
+                                }
+                              }
+                            },
                           ),
                         ],
                       ),
-                      const SizedBox(width: 10,),
-                      FutureBuilder<Profile>(
-                        future: API.profileiD(),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
-                            return const CircularProgressIndicator();
-                          } else if (snapshot.hasError) {
-                            return Text('Error: ${snapshot.error}');
-                          } else {
-                            if (snapshot.data != null) {
-                              final nama = snapshot.data!.data?.namaKaryawan ?? "";
-                              final hp = snapshot.data!.data?.hp ?? "";
-                              return Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    nama,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Text(
-                                    hp,
-                                    style: const TextStyle(
-                                      fontSize: 15.0,
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.normal,
-                                    ),
-                                  ),
-                                ],
-                              );
-                            } else {
-                              return const Text('Tidak ada data');
-                            }
-                          }
-                        },
-                      ),
                     ],
+                  ),
+                  SizedBox(height: 10,),
+                  Text(
+                    _currentAddress,
+                    style: GoogleFonts.nunito(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 10,),
+                  Container(
+                    width: double.infinity,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Penting !!', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),),
+                        Text('Bila anda mencoba menggunakan fake GPS maka absen tidak berfungsi.', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 9),),
+                        Text('Bila anda mencoba menggubah tanggal dan jam pada settingan Smartphone anda absen tidak berfungsi.',  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 9),),
+                      ],
+                    ),
                   ),
                   const SizedBox(height : 30,),
                   Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20)
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.1),
+                          spreadRadius: 5,
+                          blurRadius: 10,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
                     ),
                     child: Column(
                       children: [
@@ -353,7 +493,7 @@ class _AbsenViewState extends State<AbsenView> {
                         ),
                         Text(
                           '$_currentDate',
-                          style: TextStyle(fontSize: 20, color: MyColors.appPrimaryColor),
+                          style: TextStyle(fontSize: 20, color: Colors.white),
                         ),
                         const SizedBox(height: 10,),
                         Container(
@@ -431,31 +571,65 @@ class _AbsenViewState extends State<AbsenView> {
                                           borderRadius: BorderRadius.all(Radius.circular(10)),
                                         ),
                                         child: ElevatedButton(
-                                          onPressed: ()  async {
-                                            var response = await API.AbsenMasukID(idkaryawan: idkaryawan);
-                                            if (response.status == 'success') {
-                                              setState(() {
-                                                isButtonDisabled = true;
-                                              });
-                                              QuickAlert.show(
-                                                context: context,
-                                                type: QuickAlertType.success,
-                                                text: 'Berhasil Absen',
-                                                onConfirmBtnTap: () {
-                                                  Navigator.pop(context);
-                                                },
+                                          onPressed: isButtonDisabled ? null : () async {
+                                            try {
+                                              // Mendapatkan posisi saat ini
+                                              _currentPosition = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+
+                                              // Mencetak nilai latitude dan longitude
+                                              print('response latitude : ${_currentPosition?.latitude.toString() ?? ''}');
+                                              print('response longitude : ${_currentPosition?.longitude.toString() ?? ''}');
+
+                                              // Lakukan postmeridian fake GPS
+                                              if (await _checkFakeGPS(_currentPosition!)) {
+                                                Get.snackbar(
+                                                  'Warning',
+                                                  'Fake GPS detected! Cannot proceed with Absen Masuk.',
+                                                  snackPosition: SnackPosition.TOP,
+                                                  backgroundColor: Colors.red,
+                                                  colorText: Colors.white,
+                                                );
+                                                setState(() {
+                                                  isButtonDisabled = true; // Nonaktifkan tombol jika terdeteksi fake GPS
+                                                });
+                                                return;
+                                              }
+
+                                              // Mengirim data ke API
+                                              var response = await API.AbsenMasukID(
+                                                  idkaryawan: 'idkaryawan', // Ganti dengan idkaryawan yang sesuai
+                                                  latitude: _currentPosition?.latitude.toString() ?? '',
+                                                  longitude: _currentPosition?.longitude.toString() ?? ''
                                               );
-                                              _initializeButtonState();
-                                            } else {
-                                              QuickAlert.show(
-                                                context: context,
-                                                type: QuickAlertType.error,
-                                                text: response.message,
-                                              );
+
+                                              // Menangani hasil dari API
+                                              if (response.status == 'success') {
+                                                setState(() {
+                                                  isButtonDisabled = true;
+                                                });
+                                                QuickAlert.show(
+                                                  context: context,
+                                                  type: QuickAlertType.success,
+                                                  text: 'Berhasil Absen',
+                                                  onConfirmBtnTap: () {
+                                                    Navigator.pop(context);
+                                                  },
+                                                );
+                                                _initializeButtonState();
+                                              } else {
+                                                QuickAlert.show(
+                                                  context: context,
+                                                  type: QuickAlertType.error,
+                                                  text: response.message,
+                                                );
+                                              }
+                                            } catch (e) {
+                                              print('Error getting current location or processing request: $e');
+                                              Get.snackbar('Absen anda gagal', 'Jangankauan Absen anda jauh dari Lokasi', snackPosition: SnackPosition.TOP, colorText: Colors.white, backgroundColor: Colors.red);
                                             }
                                           },
                                           style: ElevatedButton.styleFrom(
-                                            backgroundColor: MyColors.appPrimaryColor,
+                                            backgroundColor: isButtonDisabled ? Colors.grey : MyColors.appPrimaryColor,
                                             shape: RoundedRectangleBorder(
                                               borderRadius: BorderRadius.circular(10),
                                             ),
@@ -468,6 +642,209 @@ class _AbsenViewState extends State<AbsenView> {
                                               color: Colors.white,
                                             ),
                                           ),
+                                        ),
+
+                                      );
+                                    }
+                                  } else {
+                                    return SizedBox(
+                                      height: Get.height - 250,
+                                      child: const SingleChildScrollView(
+                                        child: Column(
+                                          children: [],
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                },
+                              ),
+                              FutureBuilder(
+                                future: API.AbsenHistoryID(idkaryawan: idkaryawan),
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasData &&
+                                      snapshot.connectionState != ConnectionState.waiting &&
+                                      snapshot.data != null) {
+                                    AbsenHistory getDataAcc = snapshot.data!;
+                                    final currentTime = DateTime.now();
+                                    HistoryAbsen? matchingAbsen;
+
+                                    if (getDataAcc.historyAbsen != null && getDataAcc.historyAbsen!.isNotEmpty) {
+                                      for (var e in getDataAcc.historyAbsen!) {
+                                        if (e.jamKeluar != null && e.tglAbsen != null) {
+                                          final dateStr = e.tglAbsen!;
+                                          final timeStr = e.jamKeluar!;
+                                          final dateTimeStr = '$dateStr $timeStr';
+                                          try {
+                                            final jamMasuk = DateFormat('yyyy-MM-dd HH:mm').parse(dateTimeStr);
+
+                                            // Compare date and hours
+                                            final isSameDay = jamMasuk.year == currentTime.year &&
+                                                jamMasuk.month == currentTime.month &&
+                                                jamMasuk.day == currentTime.day;
+
+                                            if (isSameDay && (jamMasuk.hour == currentTime.hour || jamMasuk.isBefore(currentTime))) {
+                                              matchingAbsen = e;
+                                              break;
+                                            }
+                                          } catch (e) {
+                                            // Handle parsing error if necessary
+                                          }
+                                        }
+                                      }
+                                    }
+
+                                    if (matchingAbsen != null) {
+                                      final timeStr = matchingAbsen.jamKeluar!;
+                                      final jamMasuk = DateFormat('HH:mm').parse(timeStr);
+                                      return Column(
+                                        children: AnimationConfiguration.toStaggeredList(
+                                          duration: const Duration(milliseconds: 475),
+                                          childAnimationBuilder: (widget) => SlideAnimation(
+                                            child: FadeInAnimation(
+                                              child: widget,
+                                            ),
+                                          ),
+                                          children: [
+                                            HistoryAbsensiTombolPulang(
+                                              items: matchingAbsen,
+                                              jamMasuk: DateFormat('HH:mm').format(jamMasuk),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    } else {
+                                      return Container(
+                                        decoration: const BoxDecoration(
+                                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                                        ),
+                                        child: FutureBuilder(
+                                          future: API.AbsenHistoryID(idkaryawan: idkaryawan),
+                                          builder: (context, snapshot) {
+                                            if (snapshot.connectionState == ConnectionState.waiting) {
+                                              return ElevatedButton(
+                                                onPressed: () async {},
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: Colors.grey.shade200,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(10),
+                                                  ),
+                                                ),
+                                                child: Text(
+                                                  'Absen Pulang',
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: MyColors.appPrimaryColor,
+                                                  ),
+                                                ),
+                                              );
+                                            } else if (snapshot.hasError) {
+                                              return Text('Error: ${snapshot.error}');
+                                            } else if (!snapshot.hasData || snapshot.data == null) {
+                                              return SizedBox(
+                                                height: Get.height - 250,
+                                                child: SingleChildScrollView(
+                                                  child: Column(
+                                                    children: [],
+                                                  ),
+                                                ),
+                                              );
+                                            } else {
+                                              AbsenHistory getDataAcc = snapshot.data!;
+                                              if (getDataAcc.historyAbsen == null || getDataAcc.historyAbsen!.isEmpty) {
+                                                return ElevatedButton(
+                                                  onPressed: () async {},
+                                                  style: ElevatedButton.styleFrom(
+                                                    backgroundColor: MyColors.appPrimaryColor,
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius: BorderRadius.circular(10),
+                                                    ),
+                                                  ),
+                                                  child: const Text(
+                                                    'Absen Pulang',
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight: FontWeight.bold,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                );
+                                              }
+                                              var itemId = getDataAcc.historyAbsen!.first.id; // Example: getting the first item's id
+                                              return ElevatedButton(
+                                                onPressed: isButtonDisabledpulang || itemId == null ? null : () async {
+                                                  QuickAlert.show(
+                                                    context: context,
+                                                    type: QuickAlertType.warning,
+                                                    barrierDismissible: true,
+                                                    title: 'Absen pulang untuk hari ini',
+                                                    confirmBtnText: 'Absen Pulang',
+                                                    confirmBtnColor: MyColors.appPrimaryColor,
+                                                    widget: TextFormField(
+                                                      controller: controller.catatan,
+                                                      decoration: const InputDecoration(
+                                                        alignLabelWithHint: true,
+                                                        hintText: 'catatan',
+                                                        prefixIcon: Icon(
+                                                          Icons.mail_lock_rounded,
+                                                        ),
+                                                      ),
+                                                      textInputAction: TextInputAction.next,
+                                                    ),
+                                                    onConfirmBtnTap: () async {
+                                                      Navigator.pop(Get.context!);
+                                                      if (itemId == null) {
+                                                        // Handle the case where itemId is null
+                                                        QuickAlert.show(
+                                                          context: Get.context!,
+                                                          type: QuickAlertType.error,
+                                                          text: 'ID not available',
+                                                        );
+                                                        return;
+                                                      }
+
+                                                      var response = await API.AbsenPulangID(
+                                                        id: itemId.toString(),
+                                                        keterangan: controller.catatan.text,
+                                                      );
+
+                                                      if (response.status == 'success') {
+                                                        setState(() {
+                                                          isButtonDisabledpulang = true;
+                                                        });
+                                                        QuickAlert.show(
+                                                          context: Get.context!,
+                                                          type: QuickAlertType.success,
+                                                          text: 'Berhasil Absen Pulang',
+                                                        );
+                                                      } else {
+                                                        QuickAlert.show(
+                                                          context: Get.context!,
+                                                          type: QuickAlertType.error,
+                                                          text: response.message,
+                                                        );
+                                                      }
+                                                      _initializeButtonpulangState();
+                                                    },
+                                                  );
+                                                },
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: MyColors.appPrimaryColor,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(10),
+                                                  ),
+                                                ),
+                                                child: const Text(
+                                                  'Absen Pulang',
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                          },
                                         ),
                                       );
                                     }
@@ -483,208 +860,6 @@ class _AbsenViewState extends State<AbsenView> {
                                   }
                                 },
                               ),
-                    FutureBuilder(
-                      future: API.AbsenHistoryID(idkaryawan: idkaryawan),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData &&
-                            snapshot.connectionState != ConnectionState.waiting &&
-                            snapshot.data != null) {
-                          AbsenHistory getDataAcc = snapshot.data!;
-                          final currentTime = DateTime.now();
-                          HistoryAbsen? matchingAbsen;
-
-                          if (getDataAcc.historyAbsen != null && getDataAcc.historyAbsen!.isNotEmpty) {
-                            for (var e in getDataAcc.historyAbsen!) {
-                              if (e.jamKeluar != null && e.tglAbsen != null) {
-                                final dateStr = e.tglAbsen!;
-                                final timeStr = e.jamKeluar!;
-                                final dateTimeStr = '$dateStr $timeStr';
-                                try {
-                                  final jamMasuk = DateFormat('yyyy-MM-dd HH:mm').parse(dateTimeStr);
-
-                                  // Compare date and hours
-                                  final isSameDay = jamMasuk.year == currentTime.year &&
-                                      jamMasuk.month == currentTime.month &&
-                                      jamMasuk.day == currentTime.day;
-
-                                  if (isSameDay && (jamMasuk.hour == currentTime.hour || jamMasuk.isBefore(currentTime))) {
-                                    matchingAbsen = e;
-                                    break;
-                                  }
-                                } catch (e) {
-                                  // Handle parsing error if necessary
-                                }
-                              }
-                            }
-                          }
-
-                          if (matchingAbsen != null) {
-                            final timeStr = matchingAbsen.jamKeluar!;
-                            final jamMasuk = DateFormat('HH:mm').parse(timeStr);
-                            return Column(
-                              children: AnimationConfiguration.toStaggeredList(
-                                duration: const Duration(milliseconds: 475),
-                                childAnimationBuilder: (widget) => SlideAnimation(
-                                  child: FadeInAnimation(
-                                    child: widget,
-                                  ),
-                                ),
-                                children: [
-                                  HistoryAbsensiTombolPulang(
-                                    items: matchingAbsen,
-                                    jamMasuk: DateFormat('HH:mm').format(jamMasuk),
-                                  ),
-                                ],
-                              ),
-                            );
-                          } else {
-                            return Container(
-                              decoration: const BoxDecoration(
-                                borderRadius: BorderRadius.all(Radius.circular(10)),
-                              ),
-                              child: FutureBuilder(
-                                future: API.AbsenHistoryID(idkaryawan: idkaryawan),
-                                builder: (context, snapshot) {
-                                  if (snapshot.connectionState == ConnectionState.waiting) {
-                                    return ElevatedButton(
-                                      onPressed: () async {},
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.grey.shade200,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(10),
-                                        ),
-                                      ),
-                                      child: Text(
-                                        'Absen Pulang',
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          color: MyColors.appPrimaryColor,
-                                        ),
-                                      ),
-                                    );
-                                  } else if (snapshot.hasError) {
-                                    return Text('Error: ${snapshot.error}');
-                                  } else if (!snapshot.hasData || snapshot.data == null) {
-                                    return SizedBox(
-                                      height: Get.height - 250,
-                                      child: SingleChildScrollView(
-                                        child: Column(
-                                          children: [],
-                                        ),
-                                      ),
-                                    );
-                                  } else {
-                                    AbsenHistory getDataAcc = snapshot.data!;
-                                    if (getDataAcc.historyAbsen == null || getDataAcc.historyAbsen!.isEmpty) {
-                                      return ElevatedButton(
-                                        onPressed: () async {},
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: MyColors.appPrimaryColor,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(10),
-                                          ),
-                                        ),
-                                        child: const Text(
-                                          'Absen Pulang',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      );
-                                    }
-                                    var itemId = getDataAcc.historyAbsen!.first.id; // Example: getting the first item's id
-                                    return ElevatedButton(
-                                      onPressed: isButtonDisabledpulang || itemId == null ? null : () async {
-                                        QuickAlert.show(
-                                          context: context,
-                                          type: QuickAlertType.warning,
-                                          barrierDismissible: true,
-                                          title: 'Absen pulang untuk hari ini',
-                                          confirmBtnText: 'Absen Pulang',
-                                          confirmBtnColor: MyColors.appPrimaryColor,
-                                          widget: TextFormField(
-                                            controller: controller.catatan,
-                                            decoration: const InputDecoration(
-                                              alignLabelWithHint: true,
-                                              hintText: 'catatan',
-                                              prefixIcon: Icon(
-                                                Icons.mail_lock_rounded,
-                                              ),
-                                            ),
-                                            textInputAction: TextInputAction.next,
-                                          ),
-                                          onConfirmBtnTap: () async {
-                                            Navigator.pop(Get.context!);
-                                            if (itemId == null) {
-                                              // Handle the case where itemId is null
-                                              QuickAlert.show(
-                                                context: Get.context!,
-                                                type: QuickAlertType.error,
-                                                text: 'ID not available',
-                                              );
-                                              return;
-                                            }
-
-                                            var response = await API.AbsenPulangID(
-                                              id: itemId.toString(),
-                                              keterangan: controller.catatan.text,
-                                            );
-
-                                            if (response.status == 'success') {
-                                              setState(() {
-                                                isButtonDisabledpulang = true;
-                                              });
-                                              QuickAlert.show(
-                                                context: Get.context!,
-                                                type: QuickAlertType.success,
-                                                text: 'Berhasil Absen Pulang',
-                                              );
-                                            } else {
-                                              QuickAlert.show(
-                                                context: Get.context!,
-                                                type: QuickAlertType.error,
-                                                text: response.message,
-                                              );
-                                            }
-                                            _initializeButtonpulangState();
-                                          },
-                                        );
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: MyColors.appPrimaryColor,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(10),
-                                        ),
-                                      ),
-                                      child: const Text(
-                                        'Absen Pulang',
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                },
-                              ),
-                            );
-                          }
-                        } else {
-                          return SizedBox(
-                            height: Get.height - 250,
-                            child: const SingleChildScrollView(
-                              child: Column(
-                                children: [],
-                              ),
-                            ),
-                          );
-                        }
-                      },
-                    ),
                             ],
                           ),
                         ),
@@ -704,6 +879,7 @@ class _AbsenViewState extends State<AbsenView> {
                             ],
                           ),
                         ),
+                        SizedBox(height: 10,),
                         FutureBuilder(
                           future: API.AbsenHistoryID(idkaryawan: idkaryawan),
                           builder: (context, snapshot) {

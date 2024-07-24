@@ -6,7 +6,7 @@ class DetailHistory {
   List<DataSvcDtlPart>? dataSvcDtlPart;
   List<DataSvcDtlJasa>? dataSvcDtlJasa;
   List<Null>? paket;
-  Null? deskripsiMembership;
+  String? deskripsiMembership;
 
   DetailHistory(
       {this.status,
@@ -119,6 +119,7 @@ class DataSvc {
   int? faktur;
   int? deleted;
   int? notab;
+  int? planning;
   String? statusApproval;
   String? createdBy;
   String? createdByPkb;
@@ -210,6 +211,7 @@ class DataSvc {
         this.faktur,
         this.deleted,
         this.notab,
+        this.planning,
         this.statusApproval,
         this.createdBy,
         this.createdByPkb,
@@ -301,6 +303,7 @@ class DataSvc {
     faktur = json['faktur'];
     deleted = json['deleted'];
     notab = json['notab'];
+    notab = json['planning'];
     statusApproval = json['status_approval'];
     createdBy = json['created_by'];
     createdByPkb = json['created_by_pkb'];
@@ -394,6 +397,7 @@ class DataSvc {
     data['faktur'] = this.faktur;
     data['deleted'] = this.deleted;
     data['notab'] = this.notab;
+    data['planning'] = this.planning;
     data['status_approval'] = this.statusApproval;
     data['created_by'] = this.createdBy;
     data['created_by_pkb'] = this.createdByPkb;
@@ -462,7 +466,7 @@ class DataSvcDtlPart {
   String? updatedAt;
   String? kodeMaster;
   String? kode;
-  int? kode2;
+  String? kode2;
   String? nama;
   String? divisi;
   String? brand;
@@ -487,7 +491,6 @@ class DataSvcDtlPart {
   String? createdBy;
   String? gudang;
   int? cabangId;
-
   DataSvcDtlPart(
       {this.id,
         this.kodeSvc,

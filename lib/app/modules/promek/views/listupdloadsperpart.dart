@@ -233,7 +233,7 @@ class _PKBUploadlistState extends State<PKBUploadlist>
                           SizedBox(width: 10,),
                           Icon(Icons.search_rounded, color: MyColors.appPrimaryColor,),
                           SizedBox(width: 10,),
-                          Text('Pencarian List Sperepart',  style: TextStyle(fontSize: 14, color: MyColors.appPrimaryColor),)
+                          Text('Pencarian List Sperepart',  style: TextStyle(fontSize: 14, color: Colors.black54),)
                         ],),
                       ),
                     );
@@ -258,7 +258,7 @@ class _PKBUploadlistState extends State<PKBUploadlist>
                         SizedBox(width: 10,),
                         Icon(Icons.search_rounded, color: MyColors.appPrimaryColor,),
                         SizedBox(width: 10,),
-                        Text('Pencarian List Sperepart',  style: TextStyle(fontSize: 14, color: MyColors.appPrimaryColor),)
+                        Text('Pencarian List Sperepart',  style: TextStyle(fontSize: 14, color: Colors.black54),)
                       ],),
                     );
                   }
@@ -370,6 +370,7 @@ class _PKBUploadlistState extends State<PKBUploadlist>
                   }
                 },
               ),
+              SizedBox(height: 170,)
             ],
           ),
         ),

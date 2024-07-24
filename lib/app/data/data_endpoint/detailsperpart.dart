@@ -9,16 +9,17 @@ class DetailSpertpart {
     status = json['status'];
     message = json['message'];
     dataPhotosparepart = json['dataPhotosparepart'] != null
-        ? DataPhotosparepart.fromJson(json['dataPhotosparepart'])
+        ? new DataPhotosparepart.fromJson(json['dataPhotosparepart'])
         : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = {
-      'status': status,
-      'message': message,
-      'dataPhotosparepart': dataPhotosparepart?.toJson(),
-    };
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['status'] = this.status;
+    data['message'] = this.message;
+    if (this.dataPhotosparepart != null) {
+      data['dataPhotosparepart'] = this.dataPhotosparepart!.toJson();
+    }
     return data;
   }
 }
@@ -29,31 +30,42 @@ class DataPhotosparepart {
   List<DetailSparepart>? detailSparepart;
   List<PhotoSparepart>? photoSparepart;
 
-  DataPhotosparepart({
-    this.kontak,
-    this.dataSvc,
-    this.detailSparepart,
-    this.photoSparepart,
-  });
+  DataPhotosparepart(
+      {this.kontak, this.dataSvc, this.detailSparepart, this.photoSparepart});
 
   DataPhotosparepart.fromJson(Map<String, dynamic> json) {
-    kontak = json['kontak'] != null ? List<String>.from(json['kontak']) : null;
-    dataSvc = json['data_svc'] != null ? DataSvc.fromJson(json['data_svc']) : null;
-    detailSparepart = json['detailSparepart'] != null
-        ? List<DetailSparepart>.from(json['detailSparepart'].map((x) => DetailSparepart.fromJson(x)))
+    kontak = json['kontak'].cast<String>();
+    dataSvc = json['data_svc'] != null
+        ? new DataSvc.fromJson(json['data_svc'])
         : null;
-    photoSparepart = json['photoSparepart'] != null
-        ? List<PhotoSparepart>.from(json['photoSparepart'].map((x) => PhotoSparepart.fromJson(x)))
-        : null;
+    if (json['detailSparepart'] != null) {
+      detailSparepart = <DetailSparepart>[];
+      json['detailSparepart'].forEach((v) {
+        detailSparepart!.add(new DetailSparepart.fromJson(v));
+      });
+    }
+    if (json['photoSparepart'] != null) {
+      photoSparepart = <PhotoSparepart>[];
+      json['photoSparepart'].forEach((v) {
+        photoSparepart!.add(new PhotoSparepart.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = {
-      'kontak': kontak,
-      'data_svc': dataSvc?.toJson(),
-      'detailSparepart': detailSparepart != null ? List<dynamic>.from(detailSparepart!.map((x) => x.toJson())) : null,
-      'photoSparepart': photoSparepart != null ? List<dynamic>.from(photoSparepart!.map((x) => x.toJson())) : null,
-    };
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['kontak'] = this.kontak;
+    if (this.dataSvc != null) {
+      data['data_svc'] = this.dataSvc!.toJson();
+    }
+    if (this.detailSparepart != null) {
+      data['detailSparepart'] =
+          this.detailSparepart!.map((v) => v.toJson()).toList();
+    }
+    if (this.photoSparepart != null) {
+      data['photoSparepart'] =
+          this.photoSparepart!.map((v) => v.toJson()).toList();
+    }
     return data;
   }
 }
@@ -121,8 +133,8 @@ class DataSvc {
   String? kategoriKendaraan;
   String? jenisKontrak;
   String? jenisUnit;
-  int? idPicPerusahaan;
-  int? picIdPelanggan;
+  String? idPicPerusahaan;
+  String? picIdPelanggan;
   int? idCustomer;
   String? vinNumber;
   String? expiredStnk;
@@ -464,8 +476,8 @@ class DetailSparepart {
   String? note;
   String? tipe;
   String? kodeSupplier;
-  String? qtyMin;
-  String? qtyMax;
+  int? qtyMin;
+  int? qtyMax;
   String? ukuran;
   String? kualitas;
   int? demandBulanan;
